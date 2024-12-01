@@ -123,6 +123,7 @@
 
 <script src="{% static 'js/phone/intlTelInput.min.js' %}"></script>
 
+{% block scripts %}
 <script>
     // Initialize the intl-tel-input plugin
     var input = document.querySelector("#phone");
@@ -204,5 +205,6 @@
         updateStatus("special", special.test(password));
     }
 </script>
+{% endblock scripts %}
 
 {% endblock content %}
