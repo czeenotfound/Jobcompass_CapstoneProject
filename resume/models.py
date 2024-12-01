@@ -17,15 +17,64 @@ def validate_file_size(value):
     limit = 5 * 1024 * 1024  # 5 MB
     if value.size > limit:
         raise ValidationError(f"File size must not exceed 5MB.")
+# Custom validator for avatar
+def validate_avatar(image):
+    # Check file size (e.g., max 2MB)
+    max_file_size = 2 * 1024 * 1024  # 2MB
+    if image.size > max_file_size:
+        raise ValidationError("Avatar file size must not exceed 2MB.")
     
+    # Check file format
+    valid_formats = ['JPEG', 'JPG', 'PNG', 'WEBP']
+    try:
+        img = Image.open(image)
+        if img.format.upper() not in valid_formats:
+            raise ValidationError(f"Unsupported file format. Use one of the following: {', '.join(valid_formats)}.")
+        
+        # Check dimensions (e.g., minimum 128x128 pixels)
+        min_width, min_height = 128, 128
+        if img.width < min_width or img.height < min_height:
+            raise ValidationError(f"Avatar dimensions must be at least {min_width}x{min_height} pixels.")
+    except Exception as e:
+        raise ValidationError("Invalid image file.") from e
+
+# Resize image function
+def resize_image(image, max_size=(1280, 1280)):
+    """
+    """
+    img = Image.open(image)
+    img = img.convert('RGB')  # Ensure compatibility for saving as JPEG
+    
+    # Check if the image exceeds the maximum dimensions
+    img.thumbnail(max_size, Image.Resampling.LANCZOS)  # Maintain aspect ratio and fit within max_size
+    
+    # Save the resized image into a buffer
+    buffer = BytesIO()
+    img.save(buffer, format='JPEG', quality=85)  # Adjust quality to reduce file size further if needed
+    buffer.seek(0)
+    return File(buffer, name=image.name)
+
 def resume_file_upload_path(instance, filename):
     ext = filename.split('.')[-1]  # Get the file extension
     filename = f"{uuid4()}.{ext}"  # Generate a unique filename
     return os.path.join('resume', filename)
 
+
+def resume_avatar_upload_path(instance, filename):
+    ext = filename.split('.')[-1]  # Get the file extension
+    filename = f"{uuid4()}.{ext}"  # Generate a unique filename
+    return os.path.join('resume-avatar', filename)
+
     
 class Resume(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(
+        upload_to=resume_avatar_upload_path,
+        null=True, 
+        default="icons8-male-user-96.png",
+        validators=[validate_avatar]  
+    )
+
     first_name = models.CharField(max_length=100, blank=True)
     middle_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)

@@ -24,9 +24,9 @@
                 <h4 for="employerSocials" class="form-label mb-3">Personal Information</h4>
                 <div class="row">
                     <div class="col-3 d-flex align-items-center justify-content-center">
-                        {% if avatar_phone_form.avatar.value %}
+                        {% if form.avatar.value %}
                             <div class="mb-2 row">
-                                <img src="{{ avatar_phone_form.avatar.value.url }}" alt="Current Avatar" class="img-fluid rounded-circle" style="max-width: 150px; max-height: 150px;">
+                                <img src="{{ form.avatar.value.url }}" alt="Current Avatar" class="img-fluid rounded-circle" style="max-width: 150px; max-height: 150px;">
                             </div>
                         {% endif %}
                     </div>
@@ -113,9 +113,6 @@
                             <br>
                             <small class="text-danger fw-bold">"Only 3 skills can be added or updated at a time. You can add another skill during your next update."</small>
                         </label>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="add-skill-btn">
-                            <i class="bi bi-plus-circle me-1"></i>Add Skill
-                        </button>
                     </div>
                     <div id="skills-container">
                         {{ skill_formset.management_form }}
@@ -151,11 +148,8 @@
                             Education 
                             <small class="text-danger ms-2">(Optional)</small>
                             <br>
-                            <small class="text-danger fw-bold">"Only 2 educations can be added or updated at a time. You can add education skill during your next update."</small>
+                            <small class="text-danger fw-bold">"Only 1 education can be added or updated at a time. You can add education skill during your next update."</small>
                         </label>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="add-education-btn">
-                            <i class="bi bi-plus-circle me-1"></i>Add Education
-                        </button>
                     </div>
                     <div id="education-container">
                         {{ education_formset.management_form }}
@@ -199,11 +193,8 @@
                         <label class="mb-0">
                             Experience 
                             <br>
-                            <small class="text-danger fw-bold">"Only 2 experiences can be added or updated at a time. You can add another experience during your next update."</small>
+                            <small class="text-danger fw-bold">"Only 1 experience can be added or updated at a time. You can add another experience during your next update."</small>
                         </label>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="add-experience-btn">
-                            <i class="bi bi-plus-circle me-1"></i>Add Experience
-                        </button>
                     </div>
                     <div id="experience-container">
                         {{ experience_formset.management_form }}
@@ -257,11 +248,8 @@
                             Certification 
                             <small class="text-danger ms-2">(Optional)</small>
                             <br>
-                            <small class="text-danger fw-bold">"Only 2 certifications can be added or updated at a time. You can add another certification during your next update."</small>
+                            <small class="text-danger fw-bold">"Only 1 certification can be added or updated at a time. You can add another certification during your next update."</small>
                         </label>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="add-certification-btn">
-                            <i class="bi bi-plus-circle me-1"></i>Add Certification
-                        </button>
                     </div>
                     <div id="certification-container">
                         {{ certification_formset.management_form }}
@@ -298,11 +286,8 @@
                             Project 
                             <small class="text-danger ms-2">(Optional)</small>
                              <br>
-                            <small class="text-danger fw-bold">"Only 2 projects can be added or updated at a time. You can add another project during your next update."</small>
+                            <small class="text-danger fw-bold">"Only 1 project can be added or updated at a time. You can add another project during your next update."</small>
                         </label>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="add-project-btn">
-                            <i class="bi bi-plus-circle me-1"></i>Add Project
-                        </button>
                     </div>
                     <div id="project-container">
                         {{ project_formset.management_form }}
@@ -347,11 +332,8 @@
                             Social Links
                             <small class="text-danger ms-2">(Optional)</small>
                             <br>
-                            <small class="text-danger fw-bold">"Only 2 socials can be added or updated at a time. You can add another social during your next update."</small>
+                            <small class="text-danger fw-bold">"Only 1 social can be added or updated at a time. You can add another social during your next update."</small>
                         </label>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="add-sociallink-btn">
-                            <i class="bi bi-plus-circle me-1"></i>Add Social link
-                        </button>
                     </div>
                     <div id="sociallink-container">
                         {{ sociallink_formset.management_form }}
@@ -365,7 +347,6 @@
                                         {{ form.platform }}
                                         {{ form.url}}
                                     </p>
-                                    
                                     {% if form.platform.errors %}
                                         <div class="text-danger">{{ form.platform.errors }}</div>
                                     {% endif %}
@@ -416,8 +397,6 @@
                 </div>
 
                 <hr>
-
-                
                 <!-- Submit Button -->
                 <div class="mt-4">
                     <button type="submit" class="btn btn-secondary w-100 p-3">Submit</button>
@@ -426,107 +405,4 @@
         </div>
     </div>
 
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const skillsContainer = document.getElementById('skills-container');
-            const addSkillBtn = document.getElementById('add-skill-btn');
-            const skillsTotalFormsInput = document.getElementById('id_skills-TOTAL_FORMS');
-            // Education dynamic addition
-            const educationContainer = document.getElementById('education-container');
-            const addEducationBtn = document.getElementById('add-education-btn');
-            const educationTotalFormsInput = document.getElementById('id_education-TOTAL_FORMS');
-
-            // Experience dynamic addition
-            const experienceContainer = document.getElementById('experience-container');
-            const addExperienceBtn = document.getElementById('add-experience-btn');
-            const experienceTotalFormsInput = document.getElementById('id_experience-TOTAL_FORMS');
-
-            // Certification dynamic addition
-            const certificationContainer = document.getElementById('certification-container');
-            const addCertificationBtn = document.getElementById('add-certification-btn');
-            const certificationTotalFormsInput = document.getElementById('id_certification-TOTAL_FORMS');
-
-            // Project dynamic addition
-            const projectContainer = document.getElementById('project-container');
-            const addProjectBtn = document.getElementById('add-project-btn');
-            const projectTotalFormsInput = document.getElementById('id_project-TOTAL_FORMS');
-
-            // Sociallinks dynamic addition
-            const sociallinksContainer = document.getElementById('sociallink-container');
-            const addSociallinkBtn = document.getElementById('add-sociallink-btn');
-            const sociallinkTotalFormsInput = document.getElementById('id_sociallink-TOTAL_FORMS');
-
-            
-
-            function addFormRow(container, totalFormsInput, prefix, maxForms = 10) {
-                if (parseInt(totalFormsInput.value) >= maxForms) {
-                    alert(`Maximum of ${maxForms} ${prefix}s allowed`);
-                    return;
-                }
-        
-                const forms = container.querySelectorAll(`.${prefix}-form`);
-                const lastForm = forms[forms.length - 1];
-                const newForm = lastForm.cloneNode(true);
-        
-                // Reset input values
-                const inputs = newForm.querySelectorAll('input');
-                inputs.forEach(input => {
-                    if (input.type === 'text') {
-                        input.value = '';
-                    }
-                    if (input.type === 'checkbox') {
-                        input.checked = false;
-                    }
-                });
-        
-                // Update form indices
-                const currentTotal = parseInt(totalFormsInput.value);
-                newForm.innerHTML = newForm.innerHTML.replace(
-                    new RegExp(`${prefix}-${currentTotal - 1}`, 'g'),
-                    `${prefix}-${currentTotal}`
-                );
-        
-                // Add delete button functionality for new rows
-                const deleteCheckbox = newForm.querySelector('input[type="checkbox"]');
-                if (deleteCheckbox) {
-                    const deleteLabel = newForm.querySelector('.form-check-label');
-                    deleteLabel.addEventListener('click', () => {
-                        deleteCheckbox.checked = !deleteCheckbox.checked;
-                    });
-                }
-        
-                // Increment total forms
-                totalFormsInput.value = currentTotal + 1;
-        
-                // Add new form to container
-                container.appendChild(newForm);
-            }
-        
-            // Event listeners for adding rows
-            addSkillBtn.addEventListener('click', () => {
-                addFormRow(skillsContainer, skillsTotalFormsInput, 'skill');
-            });
-            // Implement addFormRow function similar to skills template
-            addEducationBtn.addEventListener('click', () => {
-                addFormRow(educationContainer, educationTotalFormsInput, 'education', 5);
-            });
-            // Implement addFormRow function similar to skills template
-            addExperienceBtn.addEventListener('click', () => {
-                addFormRow(experienceContainer, experienceTotalFormsInput, 'experience', 5);
-            });
-            // Implement addFormRow function similar to skills template
-            addCertificationBtn.addEventListener('click', () => {
-                addFormRow(certificationContainer, certificationTotalFormsInput, 'certification', 5);
-            });
-            // Implement addFormRow function similar to skills template
-            addProjectBtn.addEventListener('click', () => {
-                addFormRow(projectContainer, projectTotalFormsInput, 'project', 5);
-            });
-            // Implement addFormRow function similar to skills template
-            addSociallinkBtn.addEventListener('click', () => {
-                addFormRow(sociallinkContainer, sociallinkTotalFormsInput, 'sociallink', 5);
-            });
-        });
-        </script>
 {% endblock content %}

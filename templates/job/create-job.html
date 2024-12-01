@@ -80,10 +80,9 @@
                         <label class="mb-0 text-dark">
                             Job Responsibilities
                             <small class="text-danger ms-2">(Minimum 1 responsibility required)</small>
+                            <br>
+                            <small class="text-danger fw-bold">"Only 2 responsibility can be added or updated at a time. You can add another responsibility during your next update."</small>
                         </label>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="add-responsibility-btn">
-                            <i class="bi bi-plus-circle me-1"></i>Add Responsibility
-                        </button>
                     </div>
                     <div id="responsibilities-container">
                         {{ responsibility_formset.management_form }}
@@ -111,10 +110,9 @@
                         <label class="mb-0 text-dark">
                             Required Skills
                             <small class="text-danger ms-2">(Minimum 1 skill required)</small>
+                            <br>
+                            <small class="text-danger fw-bold">"Only 3 skills can be added or updated at a time. You can add another skill during your next update."</small>
                         </label>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="add-skill-btn">
-                            <i class="bi bi-plus-circle me-1"></i>Add Skill
-                        </button>
                     </div>
                     <div id="skills-container">
                         {{ skill_formset.management_form }}
@@ -142,6 +140,8 @@
                         <label class="mb-0 text-dark">
                             Job Experience
                             <small class="text-danger ms-2">(Minimum 1 experience required) Maximum of 3 Experiences</small>
+                            <br>
+                            <small class="text-danger fw-bold">"Only 2 experience can be added or updated at a time. You can add another experience during your next update."</small>
                         </label>
                     </div>
                     <div id="experience-container">

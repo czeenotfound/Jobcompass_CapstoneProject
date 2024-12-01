@@ -44,32 +44,15 @@ def resize_image(image, max_size=(1280, 1280)):
     buffer.seek(0)
     return File(buffer, name=image.name)
 
-def user_avatar_upload_path(instance, filename):
-    """
-    Define the upload path for user avatars.
-    Store files in 'avatar/' with unique filenames to avoid duplicates.
-    """
-    ext = filename.split('.')[-1]  # Get the file extension
-    filename = f"{uuid4()}.{ext}"  # Generate a unique filename
-    return os.path.join('avatar', filename)
-
 # Updated User model
 class User(AbstractUser):
     email = models.EmailField(unique=True)
-    avatar = models.ImageField(
-        upload_to=user_avatar_upload_path,  # Use the callable
-        null=True, 
-        default="icons8-male-user-96.png",
-        validators=[validate_avatar]  # Add the custom validator
-    )
+    avatar = models.ImageField(null=True, default="icons8-male-user-96.png",validators=[validate_avatar])
     phone = models.CharField(max_length=15, null=True, blank=True)
-
     is_employer = models.BooleanField(default=False)
     is_applicant = models.BooleanField(default=False)
-
     has_resume = models.BooleanField(default=False)
     has_company = models.BooleanField(default=False)
-
     is_active = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
