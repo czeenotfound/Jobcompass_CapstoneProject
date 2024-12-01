@@ -1,0 +1,35 @@
+<nav class="navbar navbar-light sticky-top flex-md-nowrap bg-light navbar-expand-md bg-faded justify-content-center p-3 px-4 border-bottom">
+    <a href="{% url 'admin-dashboard' %}" class="navbar-brand d-flex w-50 me-auto">
+        <span class="fw-bold fs-4">Job Compass</span>
+    </a>
+
+    <!-- Mobile icons -->
+    <ul class="navbar-nav flex-row d-md-none">
+        <li class="nav-item text-nowrap">
+            <button class="nav-link px-3 text-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+        </li>
+        
+    </ul>
+
+    <!-- Desktop Menu -->
+    <div class="navbar-collapse collapse w-100" id="collapsingNavbar3">
+        <ul class="nav navbar-nav ms-auto w-100 justify-content-end gap-3 text-center">
+            <!-- Profile Dropdown for Large Screens -->
+            <li class="nav-item dropdown d-none d-md-block  profile-dropdown">
+                <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+                </a>
+                <ul class="dropdown-menu profile-dropdown-menu  dropdown-menu-end " aria-labelledby="navbarScrollingDropdown">
+                    <li><span class="dropdown-item custom-dropdown-item disabled text-dark">John Doe</span></li>
+                    <hr class="dropdown-divider">
+                    <li><a class="dropdown-item custom-dropdown-item" href="{% url 'admin-profile' %}">Profile</a></li>
+                    <li><a class="dropdown-item custom-dropdown-item" href="{% url 'admin-acc-settings' %}">Settings</a></li>
+                    <hr class="dropdown-divider">
+                    <li><a class="dropdown-item custom-dropdown-item" href="{% url 'admin-logout' %}">Log Out</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</nav>

@@ -1,0 +1,240 @@
+{% extends 'users/base.html' %}
+{% load humanize %}
+
+{% block content %}
+    <!-- Main Content -->
+    <div class="container mb-5">
+        <div aria-label="breadcrumb" class="custombreadcrumb bg-light p-4 mb-3 shadow-sm">
+            <ol class="breadcrumb mb-0 d-flex justify-content-end">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+                <li class="breadcrumb-item active text-dark" aria-current="page">Job Fairs</li>
+            </ol>
+        </div>
+        <div class="d-flex align-items-center">
+            <section class="applicantbanner container h-100 p-5 bg-light rounded-start">
+                <h1 class="hero-heading">Find Job Fairs</h1>
+                <br>
+                <span class="fs-5">Explore upcoming job fairs and connect with employers.</span>
+                <br>
+                <a href="{% url 'all-job-fair' %}" class="btn btn-light btn-md customButton px-4 mt-3">
+                    <i class="fa-solid fa-calendar-days me-3"></i> See All Job Fairs
+                </a>
+            </section>
+        </div>
+        <!-- Featured Event -->
+        <div class="row mt-5 mb-5">
+            {% for jobfair in jobfairs %}
+                {% if jobfair.is_featured %}
+                <div class="col-12">
+                    <div class="card event-card">
+                        <span class="featured-badge p-3">
+                            <span class="badge bg-warning text-dark">Featured Event</span>
+                        </span>
+                        <div class="card-body p-5">
+                            <div class="row align-items-center">
+                                
+                                <div class="col-md-3 text-center">
+                                    <img src="{{jobfair.image.url}}" alt="featuredJobFair" class="img-fluid rounded mb-3">
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="{% url 'job-fair-info' jobfair.pk %}" class="text-decoration-none text-dark"> 
+                                        <h2 class="mb-2">{{jobfair.title}}</h2>
+                                    </a>
+                                    <p class="text-muted mb-3">
+                                        <i class="fas fa-calendar-alt me-2"></i> {{jobfair.start_date|date:'F d, Y'}}
+                                        <i class="fas fa-clock ms-3 me-2"></i> {{ jobfair.start_date|date:'h:i A'  }} - {{ jobfair.end_date|date:'h:i A'  }}
+                                        <i class="fas fa-map-marker-alt ms-3 me-2"></i> {{ jobfair.location.street }}, {{ jobfair.location.city }}
+                                    </p>
+                                    <p class="mb-3">{{ jobfair.description|slice:":150" }}...</p>
+                                </div>
+                                {% if user.is_authenticated %}
+                                    {% if jobfair.is_active %}
+                                        {% if jobfair.is_registered %}
+                                            <div class="col-md-3 text-center text-md-end">
+                                                <a href="#" class="btn btn-secondary disabled customButton px-4">Registered</a>
+                                            </div>
+                                        {% else %}
+                                            <div class="col-md-3 text-center text-md-end">
+                                                <a href="{% url 'jobfair_register' jobfair.pk %}" class="customButton btn btn-primary btn-lg mb-2 w-100">Register Now</a>
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="col-md-3 text-center text-md-end">
+                                            <button class="customButton btn btn-secondary btn-lg mb-2 w-100 " disabled>Event Closed</button>
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="up-event-card-footer bg-white p-4">
+                                        <a href="{% url 'login' %}" class="customButton btn btn-secondary w-100 text-decoration-none">Login to register for the event.</a> 
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <!-- Upcoming Events -->
+        <div class="d-flex justify-content-start gap-5 align-items-center mb-4">
+            <h3 class="mb-0">Upcoming Job Fairs</h3>
+            <a href="{% url 'all-job-fair' %}" class="text-decoration-none text-dark">See All Job Fairs <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+        <div class="row g-4">
+            {% for jobfair in jobfairs|slice:":3" %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card event-card h-100">
+                        <img src="{{jobfair.image.url}}" alt="Tech Career Fair" class="img-fluid mb-3" style="border-radius: 1.5rem 1.5rem 0 0;">
+                        <div class="card-body">
+                            <a href="{% url 'job-fair-info' jobfair.pk %}" class="jobfairlink fs-4 fw-bold text-decoration-none card-title">{{ jobfair.title }}</a>
+                            <p class="text-muted mb-3">
+                                <i class="fas fa-calendar-alt me-2"></i> {{ jobfair.start_date|date:'F d, Y' }} - {{ jobfair.end_date|date:'F d, Y'}}
+                                <br>
+                                <i class="fas fa-clock me-2"></i> {{ jobfair.start_date|date:'h:i A'  }} - {{ jobfair.end_date|date:'h:i A'  }}
+                                <br>
+                                <i class="fas fa-map-marker-alt me-2"></i> {{ jobfair.location.street }}, {{ jobfair.location.city }}
+                            </p>
+                            <p class="card-text">{{ jobfair.description|slice:":100" }}...</p>
+                        </div>
+                        {% if user.is_authenticated %}
+                            {% if jobfair.is_active %}
+                                {% if jobfair.is_registered %}
+                                    <div class="up-event-card-footer bg-white p-4">
+                                        <a href="#" class="customButton btn btn-secondary w-100 disabled">Registered</a>
+                                    </div>
+                                {% else %}
+                                    <div class="up-event-card-footer bg-white p-4">
+                                        <a href="{% url 'jobfair_register' jobfair.pk %}" class="customButton btn btn-outline-primary w-100">Register</a>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="up-event-card-footer bg-white p-4">
+                                    <button class="customButton btn btn-secondary w-100 " disabled>Event Closed</button>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="up-event-card-footer bg-white p-4">
+                                <a href="{% url 'login' %}" class="customButton btn btn-secondary w-100 text-decoration-none">Login to register for the event.</a> 
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <section class="about-section">
+        <div class="container text-center py-5">
+            <div class="mb-5">
+                <h1>Why Attend Our Job Fairs?</h1>
+            </div>
+            
+            
+            <div class="row g-4">
+                <div class="col-12 col-md-4">
+                    <div class="card card-hover py-5 h-100 text-center">
+                        <div class="card-body">
+                            <i class="fas fa-handshake fa-3x mb-3" style="font-size: 5rem;"></i>
+                            <h4 class="card-title fs-4 fw-bold mb-3">Direct Networking</h4>
+                            <p class="card-text text-muted">Meet recruiters face-to-face and make lasting impressions that online applications can't match.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card card-hover py-5 h-100 text-center">
+                        <div class="card-body">
+                            <i class="fas fa-lightbulb fa-3x mb-3" style="font-size: 5rem;"></i>
+                            <h4 class="card-title fs-4 fw-bold mb-3">Industry Insights</h4>
+                            <p class="card-text text-muted">Learn about industry trends and requirements directly from company representatives.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card card-hover py-5 h-100 text-center">
+                        <div class="card-body">
+                            <i class="fas fa-rocket fa-3x mb-3" style="font-size: 5rem;"></i>
+                            <h4 class="card-title fs-4 fw-bold mb-3">Instant Opportunities</h4>
+                            <p class="card-text text-muted">Get interviewed on the spot and receive immediate feedback on your applications.</p>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+        </div>
+    </section>
+    {% endblock content %}
+    <!-- Footer -->
+
+    <footer class="bg-light py-5">
+        <div class="container">
+            <div class="">
+                <div class="col-md-6 col-lg-3">
+                    <a class="logoName fs-2 text-decoration-none brand text-dark fw-bold" href="index.html"><img src="#" alt="" width="40px">Job Compass</a>
+                </div>
+            </div>
+            <hr class="mt-5">
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-5">
+                    <p class="fs-4">Contact Us</p>
+                    <ul class="list-unstyled">
+                        <li class="my-3">
+                            <span>666 John Doe Rd, Boulevard, CO
+                                7000, Zamboanga City
+                            </span>
+                        </li>
+                        <li class="my-3">
+                            <span> +63662323122</span>
+                        </li>
+                        <li class="my-3">
+                            <span> jobcompassCO@sample.com</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <p class="fs-4">My Account</p>
+                    <ul class="list-unstyled">
+                        <li class="my-3">
+                            <a href="login.html" class="text-dark text-decoration-none text-muted footer-link"><i class="fa-solid fa-chevron-right"></i> Profile</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6 col-lg-3 socials">
+                    <p class="fs-4">Follow Us</p>
+                    <ul class="list-unstyled">
+                        <li class="my-3">
+                            <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-facebook footer-link"></i></a>
+                        </li>
+                        <li class="my-3">
+                            <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-x-twitter footer-link"></i></a>
+                        </li>
+                        <li class="my-3">
+                            <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-instagram footer-link"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer> 
+
+
+    <div class="card-footer text-center bg-dark text-white py-2">
+        &copy; 2024 Job Compass. All rights reserved.
+    </div>
+    <!-- SCRIPTS -->
+    <script src="static/JS/index.js"></script>
+    <script src="static/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showJobDetails(jobId) {
+            // Remove 'active' class from all job cards and hide all job details
+            document.querySelectorAll('.job-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelectorAll('.job-details').forEach(detail => {
+                detail.classList.remove('active');
+            });
+    
+            // Add 'active' class to the clicked job card and display corresponding job details
+            document.querySelector(`.job-card[onclick="showJobDetails(${jobId})"]`).classList.add('active');
+            document.getElementById(`job-${jobId}`).classList.add('active');
+        }
+    </script>
+</body>
+</html>

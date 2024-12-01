@@ -1,0 +1,101 @@
+{% extends 'users/base.html' %}
+{% load humanize %}
+
+{% block content %}
+    <div aria-label="breadcrumb" class="custombreadcrumb container bg-light p-4 mb-3 shadow-sm">
+        <ol class="breadcrumb mb-0 d-flex justify-content-end">
+            <li class="breadcrumb-item"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+            <li class="breadcrumb-item active text-dark" aria-current="page">View Job Fair</li>
+        </ol>
+    </div>
+<!-- Main Section -->
+    <div class="container">
+        <h4 class="mt-4 mb-4 col-lg-2"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
+    </div>
+
+    <div class="custom-container container bg-white applicantProfile-card">
+        <div class="p-5 mb-5">
+            <div class="row">
+                <div class="col-md-7">
+                    <h1>{{jobfair.title}}</h1>
+                    <p class="fs-3 text-muted mb-0">{{jobfair.location_job_type|title}}</p>
+                    <p>{{jobfair.fair_event_held}}</p>
+                    <p class="fs-5">Venue: {{jobfair.location.street}}, {{jobfair.location.city}}</p>
+
+                    <p class="mt-4 mb-3">Start Date: {{jobfair.start_date|date:'F m, Y h A'}} - {{jobfair.end_date|date:'F m, Y h A'}}</p>
+                    <p class="mb-3">Application Date: {{jobfair.start_date|date:'F m, Y h A'}} - {{jobfair.end_date|date:'F m, Y h A'}}</p>
+                    
+                    {% if user.is_authenticated %}
+                        {% if jobfair.is_active %}
+                            {% if jobfair.is_registered %}
+                                <div class="col-md-3 text-center text-md-end">
+                                    <a href="#" class="customButton btn btn-secondary btn-lg mb-2 w-100 disabled">Registered</a>
+                                </div>
+                            {% else %}
+                                <div class="col-md-3 text-center text-md-end">
+                                    <a href="{% url 'jobfair_register' jobfair.pk %}" class="customButton btn btn-primary btn-lg mb-2 w-100">Register</a>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="col-md-3 text-center text-md-end">
+                                <button class="customButton btn btn-secondary btn-lg mb-2 w-100 " disabled>Event Closed</button>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="up-event-card-footer bg-white p-4">
+                            <a href="{% url 'login' %}" class="customButton btn btn-secondary w-100 text-decoration-none">Login to register for the event.</a> 
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-5 mt-5">
+                    <img src="{{jobfair.image.url}}" alt="Tech Career Fair" class="img-fluid mb-3">
+                </div>
+                <div class="col-md-5">
+                    <div class="stats-card mb-3">
+                        <div class="mb-4">
+                            <p>Company Name</p>
+                            <h4>{{jobfair.company|title}}</h4>
+                            <h6>{{jobfair.company.industry|title}}</h6>
+                        </div>
+                    </div>
+                    <div class="stats-card mb-3">
+                        <h5>Attendees</h5>
+                        <div class="contact-info mb-2">
+                            <i class="fa-solid fa-people-group fs-3 me-3"></i>
+                            <span class="fs-5">{{jobfair.max_attendees}}</span>
+                        </div>
+                    </div>
+                    <div class="stats-card mb-3">
+                        <h5>Contact Information</h5>
+                        <div class="contact-info mb-2">
+                            <i class="fas fa-phone me-2"></i>
+                            <span>{{jobfair.company.phone}}</span>
+                        </div>
+                        <div class="contact-info mb-2">
+                            <i class="fas fa-envelope me-2"></i>
+                            <span>{{jobfair.company.email}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mt-3">
+                    {% if jobfair.description %}
+                    <div class="mb-4">
+                        <h4>Job Fair Description</h4>
+                        <div>
+                            <p>{{jobfair.description}}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if jobfair.url_location %}
+                    <div class="mb-4">
+                        <h4>Job Fair Url location</h4>
+                        <div>
+                            <p>{{jobfair.url_location}}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

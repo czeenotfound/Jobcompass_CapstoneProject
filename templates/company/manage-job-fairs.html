@@ -1,0 +1,102 @@
+{% extends 'users/base.html' %}
+{% load humanize %}
+{% load static %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/buttons.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.bootstrap5.css' %}">
+
+    <script src="{% static 'JS/datatables/dataTables.js' %}"></script>
+
+{% endblock scripts %}
+
+{% block content %}
+    <div class="container-container custom-container mb-5">
+        <div aria-label="breadcrumb" class="custombreadcrumb bg-light p-4 mb-3 shadow-sm">
+            <ol class="breadcrumb mb-0 d-flex justify-content-end">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+                <li class="breadcrumb-item active text-dark" aria-current="page">Manage Job Fairs</li>
+            </ol>
+        </div>
+        
+        <!-- Welcome  -->
+        <div class="d-flex align-items-center">
+            <section class="employerbanner w-100  h-100 p-5 bg-light mb-4">
+                <h1 class="hero-heading">Manage Company's Job Fairs</h1>
+                <br>
+                <a href="{% url 'create-job-fair' %}" class="btn btn-light customButton btn-md mt-3"><i class="fa-solid fa-plus"></i> Post Job Fair</a>
+            </section>
+        </div>
+        
+        <div class="row flex-column flex-lg-row">
+            <!-- Sidebar -->
+            
+            {% include 'sidebar.html' %}
+
+            <!-- Main Content -->
+            <div class="mainTableContent col-12 col-lg-9">
+                <!-- Main Section -->
+                <div class="custom-container bg-light p-3 shadow-sm">
+                    <div class="mb-5">
+                        <div class="tableBg">
+                            <table id="jobfairPostingsTable" class="table w-100">
+                                <thead>
+                                    <tr>
+                                        <th>Job Fair Title</th>
+                                        <th>Event Held</th>
+                                        <th>Applications</th>
+                                        <th>Status</th>
+                                        <th>Post Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for jobfair in jobfairs %}
+                                        <tr>
+                                            <td class="fw-semibold">
+                                                <h1 style="font-size: 1.5rem;">{{jobfair.title}}</h1>
+                                                <div class="location-badge">
+                                                    <i class="fas fa-location-dot"></i>
+                                                    {{jobfair.location.barangay}},{{jobfair.location.city}}
+                                                </div>
+                                            </td>
+                                            <td>{{jobfair.fair_event_held}}</td>
+                                            <td><span class="applicants-badge">{{jobfair.application_set.all.count}} Registered  <a href="{% url 'job-applicants' jobfair.pk %}"> View All</a></td></span></td>
+                                            {% if jobfair.is_active %}
+                                                <td><span class="status-badge status-open">Open</span></td>
+                                            {% else %}
+                                                <td><span class="status-badge status-closed">Closed</span></td>
+                                            {% endif %}
+                                            <td>{{jobfair.posted_date|date:'F d, Y'}}</td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <a href="{% url 'update-job-fair' jobfair.pk %}" class="btn btn-edit"><i class="fa-regular fa-pen-to-square"></i></a>
+                                                    {% if jobfair.is_active %}
+                                                        <!-- Deactivate Button -->
+                                                        <a href="{% url 'deactivate-job-fair' jobfair.pk %}" title="deactivate job fair" class="btn btn-danger" 
+                                                        onclick="return confirm('Are you sure you want to deactivate this job?')">
+                                                            <i class="fa-solid fa-times"></i> Disable
+                                                        </a>
+                                                    {% else %}
+                                                        <!-- Activate Button -->
+                                                        <a href="{% url 'activate-job-fair' jobfair.pk %}" title="activate job fair" class="btn btn-success" 
+                                                        onclick="return confirm('Are you sure you want to activate this job?')">
+                                                            <i class="fa-solid fa-check"></i> Enable
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+{% endblock content %}

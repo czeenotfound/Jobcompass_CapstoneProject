@@ -1,0 +1,78 @@
+{% extends 'users/base.html' %}
+{% load humanize %}
+{% load static %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/buttons.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.bootstrap5.css' %}">
+
+    <script src="{% static 'JS/datatables/dataTables.js' %}"></script>
+{% endblock scripts %}
+
+{% block content %}
+    <div class="container-container custom-container mb-5">
+        <div aria-label="breadcrumb" class="custombreadcrumb bg-light p-4 mb-3 shadow-sm">
+            <ol class="breadcrumb mb-0 d-flex justify-content-end">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+                <li class="breadcrumb-item active text-dark" aria-current="page">My Job Application</li>
+            </ol>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="d-flex align-items-center">
+            <section class="applicantbanner w-100 h-100 p-5 bg-light rounded-start mb-4">
+                <h1 class="hero-heading">Your Job Fair Registrations</h1>
+                <br>
+                <span class="fs-5">Track the status of jobs you've applied for below.</span>
+                <br>
+                <a href="{% url 'all-job-fair' %}" class="btn btn-light btn-md customButton px-4 mt-3"><i class="fa-solid fa-briefcase me-3"></i> Register Now</a>
+            </section>
+        </div>
+        <div class="row flex-column flex-lg-row">
+
+            {% include 'sidebar.html' %}
+            
+            <!-- Main Content -->
+            <div class="mainTableContent col-12 col-lg-9">
+                <!-- Main Section -->
+                <div class="custom-container bg-light p-3 shadow-sm">
+                    <div class="mb-5">
+                        <div class="tableBg">
+                            <table id="jobFairTable" class="table w-100">
+                                <thead>
+                                    <tr>
+                                        <th>Job Fair Title</th>
+                                        <th>Event Held</th>
+                                        <th>Saved Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for register in registrations %}
+                                        <tr>
+                                            <td class="fw-semibold">
+                                                <h1 style="font-size: 1.5rem;">{{ register.jobfair.title }}</h1>
+                                                <div class="location-badge">
+                                                    <i class="fas fa-location-dot"></i>
+                                                    {{ register.jobfair.location.barangay }}, {{ register.jobfair.location.city }}
+                                                </div>
+                                            </td>
+                                            <td>{{ register.jobfair.fair_event_held}}</td>
+                                            <td>{{ register.submit_date|date:'F d, Y h:m A' }}</td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <a href="{% url 'job-fair-info' register.jobfair.pk %}" class="btn btn-view"><i class="fa-solid fa-eye"></i></a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

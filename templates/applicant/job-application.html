@@ -1,0 +1,534 @@
+{% extends 'users/base.html' %}
+{% load humanize %}
+
+{% block content %}
+    <div class="container-container custom-container mb-5">
+        <div aria-label="breadcrumb" class="custombreadcrumb bg-light p-4 mb-3 shadow-sm">
+            <ol class="breadcrumb mb-0 d-flex justify-content-end">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+                <li class="breadcrumb-item active text-dark" aria-current="page">My Job Application</li>
+            </ol>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="d-flex align-items-center">
+            <section class="applicantbanner w-100 h-100 p-5 bg-light rounded-start mb-4">
+                <h1 class="hero-heading">Your Job Applications</h1>
+                <br>
+                <span class="fs-5">Track the status of jobs you've applied for below.</span>
+                <br>
+                <a href="{% url 'dashboard' %}" class="btn btn-light btn-md customButton px-4 mt-3"><i class="fa-solid fa-briefcase me-3"></i> Apply Now</a>
+            </section>
+        </div>
+        <div class="row flex-column flex-lg-row">
+
+            {% include 'sidebar.html' %}
+            <div class="jobApplication col-12 col-lg-9 p-0 mb-5">
+                <div class="card-body p-0">
+                    <!-- Status Tabs -->
+                    <ul class="nav nav-tabs d-flex justify-content-between" id="applicationTabs" role="tablist">
+                        <li class="nav-item" role="allstatuses">
+                            <button class="nav-link active" id="allstatuses-tab" data-bs-toggle="tab" data-bs-target="#allstatuses" type="button" role="tab">
+                                All <span class="tab-count">{{ total_jobs }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="submitted-tab" data-bs-toggle="tab" data-bs-target="#submitted" type="button" role="tab">
+                                Submitted <span class="tab-count">{{ status_counts.SUBMITTED|default:0 }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab">
+                                Under Review <span class="tab-count">{{ status_counts.UNDER_REVIEW|default:0 }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="interview-tab" data-bs-toggle="tab" data-bs-target="#interview" type="button" role="tab">
+                                Interview <span class="tab-count">{{ status_counts.INTERVIEW|default:0 }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="offered-tab" data-bs-toggle="tab" data-bs-target="#offered" type="button" role="tab">
+                                Offered <span class="tab-count">{{ status_counts.OFFERED|default:0 }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="accepted-tab" data-bs-toggle="tab" data-bs-target="#accepted" type="button" role="tab">
+                                Accepted <span class="tab-count">{{ status_counts.ACCEPTED|default:0 }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button" role="tab">
+                                Rejected <span class="tab-count">{{ status_counts.REJECTED|default:0 }}</span>
+                            </button>
+                        </li>
+                    </ul>
+                    {% if applications %}
+                    <!-- Tab Content -->
+                    <div class="tab-content p-3" id="applicationTabsContent">
+                        <!-- all tab -->
+                        <div class="tab-pane fade show active" id="allstatuses" role="tabpanel">
+                            {% for application in applications  %}
+                                <div class="job-card p-4 border-bottom">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <h5 class="mb-0 me-3">{{application.job.title|title}}</h5>
+                                                {% with status=application.applicationstatus.status %}
+                                                    {% if status == 'SUBMITTED' %}
+                                                        <span class="status-badge status-submitted">Submitted</span>
+                                                    {% elif status == 'UNDER_REVIEW' %}
+                                                        <span class="status-badge status-review">Under Review</span>
+                                                    {% elif status == 'INTERVIEW' %}
+                                                        <span class="status-badge status-interview">Interview Scheduled</span>
+                                                    {% elif status == 'OFFERED' %}
+                                                        <span class="status-badge status-offered">Offered</span>
+                                                    {% elif status == 'ACCEPTED' %}
+                                                        <span class="status-badge status-accepted">Accepted</span>
+                                                    {% elif status == 'REJECTED' %}
+                                                        <span class="status-badge status-rejected">Rejected</span>
+                                                    {% endif %}
+                                                {% endwith %}
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-3 text-muted small mb-2">
+                                                <div class="d-flex align-items-center">
+                                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                                    </svg>
+                                                    {{application.job.company.company_name|title}}
+                                                </div>
+                                                <div class="d-flex align-items-center">
+                                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    </svg>
+                                                    {{ application.job.location.city|title}}, {{ application.job.location.province|title}}
+                                                </div>
+                                                <div class="d-flex align-items-center">
+                                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                    ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }}
+                                                </div>
+                                            </div>
+                                            <div class="text-muted small">
+                                                <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                </svg>
+                                                {{ application.applicationstatus.status_date|date:'F d, Y • h:i A' }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mt-3 mt-md-0 text-md-end">
+                                            <a href="{% url 'view_job_application' application.id %}"
+                                                    class="btn btn-outline-primary customButton px-3">
+                                                <i class="fa-solid fa-eye"></i> View Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <!-- Submitted Tab -->
+                        <div class="tab-pane fade" id="submitted" role="tabpanel">
+                            {% for application in applications  %}
+                                {% if application.applicationstatus.status == 'SUBMITTED' %}
+                                    <div class="job-card p-4 border-bottom">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <h5 class="mb-0 me-3">{{application.job.title|title}}</h5>
+                                                    {% with status=application.applicationstatus.status %}
+                                                        {% if status == 'SUBMITTED' %}
+                                                            <span class="status-badge status-submitted">Submitted</span>
+                                                        {% elif status == 'UNDER_REVIEW' %}
+                                                            <span class="status-badge status-review">Under Review</span>
+                                                        {% elif status == 'INTERVIEW' %}
+                                                            <span class="status-badge status-interview">Interview Scheduled</span>
+                                                        {% elif status == 'OFFERED' %}
+                                                            <span class="status-badge status-offered">Offered</span>
+                                                        {% elif status == 'ACCEPTED' %}
+                                                            <span class="status-badge status-accepted">Accepted</span>
+                                                        {% elif status == 'REJECTED' %}
+                                                            <span class="status-badge status-rejected">Rejected</span>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3 text-muted small mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                                        </svg>
+                                                        {{application.job.company.company_name|title}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                        </svg>
+                                                        {{ application.job.location.city|title}}, {{ application.job.location.province|title}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }}
+                                                    </div>
+                                                </div>
+                                                <div class="text-muted small">
+                                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    <span title="{{ application.applicationstatus.status_date|date:'F d, Y • h:i A' }}">
+                                                        Submitted {{ application.applicationstatus.status_date|naturaltime }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mt-3 mt-md-0 text-md-end">
+                                                <a href="{% url 'view_job_application' application.id %}"
+                                                        class="btn btn-outline-primary customButton px-3">
+                                                    <i class="fa-solid fa-eye"></i> View Details
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <!-- Under Review Tab -->
+                        <div class="tab-pane fade" id="review" role="tabpanel">
+                            {% for application in applications  %}
+                                {% if application.applicationstatus.status == 'UNDER_REVIEW' %}
+                                    <div class="job-card p-4 border-bottom">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <h5 class="mb-0 me-3">{{application.job.title|title}}</h5>
+                                                    {% with status=application.applicationstatus.status %}
+                                                        {% if status == 'SUBMITTED' %}
+                                                            <span class="status-badge status-submitted">Submitted</span>
+                                                        {% elif status == 'UNDER_REVIEW' %}
+                                                            <span class="status-badge status-review">Under Review</span>
+                                                        {% elif status == 'INTERVIEW' %}
+                                                            <span class="status-badge status-interview">Interview Scheduled</span>
+                                                        {% elif status == 'OFFERED' %}
+                                                            <span class="status-badge status-offered">Offered</span>
+                                                        {% elif status == 'ACCEPTED' %}
+                                                            <span class="status-badge status-accepted">Accepted</span>
+                                                        {% elif status == 'REJECTED' %}
+                                                            <span class="status-badge status-rejected">Rejected</span>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3 text-muted small mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                                        </svg>
+                                                        {{application.job.company.company_name|title}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                        </svg>
+                                                        {{ application.job.location.city|title}}, {{ application.job.location.province|title}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }}
+                                                    </div>
+                                                </div>
+                                                <div class="text-muted small">
+                                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    <span title="{{ application.applicationstatus.status_date|date:'F d, Y • h:i A' }}">
+                                                        Submitted {{ application.applicationstatus.status_date|naturaltime }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mt-3 mt-md-0 text-md-end">
+                                                <a href="{% url 'view_job_application' application.id %}"
+                                                        class="btn btn-outline-primary customButton px-3">
+                                                    <i class="fa-solid fa-eye"></i> View Details
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <!-- Interview Tab -->
+                        <div class="tab-pane fade" id="interview" role="tabpanel">
+                            {% for application in applications  %}
+                                {% if application.applicationstatus.status == 'INTERVIEW' %}
+                                    <div class="job-card p-4 border-bottom">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <h5 class="mb-0 me-3">{{application.job.title|title}}</h5>
+                                                    {% with status=application.applicationstatus.status %}
+                                                        {% if status == 'SUBMITTED' %}
+                                                            <span class="status-badge status-submitted">Submitted</span>
+                                                        {% elif status == 'UNDER_REVIEW' %}
+                                                            <span class="status-badge status-review">Under Review</span>
+                                                        {% elif status == 'INTERVIEW' %}
+                                                            <span class="status-badge status-interview">Interview Scheduled</span>
+                                                        {% elif status == 'OFFERED' %}
+                                                            <span class="status-badge status-offered">Offered</span>
+                                                        {% elif status == 'ACCEPTED' %}
+                                                            <span class="status-badge status-accepted">Accepted</span>
+                                                        {% elif status == 'REJECTED' %}
+                                                            <span class="status-badge status-rejected">Rejected</span>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3 text-muted small mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                                        </svg>
+                                                        {{application.job.company.company_name|title}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                        </svg>
+                                                        {{ application.job.location.city|title}}, {{ application.job.location.province|title}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }}
+                                                    </div>
+                                                </div>
+                                                <div class="text-muted small">
+                                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    <span title="{{ application.applicationstatus.status_date|date:'F d, Y • h:i A' }}">
+                                                        Submitted {{ application.applicationstatus.status_date|naturaltime }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mt-3 mt-md-0 text-md-end">
+                                                <a href="{% url 'view_job_application' application.id %}"
+                                                        class="btn btn-outline-primary customButton px-3">
+                                                    <i class="fa-solid fa-eye"></i> View Details
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <!-- Offered Tab -->
+                        <div class="tab-pane fade" id="offered" role="tabpanel">
+                            {% for application in applications  %}
+                                {% if application.applicationstatus.status == 'OFFERED' %}
+                                    <div class="job-card p-4 border-bottom">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <h5 class="mb-0 me-3">{{application.job.title|title}}</h5>
+                                                    {% with status=application.applicationstatus.status %}
+                                                        {% if status == 'SUBMITTED' %}
+                                                            <span class="status-badge status-submitted">Submitted</span>
+                                                        {% elif status == 'UNDER_REVIEW' %}
+                                                            <span class="status-badge status-review">Under Review</span>
+                                                        {% elif status == 'INTERVIEW' %}
+                                                            <span class="status-badge status-interview">Interview Scheduled</span>
+                                                        {% elif status == 'OFFERED' %}
+                                                            <span class="status-badge status-offered">Offered</span>
+                                                        {% elif status == 'ACCEPTED' %}
+                                                            <span class="status-badge status-accepted">Accepted</span>
+                                                        {% elif status == 'REJECTED' %}
+                                                            <span class="status-badge status-rejected">Rejected</span>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3 text-muted small mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                                        </svg>
+                                                        {{application.job.company.company_name|title}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                        </svg>
+                                                        {{ application.job.location.city|title}}, {{ application.job.location.province|title}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }}
+                                                    </div>
+                                                </div>
+                                                <div class="text-muted small">
+                                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    <span title="{{ application.applicationstatus.status_date|date:'F d, Y • h:i A' }}">
+                                                        Submitted {{ application.applicationstatus.status_date|naturaltime }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mt-3 mt-md-0 text-md-end">
+                                                <a href="{% url 'view_job_application' application.id %}"
+                                                        class="btn btn-outline-primary customButton px-3">
+                                                    <i class="fa-solid fa-eye"></i> View Details
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <!-- Accepted Tab -->
+                        <div class="tab-pane fade" id="accepted" role="tabpanel">
+                            {% for application in applications  %}
+                                {% if application.applicationstatus.status == 'ACCEPTED' %}
+                                    <div class="job-card p-4 border-bottom">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <h5 class="mb-0 me-3">{{application.job.title|title}}</h5>
+                                                    {% with status=application.applicationstatus.status %}
+                                                        {% if status == 'SUBMITTED' %}
+                                                            <span class="status-badge status-submitted">Submitted</span>
+                                                        {% elif status == 'UNDER_REVIEW' %}
+                                                            <span class="status-badge status-review">Under Review</span>
+                                                        {% elif status == 'INTERVIEW' %}
+                                                            <span class="status-badge status-interview">Interview Scheduled</span>
+                                                        {% elif status == 'ACCEPTED' %}
+                                                            <span class="status-badge status-accepted">Accepted</span>
+                                                        {% elif status == 'REJECTED' %}
+                                                            <span class="status-badge status-rejected">Rejected</span>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3 text-muted small mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                                        </svg>
+                                                        {{application.job.company.company_name|title}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                        </svg>
+                                                        {{ application.job.location.city|title}}, {{ application.job.location.province|title}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }} ({{ application.job.salary_mode }})
+                                                    </div>
+                                                </div>
+                                                <div class="text-muted small">
+                                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    <span title="{{ application.applicationstatus.status_date|date:'F d, Y • h:i A' }}">
+                                                        Submitted {{ application.applicationstatus.status_date|naturaltime }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mt-3 mt-md-0 text-md-end">
+                                                <a href="{% url 'view_job_application' application.id %}"
+                                                        class="btn btn-outline-primary customButton px-3">
+                                                    <i class="fa-solid fa-eye"></i> View Details
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <!-- Rejected Tab -->
+                        <div class="tab-pane fade" id="rejected" role="tabpanel">
+                            {% for application in applications  %}
+                                {% if application.applicationstatus.status == 'REJECTED' %}
+                                    <div class="job-card p-4 border-bottom">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <h5 class="mb-0 me-3">{{application.job.title|title}}r</h5>
+                                                    {% with status=application.applicationstatus.status %}
+                                                        {% if status == 'SUBMITTED' %}
+                                                            <span class="status-badge status-submitted">Submitted</span>
+                                                        {% elif status == 'UNDER_REVIEW' %}
+                                                            <span class="status-badge status-review">Under Review</span>
+                                                        {% elif status == 'INTERVIEW' %}
+                                                            <span class="status-badge status-interview">Interview Scheduled</span>
+                                                        {% elif status == 'ACCEPTED' %}
+                                                            <span class="status-badge status-accepted">Accepted</span>
+                                                        {% elif status == 'REJECTED' %}
+                                                            <span class="status-badge status-rejected">Rejected</span>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3 text-muted small mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                                        </svg>
+                                                        {{application.job.company.company_name|title}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                        </svg>
+                                                        {{ application.job.location.city|title}}, {{ application.job.location.province|title}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }} ({{ application.job.salary_mode }})
+                                                    </div>
+                                                </div>
+                                                <div class="text-muted small">
+                                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    <span title="{{ application.applicationstatus.status_date|date:'F d, Y • h:i A' }}">
+                                                        Rejected {{ application.applicationstatus.status_date|naturaltime }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mt-3 mt-md-0 text-md-end">
+                                                <a href="{% url 'view_job_application' application.id %}"
+                                                        class="btn btn-outline-primary customButton px-3">
+                                                    <i class="fa-solid fa-eye"></i> View Details
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% else %}
+                        <h5 class="text-center p-4 alert-danger mb-0">You haven't applied for any jobs yet.</h2>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

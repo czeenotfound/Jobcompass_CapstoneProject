@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Compass</title>
+    <link rel="stylesheet" href="{% static 'bootstrap-5.0.2-dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/main.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome-free-6.5.1/css/all.min.css' %}">
+
+    <!-- for location purposes -->
+    <script src="{% static 'JS/jquery.min.js' %}"></script>
+    <script src="{% static 'JS/ph-address-selector.js' %}"></script>
+    <script src="{% static 'JS/jquery-3.7.1.js' %}"></script>
+
+    <!-- Add SweetAlert2 script -->
+    <script src="{% static 'JS/sweetalert2@11.js' %}"></script>
+    <script src="{% static 'JS/htmx.min.js' %}" defer></script>
+
+    
+</head>
+<body>
+
+    {% include 'navbar.html' %}
+
+    {% block content %}
+
+    {% endblock content %}
+    <!-- Footer -->
+    <footer class="bg-light py-5">
+        <div class="container">
+            <div class="">
+                <div class="col-md-6 col-lg-3">
+                    <a class="logoName fs-2 text-decoration-none brand text-dark fw-bold" href="{% url 'dashboard' %}"><img src="#" alt="" width="40px">Job Compass</a>
+                </div>
+            </div>
+            <hr class="mt-5">
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-5">
+                    <p class="fs-4">Contact Us</p>
+                    <ul class="list-unstyled">
+                        <li class="my-3">
+                            <span>666 John Doe Rd, Boulevard, CO
+                                7000, Zamboanga City
+                            </span>
+                        </li>
+                        <li class="my-3">
+                            <span> +63662323122</span>
+                        </li>
+                        <li class="my-3">
+                            <span> jobcompassCO@sample.com</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- <div class="col-md-6 col-lg-3">
+                    <p class="fs-4">My Account</p>
+                    <ul class="list-unstyled">
+                        <li class="my-3">
+                            <a href="{% url 'login' %}" class="text-dark text-decoration-none text-muted footer-link"><i class="fa-solid fa-chevron-right"></i> Profile</a>
+                        </li>
+                    </ul>
+                </div> -->
+                <div class="col-md-6 col-lg-3 socials">
+                    <p class="fs-4">Follow Us</p>
+                    <ul class="list-unstyled">
+                        <li class="my-3">
+                            <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-facebook footer-link"></i></a>
+                        </li>
+                        <li class="my-3">
+                            <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-x-twitter footer-link"></i></a>
+                        </li>
+                        <li class="my-3">
+                            <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-instagram footer-link"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer> 
+    
+    <div class="card-footer text-center bg-dark text-white py-3">
+        &copy; 2024 Job Compass. All rights reserved.
+    </div>
+    <button id="scroll-to-top" onclick="scrollToTop()"><i class="fa-solid fa-chevron-up"></i></button>
+    <!-- SCRIPTS -->
+    {% block scripts %}
+       
+    {% endblock %}
+    <script src="{% static 'bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- main script js -->
+    {% if messages %}
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                {% for message in messages %}
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: '{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}',
+                    title: '{{ message }}',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: '{% if message.tags == 'success' %}#28a745{% elif message.tags == 'error' %}#dc3545{% elif message.tags == 'warning' %}#ffc107{% else %}#17a2b8{% endif %}',
+                    color: '#ffffff',
+                    customClass: {
+                        popup: 'colored-toast' // Custom class for extra styling if needed
+                    }
+                });
+                {% endfor %}
+            });
+        </script>
+    {% endif %}
+    <script src="{% static 'JS/index.js' %}"></script>
+    
+</body>
+</html>

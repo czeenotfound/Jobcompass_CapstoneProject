@@ -1,0 +1,82 @@
+{% extends 'users/base.html' %}
+{% load humanize %}
+{% load static %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/buttons.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.bootstrap5.css' %}">
+
+    <script src="{% static 'JS/datatables/dataTables.js' %}"></script>
+{% endblock scripts %}
+
+{% block content %}
+    <div class="container-container custom-container mb-5">
+        <div aria-label="breadcrumb" class="custombreadcrumb bg-light p-4 mb-3 shadow-sm">
+            <ol class="breadcrumb mb-0 d-flex justify-content-end">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+                <li class="breadcrumb-item active text-dark" aria-current="page">My Saved Jobs</li>
+            </ol>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="d-flex align-items-center">
+            <section class="applicantbanner w-100 h-100 p-5 bg-light rounded-start mb-4">
+                <h1 class="hero-heading">Your Job Applications</h1>
+                <br>
+                <span class="fs-5">Track the status of jobs you've applied for below.</span>
+                <br>
+                <a href="{% url 'dashboard' %}" class="btn btn-light btn-md customButton px-4 mt-3"><i class="fa-solid fa-briefcase me-3"></i> Apply Now</a>
+            </section>
+        </div>
+        <div class="row flex-column flex-lg-row">
+
+            {% include 'sidebar.html' %}
+            
+            <!-- Main Content -->
+            <div class="mainTableContent col-12 col-lg-9">
+                <!-- Main Section -->
+                <div class="custom-container bg-light p-3 shadow-sm">
+                    <div class="mb-5">
+                        <div class="tableBg">
+                            <table id="jobSavedTable" class="table w-100">
+                                <thead>
+                                    <tr>
+                                        <th>Job Title</th>
+                                        <th>Job Type</th>
+                                        <th>Saved Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for saved in save_job %}
+                                        <tr>
+                                            <td class="fw-semibold">
+                                                <h1 style="font-size: 1.5rem;">{{ saved.job.title }}</h1>
+                                                <div class="location-badge">
+                                                    <i class="fas fa-location-dot"></i>
+                                                    {{ saved.job.location.barangay }}, {{ saved.job.location.city }}
+                                                </div>
+                                            </td>
+                                            <td>{{ saved.job.employment_job_type }}</td>
+                                            <td>{{ saved.job.posted_date_time|date:'F d, Y h:m A' }}</td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <a href="{% url 'job-info' saved.job.pk %}" class="btn btn-view"><i class="fa-solid fa-eye"></i></a>
+                                                    <a href="{% url 'unsave-job' saved.job.pk %}" class="deleteButton btn btn-outline-danger" 
+                                                        onclick="return confirm('Are you sure you want to unsave this job?')">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,26 @@
+{% extends 'users/base.html' %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+{% block content %}
+    <div class="container-container custom-container mb-5">
+        <div aria-label="breadcrumb" class="custombreadcrumb bg-light p-4 mb-3 shadow-sm">
+            <ol class="breadcrumb mb-0 d-flex justify-content-end">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+                <li class="breadcrumb-item active text-dark" aria-current="page">Job Fair Registration Success</li>
+            </ol>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="d-flex align-items-center">
+            <section class="applicantbanner w-100 h-100 p-5 bg-light rounded-start mb-4">
+                <h1>Registration Successful!</h1>
+                <br>
+                <p class="fs-4">You have successfully registered for the job fair: <strong>{{ job_fair.title }}</strong></p>
+                <p class="fs-5">Date: {{ job_fair.start_date }} to {{ job_fair.end_date }}</p>
+                <a href="{% url 'job-fair' %}" class="btn btn-light fw-bold btn-md customButton px-4 mt-2">Finished</a>
+            </section>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,686 @@
+{% load static %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+<div class="area" >
+    <ul class="circles">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+</div >
+<div class="content-wrapper">
+    <!--  SECTION  -->
+    <section id="landsection" class="text-white text-center d-flex align-items-center mb-5">
+        <div class="container">
+            <h1 id="main-heading" class="display-4 fw-bold">Find Your Dream Job</h1>
+            <p id="sub-heading"  class="lead mb-5">Search thousands of jobs.</p>
+            <form class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="input-group d-flex gap-3 align-items-center bubbleformfilter ">
+                        <i class="fa-solid fa-magnifying-glass text-dark"></i>
+                        {% render_field job_filter.form.title class="searchbar form-control form-control-lg border-0 p-0" placeholder="Search for jobs..." %}
+                        <button class="searchbar btn btn-primary" style="border-radius: 1.5rem;" type="submit">Search</button> 
+                        <a href="{% url 'home' %}" class="searchbar btn btn-outline-secondary custom-button" style="border-radius: 1.5rem;" type="submit">Reset</a>
+                        <button id="filter-btn" class="searchbar btn btn-dark custom-button text-light" style="border-radius: 1.5rem;" type="button">
+                            <i class="fa-solid fa-filter"></i> Filter
+                        </button>
+                       
+                    </div>
+                </div>
+
+                <div id="filter-options" class="row g-3 mb-4 justify-content-center input-group filter-hidden">
+                    <div class="col-xs-12 col-sm-6 col-md-3">
+                        <label for="jobtype">Location</label>
+                        <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                            <i class="fa-solid fa-location-dot text-dark"></i>
+                            <div class="input-group">
+                                {% render_field job_filter.form.location class="form-control border-0 p-0" placeholder="barangay, city, or region" %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-3">
+                        <label for="jobType">Job Type</label>
+                        <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                            <i class="fa-solid fa-briefcase text-dark"></i>
+                            <select class="form-control border-0 p-0" name="employment_job_type" id="employment_job_type">
+                                <option value="" disabled selected>Select Job Type</option>
+                                {% for choice in job_filter.form.employment_job_type.field.choices %}
+                                    <option value="{{ choice.0 }}" {% if form.employment_job_type.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-3">
+                        <label for="industry">Industry</label>
+                        <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                            <i class="fa-solid fa-industry text-dark"></i>
+                            <select class="form-control border-0 p-0" name="industry" id="industry">
+                                <option value="" disabled selected>Select Industry</option>
+                                {% for choice in job_filter.form.industry.field.choices %}
+                                    <option value="{{ choice.0 }}" {% if form.industry.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-3">
+                        <label for="salaryrange">Salary Range</label>
+                        <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                            <i class="fa-solid fa-money-bill-wave me-2 text-dark"></i>
+                            {% render_field job_filter.form.salary_range class="form-select border-0 p-0" id="salaryrange" %}
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+    
+    <div id="findjobs">
+        <div class="container">
+    
+            <div class="row">
+                <!-- Job Listings Column -->
+                <div class="col-md-5">
+                    <!-- Job Cards -->
+                    <div class="job-listings">
+                        {% for job in job_filter.qs %}
+                            <div class="card job-card mb-3" onclick="showJobDetails({{ forloop.counter }})">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-4">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{job.company.avatar.url}}" alt="CompanyLogo" class="company-logo me-3">
+                                            <div>
+                                                <h5 class="mb-1 fw-bolder">{{job.title}}</h5>
+                                                <p class="text-muted mb-0">{{job.company}}</p>
+                                                <p class="text-muted mb-0" style="font-size: 12px;">{{job.location.barangay|title}}, {{job.location.city|title}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <ul class="list-unstyled mb-0">
+                                            <li>
+                                                <span class="text-dark p-2"><i class="fas fa-clock me-2"></i> {{job.employment_job_type|title}}</span>
+                                            </li>
+                                            <li>
+                                                <span class="text-dark p-2"><i class="fas fa-map-marker-alt me-2"></i> {{job.location_job_type|title}}</span>
+                                            </li>
+                                            <li>
+                                                <span class="text-dark p-2"><i class="fa-solid fa-money-bill-wave me-2"></i> ₱ {{job.salary_min}} - ₱ {{job.salary_max}} {{job.salary_mode|title}}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="card-footer bg-white" style="border-top: none;"  title="{{ job.posted_date_time|date:'F d, Y H:i:s' }}">
+                                        <span>Posted {{job.posted_date_time|naturaltime}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="customAlert alert alert-danger text-center p-4 shadow" role="alert">
+                                <h4>No results found</h4>
+                                <p class="mt-2">Please adjust your filters and try again.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Job Details Column -->
+                <div class="col-md-7">
+                    {% for job in job_filter.qs %}
+                        <div id="job-{{ forloop.counter }}" class="job-details {% if forloop.first %} active {% endif %}">
+                            <div class="card job-card-details">
+                                <div class="card-body p-4">
+                                    <div class="d-flex justify-content-between align-items-start mb-4">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{job.company.avatar.url}}" alt="CompanyLogo" class="company-logo me-3">
+                                            <div>
+                                                <h2 class="mb-1 fw-bolder">{{job.title}}</h2>
+                                                <p class="text-muted mb-0">{{job.company|title}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex flex-column mb-4">
+                                        <div class="d-flex align-items-center mb-1">
+                                            <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
+                                                <i class="fa-solid fa-location-dot text-mute"></i>
+                                            </div>
+                                            <span>{{job.location.barangay|title}}, {{job.location.city|title}} ({{job.location_job_type|title}})</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-1">
+                                            <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
+                                                <i class="fa-solid fa-building"></i>
+                                            </div>
+                                            <span>{{job.company.industry|title}}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-1">
+                                            <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
+                                                <i class="fa-regular fa-clock"></i>
+                                            </div>
+                                            <div>{{job.employment_job_type|title}}</div>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
+                                                <i class="fa-solid fa-money-bill-wave"></i>
+                                            </div>
+                                            <div>₱ {{job.salary_min}} - ₱ {{job.salary_max}} {{job.salary_mode|title}}</div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <a href="{% url 'apply-job' job.pk %}" class="btn btn-primary customButton me-2 px-4">Apply Now</a>
+                                        
+                                        <a href="{% url 'save-job' job.pk %}" class="btn btn-outline-secondary customButton px-4">Save</a>
+                                    </div>
+
+
+                                    {% if job.job_description %}
+                                        <div class="mb-4">
+                                            <h6>Job Description</h6>
+                                            <p>{{job.job_description}}</p>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if job.ideal_candidate %}
+                                        <div class="mb-4">
+                                            <h6>Ideal Candidate</h6>
+                                            <p>{{job.ideal_candidate}}</p>
+                                        </div>
+                                    {% endif %}
+
+                                    
+                                    {% if job.requiredskill_set.exists %}
+                                        <div class="mb-4">
+                                            <h6>Required Skills</h6>
+                                            {% for skill in job.requiredskill_set.all %}
+                                                <span class="skill-badge">{{skill.skill_name}}, </span>
+                                            {% empty %}
+                                                <li>No skills required</li>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if job.job_responsibilities_set.exists %}
+                                        <div class="mb-4">
+                                            <h6>Responsibilities</h6>
+                                            <ul>
+                                                {% for responsibility in job.job_responsibilities_set.all %}
+                                                    <li>{{ responsibility.res_name }}</li>
+                                                {% empty %}
+                                                    <li>No responsibilities listed</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if job.job_experience_set.exists %}
+                                        <div class="mb-4">
+                                            <h6>Experience</h6>
+                                            <ul>
+                                                {% for experience in job.job_experience_set.all %}
+                                                    <li>{{ experience.exp_name }} ({{ experience.exp_years }} years)
+                                                        <p> - {{ experience.exp_description }}</p>
+                                                    </li>
+                                                {% empty %}
+                                                    <li>No experience required</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="customAlert alert alert-danger text-center shadow" role="alert" style="padding: 5rem; margin-bottom: 10vh;">
+                            <img src="{% static 'images/undraw_no_data_re_kwbl.svg' %}" class="mb-4" width="150" height="150" alt="">
+                            <h3>No results found.</h3>
+                            {% if request.GET.title %} for "{{ request.GET.title }}"{% endif %}
+                            {% if request.GET.location %} in "{{ request.GET.location }}"{% endif %}
+                            {% if request.GET.industry %} under "{{ request.GET.industry }}" industry{% endif %}
+                            {% if request.GET.employment_job_type %} with job type "{{ request.GET.employment_job_type }}"{% endif %}
+                            {% if request.GET.salary_range %}
+                                {% for key, label in salary_range_choices %}
+                                    {% if key == request.GET.salary_range %}
+                                        with a salary range "{{ label }}".
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            <p class="mt-2">Please adjust your filters and try again.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="container mt-5 mb-5 py-3 features-section">
+        <div class="text-center mb-5">
+            <h2 class="fs-1 fw-bold">Why Choose Us?</h2>
+            <p class="text-muted">Explore the benefits of using Job Compass</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-12 col-md-4">
+                <div class="card card-hover py-5 h-100 text-center">
+                    <div class="card-body">
+                        <i class="fa-solid fa-arrow-pointer mb-3" style="font-size: 5rem;"></i>
+                        <h3 class="card-title fs-4 fw-bold mb-3">Easy to Use</h3>
+                        <p class="card-text text-muted">Our platform is user-friendly and easy to navigate.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card card-hover py-5 h-100 text-center">
+                    <div class="card-body">
+                        <i class="fa-solid fa-arrows-left-right mb-3" style="font-size: 5rem;"></i>
+                        <h3 class="card-title fs-4 fw-bold mb-3">Wide Range of Jobs</h3>
+                        <p class="card-text text-muted">Find jobs in various industries and locations within Zamboanga city.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card card-hover py-5 h-100 text-center">
+                    <div class="card-body">
+                        <i class="fa-solid fa-handshake mb-3" style="font-size: 5rem;"></i>
+                        <h3 class="card-title fs-4 fw-bold mb-3">Trusted by Thousands</h3>
+                        <p class="card-text text-muted">We are trusted by job seekers and employers alike.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <div id="aboutus">
+        <div class="bg-light">
+            <section class="container mb-5 py-5">
+                <h1>About Us</h1>
+                <div class="row">
+                    <div class="col-md-6">
+                        <img src="static/images/undraw_team_work_k-80-m (1).svg" class="img-fluid rounded" width="600px" height="400px" alt="About Job Portal">
+                    </div>
+                    <div class="col-md-6 d-flex align-items-center">
+                        <div>
+                            <h2>Who We Are</h2>
+                            <p>At Job Compass, we aim to empower both applicants and employers by providing an intuitive, powerful job portal designed for simplicity and effectiveness. Our mission is to make job search and hiring in Zamboanga City efficient and impactful.</p>
+                            <p>Whether you're an applicant seeking new opportunities or an employer looking for top talent, we have the tools you need to succeed.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    
+        <section class="about-section">
+            <div class="container text-center py-5">
+                <h1>What We Offer</h1>
+                <p class="mb-5">Discover the features that make Job Compass the best place for applicants and employers.</p>
+                
+                <div class="row g-4">
+                    <div class="col-12 col-md-4">
+                        <div class="card card-hover py-5 h-100 text-center">
+                            <div class="card-body">
+                                <i class="fa-solid fa-people-group mb-3" style="font-size: 5rem;"></i>
+                                <h4 class="card-title fs-4 fw-bold mb-3">For Applicants</h4>
+                                <p class="card-text text-muted">Personalized job recommendations, resume building tools, and access to a wide range of career opportunities.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="card card-hover py-5 h-100 text-center">
+                            <div class="card-body">
+                                <i class="fa-solid fa-building mb-3" style="font-size: 5rem;"></i>
+                                <h4 class="card-title fs-4 fw-bold mb-3">For Employers</h4>
+                                <p class="card-text text-muted">Streamlined recruitment process, job posting tools, and access to a pool of talented individuals.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="card card-hover py-5 h-100 text-center">
+                            <div class="card-body">
+                                <i class="fa-solid fa-gears mb-3" style="font-size: 5rem;"></i>
+                                <h4 class="card-title fs-4 fw-bold mb-3">Advanced Matching Algorithm</h4>
+                                <p class="card-text text-muted">Our algorithm connects job seekers with relevant job opportunities, ensuring the right match every time.</p>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Testimonials Section -->
+        <section class="testimonials mt-5 bg-white mb-5 p-5">
+            <div class="container mb-4">
+                <h1 class="text-left mt-5 mb-5">What People Say About Us</h1>
+    
+                <div class="row g-4">
+                    <!-- First Testimonial -->
+                    <div class="col-lg-4">
+                        <div class="testimonial-card bg-white">
+                            <i class="fa-solid fa-quote-left text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
+                            <br>
+                            <br>
+                            <div class="testimonial-content">
+                                <div class="quote fs-5 ">
+                                    "Job Compass helped me find the perfect job. The recommendations were spot-on and saved me so much time!"
+                                </div>
+                            </div>
+                            <div class="mt-3 person-name">- John Doe, Applicant</div>
+                        </div>
+                        
+                    </div>
+        
+                    <!-- Second Testimonial -->
+                    <div class="col-lg-4">
+                        <div class="testimonial-card bg-white">
+                            <i class="fa-solid fa-quote-left text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
+                            <br>
+                            <br>
+                            <div class="testimonial-content">
+                                <div class="quote fs-5">
+                                    "As an employer, I was able to find the ideal candidate faster than I imagined. The system is very efficient."
+                                </div>
+                                
+                            </div>
+                            <div class="mt-3 person-name">- Jane Smith, Employer</div>
+                        </div>
+                    </div>
+        
+                    <!-- Third Testimonial -->
+                    <div class="col-lg-4">
+                        <div class="testimonial-card bg-white">
+                            <i class="fa-solid fa-quote-left text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
+                            <br>
+                            <br>
+                            <div class="testimonial-content">
+                                <div class="quote fs-5">
+                                    "The advanced matching algorithm is a game-changer. It linked me with exactly the jobs I was looking for."
+                                </div>
+                            </div>
+                            <div class="mt-3 person-name">- Carlos Perez, Applicant</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <style>
+        /* Custom styles */
+        .faq-header {
+            background-color: #007bff;
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+        .faq-header h1 {
+            font-size: 3rem;
+        }
+        .accordion-button:after {
+            font-size: 1.5rem;
+        }
+    </style>
+
+    <div id="faqs">
+        <div class="bg-light mb-5 py-5">
+            
+            <div class="container">
+                <h1 class="col-11"> Frequently Asked Questions</h1>
+                <!-- <div class="faq-search">
+                    <input type="text" class="form-control p-3" id="faqSearch" placeholder="Search for a question...">
+                </div> -->
+                <br>
+                <br>
+                <br>
+                <div class="row">
+                    <section class="container mb-5 col-lg-6">
+                        <div class="container">
+                            <h2>General Questions</h2>
+                            <br>
+                            <div class="accordion" id="accordionFAQ">
+                                <!-- FAQ 1 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingSeven">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="true" aria-controls="collapseSeven">
+                                            <i class="faq-icons bi bi-person"></i> How do I create an account on Job Compass?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#accordionFAQ">
+                                        <div class="accordion-body">
+                                            To create an account, click "Sign Up" on the homepage. You’ll need to provide your name, email, and a secure password.
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <!-- FAQ 2 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingEight">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+                                            <i class="faq-icons bi bi-gear"></i> How can I reset my password if I forgot it?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#accordionFAQ">
+                                        <div class="accordion-body">
+                                            Click on "Forgot Password" on the login page. You’ll receive an email with instructions to reset your password.
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <!-- FAQ 3 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingNine">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNine" aria-expanded="false" aria-controls="collapseNine">
+                                            <i class="faq-icons bi bi-search"></i> How can I search for job listings?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseNine" class="accordion-collapse collapse" aria-labelledby="headingNine" data-bs-parent="#accordionFAQ">
+                                        <div class="accordion-body">
+                                            Use the search bar on the homepage or job listings page to filter jobs based on title, location, industry, and more.
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <!-- FAQ 4 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingTen">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTen" aria-expanded="false" aria-controls="collapseTen">
+                                            <i class="faq-icons bi bi-shield-lock"></i> Is my personal information secure on Job Compass?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseTen" class="accordion-collapse collapse" aria-labelledby="headingTen" data-bs-parent="#accordionFAQ">
+                                        <div class="accordion-body">
+                                            Yes, your personal information is secure. We use the latest encryption technologies to ensure the safety of your data.
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <!-- FAQ 5 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingEleven">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEleven" aria-expanded="false" aria-controls="collapseEleven">
+                                            <i class="faq-icons bi bi-bell"></i> How will I receive notifications for job applications?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseEleven" class="accordion-collapse collapse" aria-labelledby="headingEleven" data-bs-parent="#accordionFAQ">
+                                        <div class="accordion-body">
+                                            Notifications for new job applications will be sent to your registered email address and will also appear in your dashboard.
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <!-- FAQ 6 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingTwelve">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwelve" aria-expanded="false" aria-controls="collapseTwelve">
+                                            <i class="faq-icons bi bi-phone"></i> Can I access Job Compass on my mobile device?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseTwelve" class="accordion-collapse collapse" aria-labelledby="headingTwelve" data-bs-parent="#accordionFAQ">
+                                        <div class="accordion-body">
+                                            Yes, Job Compass is fully optimized for mobile devices, so you can access all features on your smartphone or tablet.
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <!-- FAQ 7 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingThirteen">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThirteen" aria-expanded="false" aria-controls="collapseThirteen">
+                                            <i class="faq-icons bi bi-person-circle"></i> How do I edit my profile information?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseThirteen" class="accordion-collapse collapse" aria-labelledby="headingThirteen" data-bs-parent="#accordionFAQ">
+                                        <div class="accordion-body">
+                                            To edit your profile, log into your account and navigate to the "My Profile" section. From there, you can update your details.
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <!-- FAQ 8 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingFourteen">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFourteen" aria-expanded="false" aria-controls="collapseFourteen">
+                                            <i class="faq-icons bi bi-x-square"></i> How do I delete my account?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseFourteen" class="accordion-collapse collapse" aria-labelledby="headingFourteen" data-bs-parent="#accordionFAQ">
+                                        <div class="accordion-body">
+                                            You can delete your account by contacting our support team via the "Contact Us" page. They will guide you through the process.
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <!-- FAQ 9 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingFifteen">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFifteen" aria-expanded="false" aria-controls="collapseFifteen">
+                                            <i class="faq-icons bi bi-calendar"></i> How can I view my job application history?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseFifteen" class="accordion-collapse collapse" aria-labelledby="headingFifteen" data-bs-parent="#accordionFAQ">
+                                        <div class="accordion-body">
+                                            Your job application history is available in the "My Applications" section of your account dashboard.
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <!-- FAQ 10 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingSixteen">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSixteen" aria-expanded="false" aria-controls="collapseSixteen">
+                                            <i class="faq-icons bi bi-check-circle"></i> How can I get job alerts?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseSixteen" class="accordion-collapse collapse" aria-labelledby="headingSixteen" data-bs-parent="#accordionFAQ">
+                                        <div class="accordion-body">
+                                            Job alerts can be set up by enabling email notifications for job categories or companies you're interested in.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="faq-section col-lg-6">
+                        <div class="container">
+                            <h2>For Applicants</h2>
+                            <br>
+                            <div class="accordion" id="applicantFAQ">
+                                <!-- FAQ 1 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingOne">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                            How do I create an account as a job seeker?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#applicantFAQ">
+                                        <div class="accordion-body">
+                                            To create an account as a job seeker, simply click on the "Sign Up" button on the homepage. Fill in your personal details, create a password, and you will be all set to start applying for jobs.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- FAQ 2 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingTwo">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                            How can I apply for jobs?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#applicantFAQ">
+                                        <div class="accordion-body">
+                                            Once you have created an account and completed your profile, you can browse jobs and click on the "Apply" button for any position that interests you. You can upload your resume directly to apply.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- FAQ 3 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingThree">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                            Can I track the status of my applications?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#applicantFAQ">
+                                        <div class="accordion-body">
+                                            Yes, you can track the status of your job applications in the "My Applications" section of your dashboard. You’ll be notified when an employer views your application or changes its status.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="container">
+                            <h2>For Employers</h2>
+                            <br>
+                            <div class="accordion" id="employerFAQ">
+                                <!-- FAQ 1 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingFour">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                            How do I post a job listing?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#employerFAQ">
+                                        <div class="accordion-body">
+                                            After creating an employer account, you can navigate to the "Post a Job" section in your dashboard. Fill out the job details such as title, description, and requirements, and submit the listing for it to appear on the job board.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- FAQ 2 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingFive">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                            How do I manage the applications I receive?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#employerFAQ">
+                                        <div class="accordion-body">
+                                            You can view and manage all applications for your job listings in the "My Jobs" section of your dashboard. From there, you can view applicants' resumes, schedule interviews, and communicate with candidates directly.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- FAQ 3 -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingSix">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                                            Can I edit or remove a job listing after it's posted?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#employerFAQ">
+                                        <div class="accordion-body">
+                                            Yes, you can edit or remove your job listings at any time. Simply go to "My Jobs" in your dashboard, find the listing you want to edit or remove, and take the appropriate action.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

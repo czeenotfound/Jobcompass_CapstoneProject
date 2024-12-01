@@ -1,0 +1,143 @@
+{% extends 'users/base.html' %}
+{% load static %}
+
+{% block content %}
+    <div aria-label="breadcrumb" class="custombreadcrumb container bg-light p-4 mb-3 shadow-sm">
+        <ol class="breadcrumb mb-0 d-flex justify-content-end">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+            <li class="breadcrumb-item active text-dark" aria-current="page">View Resume</li>
+        </ol>
+    </div>
+
+    <div class="container applicantProfile-card bg-white">
+        <div class="p-5">
+            <h2 class="mb-5">Applicant Resume</h2>
+            <div class="profile-header row d-flex align-items-center justify-content-between">
+                <div class="col-md-12 col-lg-3">
+                    <img src="{{resume.user.avatar.url}}" alt="Profile Image" class="profile-image bg-light">
+                </div>
+                <div class="col-md-12 col-lg-9 mb-3">
+                    <h1 class="mb-3 text-white">{{resume.user.resume.first_name|title}} {{resume.user.resume.middle_name|title}} {{resume.user.resume.last_name|title}}</h1>
+                    <p class="text-white mt-4">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        {{resume.user.resume.address.barangay}}, {{resume.user.resume.address.city}}
+                    </p>
+                    <span class="skillbadge fw-bold">Status: {{resume.user.resume.employment_job_type}}</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="mb-4">
+                        <h4>About Me</h4>
+                        <p>{{resume.user.resume.about_me}}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4>Skills</h4>
+                        <div>
+                            {% for skill in resume.user.resume.skills.all %}
+                                <span class="skill-badge">{{skill.name}}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row mt-5">
+                        <div class="col-md-6 mb-4">
+                            <h4>Experience</h4>
+                            {% for experience in resume.user.resume.experiences.all %}
+                                <p class="card-text">
+                                    <strong>{{experience.title}}</strong> <br>
+                                    {{experience.company}} <br>
+                                    {{experience.start_date}} - {{experience.end_date}} <br>
+                                    <ul>
+                                        <li>{{experience.description}}</li>
+                                    </ul>
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <h4>Education</h4>
+                            {% for education in resume.user.resume.education.all %}
+                                <p class="card-text">
+                                    <strong>{{ education.degree }}</strong> <br>
+                                    {{ education.institution }} <br>
+                                    Graduated: {{ education.graduation_year }}
+                                </p>
+                            {% empty %}
+                                <p class="card-text">No education details available.</p>
+                            {% endfor %}
+                        </div>
+
+                        
+                        
+                        <div class="col-md-6 mt-5 mb-4">
+                            <h4>Certifications</h4>
+                            {% for certificate in resume.user.resume.certifications.all %}
+                                <ul>
+                                    <li>{{ certificate.name }}</li>
+                                </ul>
+                            {% empty %}
+                                <p class="card-text">No education details available.</p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6 mt-5 mb-4">
+                            <h4>Project</h4>
+                            {% for project in resume.user.resume.projects.all %}
+                                <p class="card-text">
+                                    <strong>{{ project.title }}</strong>
+                                    <br> 
+                                    <small>{{ project.url }}</small>
+                                    <br>
+                                    <ul>
+                                        <li>{{project.description}}</li>
+                                    </ul>
+                                    
+                                </p>
+                            {% empty %}
+                                <p class="card-text">No education details available.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="stats-card mb-3">
+                        <h5>Contact Information</h5>
+                        <div class="contact-info mb-2">
+                            <i class="fas fa-phone me-2"></i>
+                            <span>{{resume.user.phone}}</span>
+                        </div>
+                        <div class="contact-info mb-2">
+                            <i class="fas fa-envelope me-2"></i>
+                            <span>{{resume.user.email}}</span>
+                        </div>
+                    </div>
+                    
+
+                    <h4>Experience</h4>
+                    {% for socials in resume.user.resume.sociallinks.all %}
+                        <p class="card-text">
+                            <strong>{{socials.platform}}</strong> <br>
+                            {{socials.company}} <br>
+                            {{socials.start_date}} - {{socials.end_date}} <br>
+                            <ul>
+                                <li>{{socials.description}}</li>
+                            </ul>
+                        </p>
+                    {% endfor %}
+                    <div class="stats-card">
+                        <h5>Social Links</h5>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-linkedin fa-2x"></i></a>
+                            <a href="#"><i class="fab fa-twitter fa-2x"></i></a>
+                            <a href="#"><i class="fab fa-github fa-2x"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

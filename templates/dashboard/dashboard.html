@@ -1,0 +1,535 @@
+{% extends 'users/base.html' %}
+{% load humanize %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+    {% if request.user.is_applicant %}
+    
+    {% if not request.user.has_resume %}
+        <div class="custombreadcrumb container alert alert-danger mt-3 p-4" role="alert">
+            Register your resume first. <a href="{% url 'create-resume' %}" class="text-decoration-none">Register Resume</a>
+        </div>
+        <!-- Welcome  -->
+        <div class="d-flex align-items-center">
+            <section class="container h-100 p-5 bg-light rounded-start mb-4">
+                <h1 class="hero-heading">Welcome to Our Platform</h1>
+                <p class="hero-subheading">Discover amazing opportunities and connect with the best companies.</p>
+            </section>
+        </div> 
+    {% endif %}
+    
+        <div class="container py-4">
+            <!-- SEARCH FILTERING -->
+            <div class="banner mb-4">
+                <form class="row justify-content-center" method="GET">
+                    <div class="col-md-10">
+                        <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                            <i class="fa-solid fa-magnifying-glass text-dark"></i>
+                            {% render_field job_filter.form.title class="searchbar form-control form-control-lg border-0 p-0" placeholder="Search for jobs..." %}
+                            
+                            <button class="searchbar btn btn-primary custom-button" type="submit">Search</button>
+                            <a href="{% url 'dashboard' %}" class="searchbar btn btn-outline-secondary custom-button" type="submit">Reset</a>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-4 justify-content-center text-center input-group">
+                        <div class="col-xs-12 col-sm-6 col-md-3">
+                            <label for="jobtype">Location</label>
+                            <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                <i class="fa-solid fa-location-dot text-dark"></i>
+                                <div class="input-group">
+                                    {% render_field job_filter.form.location class="form-control border-0 p-0" placeholder="barangay, city, or region" %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-3">
+                            <label for="jobType">Job Type</label>
+                            <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                <i class="fa-solid fa-briefcase text-dark"></i>
+                                <select class="form-control border-0 p-0" name="employment_job_type" id="employment_job_type">
+                                    <option value="" disabled selected>Select Job Type</option>
+                                    {% for choice in job_filter.form.employment_job_type.field.choices %}
+                                        <option value="{{ choice.0 }}" {% if form.employment_job_type.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class=" col-sm-6 col-md-3">
+                            <label for="industry">Industry</label>
+                            <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                <i class="fa-solid fa-industry text-dark"></i>
+                                <select class="form-control border-0 p-0" name="industry" id="industry">
+                                    <option value="" disabled selected>Select Industry</option>
+                                    {% for choice in job_filter.form.industry.field.choices %}
+                                        <option value="{{ choice.0 }}" {% if form.industry.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-3">
+                            <label for="salaryrange">Salary Range</label>
+                            <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                <i class="fa-solid fa-money-bill-wave me-2 text-dark"></i>
+                                {% render_field job_filter.form.salary_range class="form-select border-0 p-0" id="salaryrange" %}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- END OF SEARCH FILTERING -->
+            <div class="row">
+                <!-- Job Listings Column -->
+                <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+                    <h3 class="mb-1 mx-2">Jobs For You</h3>
+                </div> 
+                <!-- Job Listings Column -->
+                <div class="col-md-5">
+                    <!-- Job Cards -->
+                    <div class="job-listings">
+                        {% for job in job_filter.qs %}
+                            <div class="card job-card mb-3" onclick="showJobDetails({{ forloop.counter }})">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-4">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{job.company.avatar.url}}" alt="CompanyLogo" class="company-logo me-3">
+                                            <div>
+                                                <h5 class="mb-1 fw-bolder">{{job.title}}</h5>
+                                                <p class="text-muted mb-0">{{job.company}}</p>
+                                                <p class="text-muted mb-0" style="font-size: 12px;">{{job.location.barangay|title}}, {{job.location.city|title}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <ul class="list-unstyled mb-0">
+                                            <li>
+                                                <span class="text-dark p-2"><i class="fas fa-clock me-2"></i> {{job.employment_job_type|title}}</span>
+                                            </li>
+                                            <li>
+                                                <span class="text-dark p-2"><i class="fas fa-map-marker-alt me-2"></i> {{job.employment_job_type|title}}</span>
+                                            </li>
+                                            <li>
+                                                <span class="text-dark p-2"><i class="fa-solid fa-money-bill-wave me-2"></i> ₱ {{job.salary_min}} - ₱ {{job.salary_max}} {{job.salary_mode|title}}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    
+
+                                </div>
+                                <div class="card-footer bg-white" style="border-top: none;"  title="{{ job.posted_date_time|date:'F d, Y H:i:s' }}">
+                                    <span>Posted {{job.posted_date_time|naturaltime}}</span>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="customAlert alert alert-danger text-center p-4 shadow" role="alert">
+                                <h4>No results found</h4>
+                                <p class="mt-2">Please adjust your filters and try again.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- Job Details Column -->
+                <div class="col-md-7">
+                    {% for job in job_filter.qs %}
+                        <div id="job-{{ forloop.counter }}" class="job-details {% if forloop.first %} active {% endif %}">
+                            <div class="card job-card-details">
+                                <div class="card-body p-4">
+                                    <div class="d-flex justify-content-between align-items-start mb-4">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{job.company.avatar.url}}" alt="CompanyLogo" class="company-logo me-3">
+                                            <div>
+                                                <a href="{% url 'job-info' job.pk %}" class="joblink fs-2 text-decoration-none mb-1 fw-bolder">{{job.title}}</a>
+                                                <p class="text-muted mb-0">{{job.company}}</p>
+                                                <span class="text-muted mb-0">{{job.location_job_type|title}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex flex-column mb-4">
+                                        <div class="d-flex align-items-center mb-1">
+                                            <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
+                                                <i class="fa-solid fa-location-dot text-mute"></i>
+                                            </div>
+                                            <span>{{job.location.barangay|title}}, {{job.location.city|title}}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-1">
+                                            <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
+                                                <i class="fa-solid fa-building"></i>
+                                            </div>
+                                            <span>{{job.industry|title}}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-1">
+                                            <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
+                                                <i class="fa-regular fa-clock"></i>
+                                            </div>
+                                            <div>{{job.employment_job_type|title}}</div>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
+                                                <i class="fa-solid fa-money-bill-wave"></i>
+                                            </div>
+                                            <div>₱ {{job.salary_min}} - ₱ {{job.salary_max}} {{job.salary_mode|title}}</div>
+                                        </div>
+                                    </div>
+                                    {% if user.is_authenticated and user.is_applicant %} 
+                                        <div class="mb-4">
+                                            {% if job.has_applied %}
+                                                {% if job.application_status == 'ACCEPTED' %}
+                                                    <a href="#" class="btn btn-success customButton disabled">Application Accepted</a>
+                                                {% elif job.application_status == 'REJECTED' %}
+                                                    <a href="#" class="btn btn-danger customButton disabled">Application Rejected</a>
+                                                {% else %}
+                                                    <a href="/" class="btn btn-danger customButton px-4" onclick="return confirm('Are you sure you want to withdraw your application?')">Unapply</a>
+                                                {% endif %}
+                                            {% else %}
+                                                <a href="{% url 'apply-job' job.pk %}" class="btn btn-primary customButton px-4">Apply</a>
+                                            {% endif %}
+                                       
+                                            {% if job.is_saved %}
+                                                <a href="{% url 'save-job' job.pk %}" class="btn btn-secondary disabled customButton px-4">Saved</a>
+                                            {% else %}
+                                                <a href="{% url 'save-job' job.pk %}" class="btn btn-outline-secondary customButton px-4">Save</a>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if job.job_description %}
+                                        <div class="mb-4">
+                                            <h6>Job Description</h6>
+                                            <p>{{job.job_description}}</p>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if job.ideal_candidate %}
+                                        <div class="mb-4">
+                                            <h6>Ideal Candidate</h6>
+                                            <p>{{job.ideal_candidate}}</p>
+                                        </div>
+                                    {% endif %}    
+
+                                    
+                                    {% if job.requiredskill_set.exists %}
+                                        <div class="mb-4">
+                                            <h6>Required Skills</h6>
+                                            <ul>
+                                                {% for skill in job.requiredskill_set.all %}
+                                                    <li>{{ skill.skill_name }}</li>
+                                                {% empty %}
+                                                    <li>No skills required</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if job.job_responsibilities_set.exists %}
+                                        <div class="mb-4">
+                                            <h6>Responsibilities</h6>
+                                            <ul>
+                                                {% for responsibility in job.job_responsibilities_set.all %}
+                                                    <li>{{ responsibility.res_name }}</li>
+                                                {% empty %}
+                                                    <li>No responsibilities listed</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if job.job_experience_set.exists %}
+                                        <div class="mb-4">
+                                            <h6>Job Experience</h6>
+                                            <ul>
+                                                {% for experience in job.job_experience_set.all %}
+                                                    <li>{{ experience.exp_name }} ({{ experience.exp_years }} years)
+                                                        <p> - {{ experience.exp_description }}</p>
+                                                    </li>
+                                                {% empty %}
+                                                    <li>No experience required</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                    {% empty %}
+                        <div class="customAlert alert alert-danger text-center shadow" role="alert" style="padding: 5rem; margin-bottom: 10vh;">
+                            <img src="{% static 'images/undraw_no_data_re_kwbl.svg' %}" class="mb-4" width="150" height="150" alt="">
+                            <h3>No results found.</h3>
+                            {% if request.GET.title %} for "{{ request.GET.title }}"{% endif %}
+                            {% if request.GET.location %} in "{{ request.GET.location }}"{% endif %}
+                            {% if request.GET.industry %} under "{{ request.GET.industry }}" industry{% endif %}
+                            {% if request.GET.employment_job_type %} with job type "{{ request.GET.employment_job_type }}"{% endif %}
+                            {% if request.GET.salary_range %}
+                                {% for key, label in salary_range_choices %}
+                                    {% if key == request.GET.salary_range %}
+                                        with a salary range "{{ label }}".
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            <p class="mt-2">Please adjust your filters and try again.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- END OF JOBS FEED -->
+        </div>
+    
+    {% elif request.user.is_employer %}
+    
+        {% if not request.user.has_company %}
+            <div class="container alert alert-danger mt-3" role="alert">
+                <p class="text-dark">Register a company first.</p>
+                <a href="{% url 'register-company' %}" class="btn btn-light customButton px-3">
+                    <i class="fas fa-plus me-2"></i>Register Company 
+                </a>
+            </div>
+             <!-- Welcome  -->
+            <div class="d-flex align-items-center" style="margin-bottom: 50vh;">
+                <section class="container h-100 p-5 bg-light rounded-start mb-4">
+                    <h1 class="hero-heading">Welcome to Our Platform</h1>
+                    <p class="hero-subheading">Discover amazing opportunities and connect with the best applicants.</p>
+                </section>
+            </div>
+        {% else %}
+        {% if not is_profile_complete %}
+            <div class="container alert alert-danger mt-3" role="alert">
+                <p class="text-dark">Your employer profile is incomplete. Set it up now!</p>
+                <a href="{% url 'update-employer-profile' %}" class="btn btn-light customButton px-3">
+                    <i class="fas fa-plus me-2"></i>Set Up Employer Profile
+                </a>
+            </div>
+        {% endif %}
+            <!-- Main Section -->
+            <div class="container">
+                <!-- Banner -->
+                <div class="bannercandidate mb-4">
+                    <form class="row justify-content-center" method="GET">
+                        <div class="col-md-10">
+                            <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                <i class="fa-solid fa-magnifying-glass text-dark"></i>
+                                {% render_field resume_filter.form.name class="searchbar form-control form-control-lg border-0 p-0" placeholder="Search for Candidates..." %}
+                                <button class="searchbar btn btn-primary custom-button" type="submit">Search</button>
+                                <a href="{% url 'dashboard' %}" class="searchbar btn btn-outline-secondary custom-button" type="submit">Reset</a>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3 mb-4 justify-content-center text-center input-group">
+                            <!-- Location Filter -->
+                            <div class="col-xs-12 col-sm-6 col-md-3">
+                                <label for="address">Location</label>
+                                <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                    <i class="fa-solid fa-location-dot text-dark"></i>
+                                    <div class="input-group">
+                                        {% render_field resume_filter.form.address class="form-control border-0 p-0" placeholder="barangay, city, or region" %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Job Type Filter -->
+                            <div class="col-xs-12 col-sm-6 col-md-3">
+                                <label for="jobType">Employment Type</label>
+                                <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                    <i class="fa-solid fa-briefcase text-dark"></i>
+                                    <select class="form-control border-0 p-0" name="employment_job_type" id="employment_job_type">
+                                        <option value="" disabled selected>Select Job Type</option>
+                                        {% for choice in resume_filter.form.employment_job_type.field.choices %}
+                                            <option value="{{ choice.0 }}" {% if form.employment_job_type.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                    
+                            <!-- Industry Filter -->
+                            <div class="col-sm-6 col-md-3">
+                                <label for="industry">Industry</label>
+                                <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                    <i class="fa-solid fa-industry text-dark"></i>
+                                    <select class="form-control border-0 p-0" name="industry" id="industry">
+                                        <option value="" disabled selected>Select Industry</option>
+                                        {% for choice in resume_filter.form.industry.field.choices %}
+                                            <option value="{{ choice.0 }}" {% if form.industry.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                    
+                            <!-- Salary Range Filter -->
+                            <div class="col-xs-12 col-sm-6 col-md-3">
+                                <label for="salaryRange">Expected Salary</label>
+                                <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                    <i class="fa-solid fa-money-bill-wave me-2 text-dark"></i>
+                                    {% render_field resume_filter.form.expt_salary_range class="form-select border-0 p-0" id="salaryrange" %}
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Main content -->
+                <div class="row">
+                    <!-- Left Column: Candidates -->
+                    <div class=" col-md-8 p-4">
+                        <h2 class="mb-4">Find Candidates</h2>
+                        <!-- Candidate Card Template -->
+                        {% for resume in resume_filter.qs %}
+                            <div class="card candidate-card mb-3 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <img src="{{resume.user.avatar.url}}" alt="Candidate" class="rounded-circle me-4 bg-primary" width="80" height="80">
+                                        <div>
+                                            <h5 class="card-title mb-1 fw-bolder">{{resume.first_name|title}} {{resume.last_name|title}}</h5>
+                                            <p class="text-muted mb-2">{{resume.job_position|title}} </p>
+                                            
+                                        </div>
+                                        <div class="ms-auto">
+                                            <a href="{% url 'view-resume-profile' resume.pk %}" class="btn btn-outline-primary customButton px-3">
+                                                View Profile
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 row">
+                                        <div class="col-12 mb-3 row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="fw-bolder" for="skills">Experience</label>
+                                                <ul class="list-unstyled mb-0">
+                                                    {% for exp in resume.experiences.all %}
+                                                    <li>
+                                                        <span>{{ exp.title|title}} </span> 
+                                                        <br> -<em>{{ exp.company }}</em> ({{ exp.start_date|date:"F, Y"  }} - {{ exp.end_date|date:"F, Y"  }})
+                                                    </li>
+                                                    {% empty %}
+                                                        <li>No experience listed.</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="fw-bolder" for="skills">Education</label>
+                                                <ul class="list-unstyled mb-0">
+                                                    {% for edu in resume.education.all %}
+                                                    <li>
+                                                        <span>{{ edu.degree }}</span>, {{ edu.institution }} ({{ edu.graduation_year }})
+                                                    </li>
+                                                    {% empty %}
+                                                        <li>No education listed.</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-12 mb-3 row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="fw-bolder" for="skills">Skills</label>
+                                                
+                                                <div class="d-flex flex-wrap">
+                                                    {% for skill in resume.skills.all %}
+                                                    <span class="skillbadge me-2 mb-1">{{ skill.name }}</span>
+                                                    {% empty %}
+                                                    <span class="skillbadge me-2 mb-1">No skills listed.</span>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="fw-bolder" for="skills">Certifications</label>
+                                                <ul class="list-unstyled mb-0">
+                                                    {% for cert in resume.certifications.all %}
+                                                        <li>- {{ cert.name }}</li>
+                                                    {% empty %}
+                                                        <li>No certifications listed.</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="fw-bolder" for="skills">Projects</label>
+                                                <ul class="list-unstyled mb-0">
+                                                    {% for project in resume.projects.all %}
+                                                        <li>
+                                                            <strong>{{ project.title }}</strong><br>
+                                                            {% if project.url %}
+                                                                <br><a href="{{ project.url }}" target="_blank">View Project</a>
+                                                            {% endif %}
+                                                        </li>
+                                                        <li> {{ project.description|slice:":20" }}{% if project.description|length > 20 %}...{% endif %}</li>
+                                                    {% empty %}
+                                                        <li>No projects listed.</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="fw-bolder" for="skills">Social Links</label>
+                                                <ul class="list-unstyled mb-0">
+                                                    {% for link in resume.social_links.all %}
+                                                        <li>
+                                                            <strong>{{link.platform}}:</strong>
+                                                            <a href="{{link.url}}" target="_blank">{{ link.url }}</a>
+                                                        </li>
+                                                    {% empty %}
+                                                        <li>No social links provided.</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                        
+                                    
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="customAlert alert alert-danger text-center shadow" role="alert" style="padding: 5rem; margin-bottom: 10vh;">
+                                <img src="{% static 'images/undraw_no_data_re_kwbl.svg' %}" class="mb-4" width="150" height="150" alt="">
+                                <h3>No results found.</h3>
+                                {% if request.GET.name %} for "{{ request.GET.name }}"{% endif %}
+                                {% if request.GET.address %} in "{{ request.GET.address }}"{% endif %}
+                                {% if request.GET.industry %} under "{{ request.GET.industry }}" industry{% endif %}
+                                {% if request.GET.employment_job_type %} with employment type "{{ request.GET.employment_job_type }}"{% endif %}
+                                <!-- {% if request.GET.salary_range %}
+                                    {% for key, label in salary_range_choices %}
+                                        {% if key == request.GET.salary_range %}
+                                            with a salary range "{{ label }}".
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %} -->
+                                <p class="mt-2">Please adjust your filters and try again.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Right Column: Job Management -->
+                    <div class="col-md-4 p-4">
+                        <h3 class="mb-4">Job Management</h3>
+                        <!-- Quick Actions Card -->
+                        <div class="card recommendation-card mb-3 p-3">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">Quick Actions</h5>
+                                <div class="d-grid gap-2">
+                                    <a href="{% url 'create-job' %}" class="btn btn-primary customButton">Post a New Job</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Manage Jobs Card -->
+                        <div class="card recommendation-card mb-3 p-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Manage Jobs</h5>
+                                <p class="text-muted">View and edit your active job listings.</p>
+                                <a href="{% url 'manage-jobs' %}" class="btn btn-primary customButton px-3">Manage Jobs</a>
+                            </div>
+                        </div>
+                        <!-- Job Analytics Card -->
+                        <div class="card recommendation-card mb-3 p-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Job Analytics</h5>
+                                <p class="text-muted">Track performance of your job postings.</p>
+                                <a href="{% url 'job-analytics' %}" class="btn btn-primary customButton px-3">View Analytics</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        {% endif %}
+        
+        
+    </div>
+    {% endif %}
+
+{% endblock content %}

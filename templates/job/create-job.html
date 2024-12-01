@@ -1,0 +1,293 @@
+{% extends 'users/base.html' %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% load static %}
+
+{% block content %}
+    <div aria-label="breadcrumb" class="custombreadcrumb container bg-light p-4 mb-4 shadow-sm">
+        <ol class="breadcrumb mb-0 d-flex justify-content-end">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark text-muted">Manage Job</a></li>
+            <li class="breadcrumb-item active text-dark" aria-current="page">Post Job</li>
+        </ol>
+    </div>
+
+    <div class="container">
+        {% if form_errors %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <ul class="mb-0">
+                    {% for error in form_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+
+        <div class="row">
+            
+            <h4 class="mt-4 mb-4 col-lg-2"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
+            <form class="col-lg-10 card p-5 mb-5" method="POST" >
+                {% csrf_token %}
+                <h1 class="mb-4">Post a Job</h1>
+                <hr>
+                <h4 for="employerSocials" class="form-label mb-3">Job Information</h4>
+                
+                <div class="mb-3">
+                    <label for="jotitle" class="form-label">Job Title</label>
+                    {% render_field form.title class="form-control" required="True"%}
+                </div>
+                <div class="mb-3">
+                    <label for="jobIndustry" class="form-label">Company's Industry</label>
+                    <input type="text" disabled class="form-control" placeholder="{{user.company.industry}}">
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 mb-3">
+                        <label for="employment_job_type" class="form-label">Employement Type</label>
+                        {% render_field form.employment_job_type class="form-select" required="True"%}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="location_job_type" class="form-label">Job Type</label>
+                        {% render_field form.location_job_type class="form-select" required="True"%}
+                    </div>
+
+                    <div class="col-sm-7 mb-3">
+                        <label for="salaryRange" class="form-label">Salary Range</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₱</span>
+                            {% render_field form.salary_min class="form-control" placeholder="Min" %}
+                            <span class="input-group-text">to</span>
+                            {% render_field form.salary_max class="form-control" placeholder="Max" %}
+                        </div>
+                    </div>
+                    <div class="col-sm-5 mb-3">
+                        <label for="salary_mode" class="form-label">Salary Mode</label>
+                        {% render_field form.salary_mode class="form-select" required="True"%}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="jobdescription" class="form-label">Job Description</label>
+                    {% render_field form.job_description class="form-control" rows="4" %}
+                </div>
+                <div class="mb-3">
+                    <label for="jobidealcandidate" class="form-label">Ideal Candidate</label>
+                    {% render_field form.ideal_candidate class="form-control" rows="4" %}
+                </div>
+                
+                <!-- Responsibilities Section -->
+                <div class="mb-3">
+                    <div class="text-white d-flex justify-content-between align-items-center mb-3">
+                        <label class="mb-0 text-dark">
+                            Job Responsibilities
+                            <small class="text-danger ms-2">(Minimum 1 responsibility required)</small>
+                        </label>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="add-responsibility-btn">
+                            <i class="bi bi-plus-circle me-1"></i>Add Responsibility
+                        </button>
+                    </div>
+                    <div id="responsibilities-container">
+                        {{ responsibility_formset.management_form }}
+                        {% for form in responsibility_formset %}
+                            <div class="responsibility-form row align-items-center mb-2">
+                                <div class="col-md-10">
+                                    {{ form.res_name }}
+                                </div>
+                                <div class="col-md-2">
+                                    {% if not forloop.first %}
+                                        <div class="form-check">
+                                            {{ form.DELETE }}
+                                            <label class="form-check-label text-danger">Remove</label>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Skills Section -->
+                <div class="mb-4">
+                    <div class="text-white d-flex justify-content-between align-items-center mb-3">
+                        <label class="mb-0 text-dark">
+                            Required Skills
+                            <small class="text-danger ms-2">(Minimum 1 skill required)</small>
+                        </label>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="add-skill-btn">
+                            <i class="bi bi-plus-circle me-1"></i>Add Skill
+                        </button>
+                    </div>
+                    <div id="skills-container">
+                        {{ skill_formset.management_form }}
+                        {% for form in skill_formset %}
+                            <div class="skill-form row align-items-center mb-2">
+                                <div class="col-md-10">
+                                    {{ form.skill_name }}
+                                </div>
+                                <div class="col-md-2">
+                                    {% if not forloop.first %}
+                                        <div class="form-check">
+                                            {{ form.DELETE }}
+                                            <label class="form-check-label text-danger">Remove</label>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Experience Section -->
+                <div class="mb-3">
+                    <div class="text-white d-flex justify-content-between align-items-center mb-3">
+                        <label class="mb-0 text-dark">
+                            Job Experience
+                            <small class="text-danger ms-2">(Minimum 1 experience required) Maximum of 3 Experiences</small>
+                        </label>
+                    </div>
+                    <div id="experience-container">
+                        {{ experience_formset.management_form }}
+                        {% for form in experience_formset %}
+                            <div class="experience-form row align-items-center mb-2">
+                                <div class="col-md-10">
+                                    {{ form.exp_name }}
+                                    {{ form.exp_years }}
+                                    {{ form.exp_description }}
+                                </div>
+                                <div class="col-md-2">
+                                    {% if not forloop.first %}
+                                        <div class="form-check">
+                                            {{ form.DELETE }}
+                                            <label class="form-check-label text-danger">Remove</label>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="mb-3 row">
+                    <label for="jobLocation" class="form-label">Location</label>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Region *</label>
+                        <select name="region" class="form-control form-control-md" id="region"></select>
+                        <input type="hidden" class="form-control form-control-md" name="region" id="region-text" required>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Province *</label>
+                        <select name="province" class="form-control form-control-md" id="province"></select>
+                        <input type="hidden" class="form-control form-control-md" name="province" id="province-text" required>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">City / Municipality *</label>
+                        <select name="city" class="form-control form-control-md" id="city"></select>
+                        <input type="hidden" class="form-control form-control-md" name="city" id="city-text" required>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Barangay *</label>
+                        <select name="barangay" class="form-control form-control-md" id="barangay"></select>
+                        <input type="hidden" class="form-control form-control-md" name="barangay" id="barangay-text" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="street-text" class="form-label">Street (Optional)</label>
+                        <input type="text" class="form-control form-control-md" name="street" id="street-text">
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="mb-3">
+                    <label for="jobTitle" class="form-label">Job Available</label>
+                    {% render_field form.is_available class="form-check-input" %}
+                </div>
+            
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a href="{{request.META.HTTP_REFERER}}" class="customButton btn btn-outline-danger py-3 px-5">
+                        <i class="fa-solid fa-times me-3"></i> Cancel
+                    </a>
+                    <button type="submit" class="customButton btn btn-primary py-3 px-5">
+                        <i class="fa-solid fa-plus me-3"></i> Post
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // Skills dynamic addition
+    const skillsContainer = document.getElementById('skills-container');
+    const addSkillBtn = document.getElementById('add-skill-btn');
+    const skillsTotalFormsInput = document.getElementById('id_skills-TOTAL_FORMS');
+
+    // Responsibilities dynamic addition
+    const responsibilitiesContainer = document.getElementById('responsibilities-container');
+    const addResponsibilityBtn = document.getElementById('add-responsibility-btn');
+    const responsibilitiesTotalFormsInput = document.getElementById('id_responsibilities-TOTAL_FORMS');
+
+    // Function to add a new form row
+    function addFormRow(container, totalFormsInput, prefix, maxForms = 10) {
+        // Check if we've reached max forms
+        if (parseInt(totalFormsInput.value) >= maxForms) {
+            alert(`Maximum of ${maxForms} ${prefix} allowed`);
+            return;
+        }
+
+        // Get the last form to clone
+        const forms = container.querySelectorAll(`.${prefix}-form`);
+        const lastForm = forms[forms.length - 1];
+        
+        // Clone the last form
+        const newForm = lastForm.cloneNode(true);
+        
+        // Reset input values
+        const inputs = newForm.querySelectorAll('input');
+        inputs.forEach(input => {
+            // Clear text inputs
+            if (input.type === 'text') {
+                input.value = '';
+            }
+            // Uncheck delete checkbox if present
+            if (input.type === 'checkbox') {
+                input.checked = false;
+            }
+        });
+
+        // Update form indices
+        const currentTotal = parseInt(totalFormsInput.value);
+        newForm.innerHTML = newForm.innerHTML.replace(
+            new RegExp(`${prefix}-${currentTotal - 1}`, 'g'), 
+            `${prefix}-${currentTotal}`
+        );
+
+        // Add delete button functionality for new rows
+        const deleteCheckbox = newForm.querySelector('input[type="checkbox"]');
+        if (deleteCheckbox) {
+            const deleteLabel = newForm.querySelector('.form-check-label');
+            deleteLabel.addEventListener('click', () => {
+                deleteCheckbox.checked = !deleteCheckbox.checked;
+            });
+        }
+
+        // Increment total forms
+        totalFormsInput.value = currentTotal + 1;
+
+        // Add new form to container
+        container.appendChild(newForm);
+    }
+
+    // Event listeners for adding rows
+    addSkillBtn.addEventListener('click', () => {
+        addFormRow(skillsContainer, skillsTotalFormsInput, 'skill');
+    });
+
+    addResponsibilityBtn.addEventListener('click', () => {
+        addFormRow(responsibilitiesContainer, responsibilitiesTotalFormsInput, 'responsibility');
+    });
+
+});
+</script>
+{% endblock content %}

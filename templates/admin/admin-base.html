@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Compass | Admin Dashboard</title>
+    <link rel="stylesheet" href="{% static 'bootstrap-5.0.2-dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome-free-6.5.1/css/all.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+    <script src="{% static 'JS/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'JS/sweetalert2@11.js' %}"></script>
+</head>
+<body> 
+    <div class="wrapper">
+        <aside id="sidebar" class="js-sidebar">
+            <!-- Content For Sidebar -->
+            <div class="h-100">
+                <div class="sidebar-logo text-center">
+                    <a class="navbar-brand order-lg-0" href="index.html">
+                        <span class="logoName fw-bold">Job Compass</span>
+                    </a>
+                </div>
+
+                <ul class="sidebar-nav">
+                    <li class="mb-3 bg-white">
+                        <a href="" class="profile">
+                            <div class="profile-pic">
+                                <img src="{% static 'images/icons8-male-user-96.png' %}" alt="">
+                            </div>
+                            <div class="handle">
+                                <span class="text-capitalize text-dark">{{user.username|title }}
+                                    <span class="d-block text-muted text-white">
+                                        Admin
+                                    </span>
+                                </span>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="sidebar-item mb-2">
+                        <a href="{% url 'admin-dashboard' %}" class="sidebar-link d-flex align-items-center">
+                            <i class="fa-solid fa-gauge pe-2 me-2 fs-5"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="sidebar-item mb-2">
+                        <a href="{% url 'admin-employers' %}" class="sidebar-link d-flex align-items-center">
+                            <i class="fa-solid fa-people-group pe-2 me-2 fs-6"></i>
+                            Employers
+                        </a>
+                    </li>
+                    <li class="sidebar-item mb-2">
+                        <a href="{% url 'admin-verification' %}" class="sidebar-link d-flex align-items-center">
+                            <i class="fa-solid fa-list pe-2 me-2 fs-5"></i>
+                            Verification
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+        <div class="main">
+            <nav class="mainnav navbar navbar-expand navbar-light px-3 border-bottom shadow-sm">
+                <button class="btn" id="sidebar-toggle" type="button">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse navbar">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a href="#" data-bs-toggle="dropdown" class="nav-icon pe-md-0">
+                                <img src="{% static 'images/icons8-male-user-96.png' %}" class="rounded-circle" width="32px" height="32px" alt="">
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a href="#" class="dropdown-item">Profile</a>
+                                <a href="#" class="dropdown-item">Setting</a>
+                                <a href="{% url 'admin-logout' %}" class="dropdown-item">Logout</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            {% block content %}
+            
+            {% endblock content %}
+            
+            <footer class="footer px-2">
+                <div class="container-fluid">
+                    <div class="row text-muted">
+                        <div class="col-6 text-start">
+                            <p class="mb-0">
+                                <a class="logoName text-decoration-none brand text-dark" href="index.html"><img src="assets/images/shop-solid.svg" alt="" width="20px"> Job Compass</a>
+                            </p>
+                        </div>
+                        <div class="col-6 text-end">
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <a href="#" class="text-muted">About Us</a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a href="#" class="text-muted">Terms</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="{% static 'bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'JS/dashboard.js' %}"></script>
+
+    <script>
+        // Example tab switching logic
+        document.getElementById('verified-tab').addEventListener('click', function() {
+            document.getElementById('verified-employers').classList.remove('d-none');
+            document.getElementById('pending-verifications').classList.add('d-none');
+        });
+    
+        document.getElementById('pending-tab').addEventListener('click', function() {
+            document.getElementById('verified-employers').classList.add('d-none');
+            document.getElementById('pending-verifications').classList.remove('d-none');
+        });
+    </script>
+</body>
+</html>

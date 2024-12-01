@@ -1,0 +1,146 @@
+{% extends 'users/base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <div aria-label="breadcrumb" class="custombreadcrumb container bg-light p-4 mb-4 shadow-sm">
+        <ol class="breadcrumb mb-0 d-flex justify-content-end">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark text-muted">Manage Job Fairs</a></li>
+            <li class="breadcrumb-item active text-dark" aria-current="page">Update Job Fair</li>
+        </ol>
+    </div>
+    <div class="container">
+        <div class="row">
+            <h4 class="mt-4 mb-4 col-lg-2"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
+            <form class="col-lg-10 card p-5 mb-5" method="POST">
+                {% csrf_token %}
+                <h1 class="mb-4">Update Job Fair</h1>
+                <hr>
+                <h4 for="employerSocials" class="form-label mb-3">Job Fair Information</h4>
+
+                <div class="mb-3">
+                    <label for="jobfairtitle" class="form-label">Job Fair Title</label>
+                    {% render_field form.title class="form-control" %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="jobfairtitle" class="form-label">Company's Industry</label>
+                    <input type="text" disabled class="form-control" name="" id="" placeholder="{{user.company.industry}}">
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 mb-3">
+                        <label for="fair_event_held" class="form-label">Job Fair Type</label>
+                        {% render_field form.fair_event_held class="form-select" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="jobfairattendees" class="form-label">Attendees</label>
+                        {% render_field form.max_attendees class="form-control" %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="jobfairUrlVirtual" class="form-label">URL Virtual (For Virtual Job Fair)</label>
+                    {% render_field form.url_location class="form-control" placeholder="https://www.website.com" %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="jobfairdescription" class="form-label">Description</label>
+                    {% render_field form.description class="form-control" rows="4" %}
+                </div>
+
+                <hr>
+
+                <div class="row">
+                    <h5 class="mb-3">Contacts</h5>
+                    <div class="col-sm-6 mb-3">
+                        <label for="jobfairattendees" class="form-label">Organizer Email</label>
+                        {% render_field form.contact_email class="form-control" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="jobfairattendees" class="form-label">Organizer Phone #</label>
+                        {% render_field form.contact_phone class="form-control" %}
+                    </div>
+                </div>
+                <hr>
+
+                <div class="row">
+                    <h5 class="mb-3">Job Fair Date</h5>
+                    <div class="col-sm-6 mb-3">
+                        <label for="jobfairstartDate class="form-label">Start Date</label>
+                        {% render_field form.start_date class="form-control" type="datetime-local"  %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="jobfairendDate class="form-label">End Date</label>
+                        {% render_field form.end_date class="form-control" type="datetime-local"  %}
+                    </div>
+
+                    <div class="col-sm-6 mb-3">
+                        <label for="jobfairApplicationStarts class="form-label">Application Start</label>
+                        {% render_field form.application_starts class="form-control" type="datetime-local"  %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="jobfairApplicationDeadline class="form-label">Application Deadline</label>
+                        {% render_field form.application_deadline class="form-control" type="datetime-local"  %}
+                    </div>
+                </div>
+
+                <hr>
+                
+                <div class="mb-3">
+                    <label for="jobfairimage" class="form-label fw-bold">Job Fair Cover Image</label>
+                
+                    <!-- Display the current image if it exists -->
+                    {% if form.image.value %}
+                        <div class="mb-2">
+                            <img src="{{ form.image.value.url }}" alt="Current Job Fair Image" class="img-fluid" style="max-width: 200px;">
+                        </div>
+                    {% endif %}
+                
+                    <!-- File input for a new image -->
+                    {% render_field form.image class="form-control" %}
+                </div>
+
+                <hr>
+                <div class="row">
+                    <h4 for="employerAddress" class="form-label mb-3">Location Venue</h4>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Region *</label>
+                        <select name="region" class="form-control form-control-md" id="region"></select>
+                        {% render_field address_form.region class="form-control form-control-md" name="region_text" id="region-text" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Province *</label>
+                        <select name="province" class="form-control form-control-md" id="province"></select>
+                        {% render_field address_form.province class="form-control form-control-md" name="province_text" id="province-text" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">City / Municipality *</label>
+                        <select name="city" class="form-control form-control-md" id="city"></select>
+                        {% render_field address_form.city class="form-control form-control-md" name="city_text" id="city-text" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Barangay *</label>
+                        <select name="barangay" class="form-control form-control-md" id="barangay"></select>
+                        {% render_field address_form.barangay class="form-control form-control-md" name="barangay_text" id="barangay-text" %}
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="street-text" class="form-label">Venue</label>
+                        {% render_field address_form.street class="form-control form-control-md" id="street-text" %}
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a href="{% url 'manage-job-fairs' %}" class="customButton btn btn-outline-danger py-3 px-5">
+                        <i class="fa-solid fa-times me-3"></i> Cancel
+                    </a>
+                    <button type="submit" class="customButton btn btn-primary py-3 px-5">
+                        <i class="fa-solid fa-save me-3"></i> Update
+                    </button>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+
+{% endblock content %}

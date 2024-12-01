@@ -1,0 +1,153 @@
+{% extends 'users/base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            {% if form_errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for error in form_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            <h4 class="mt-4 mb-4 col-lg-2"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
+            <form class="col-lg-10 card p-5 mb-5" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <h1 class="mb-4">Register your Company</h1> 
+
+                <h4 for="employerSocials" class="form-label mb-3">Company Information</h4>
+                <div class="row">
+                    <div class="col-3 d-flex align-items-center justify-content-center">
+                        {% if form.avatar.value %}
+                            <div class="mb-2 row">
+                                <img src="{{ form.avatar.value.url }}" alt="Current Avatar" class="img-fluid rounded-circle" style="max-width: 150px; max-height: 150px;">
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-9 mb-3 bg-light p-3">
+                        <label for="userAvatar" class="form-label fw-bold">User Avatar</label>
+                        {% render_field form.avatar class="form-control"%}
+                    </div>
+                </div>
+                <!-- Company Name -->
+                <div class="mb-3">
+                    <label for="companyName" class="form-label">Company Name *</label>
+                    {% render_field form.company_name class="form-control" placeholder="Enter Company Name" required=True%}
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-6 mb-3">
+                        <label for="companyEmail" class="form-label">Company Email *</label>
+                        {% render_field form.email class="form-control" placeholder="Enter Company Email" %}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="companyPhone" class="form-label">Company Phone *</label>
+                        {% render_field form.phone class="form-control" placeholder="Phone or Landline" %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6 mb-3 d-flex flex-column justify-content-end">
+                        <label for="industry" class="form-label">Select Company Industry *</label>
+                        <select class="form-control" name="industry" id="industry">
+                            <option value="" disabled selected>Select Industry</option>
+                            {% for choice in form.industry.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.industry.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="dateFounded" class="form-label">Company Establish Date*</label>
+                        {% render_field form.dateFounded class="form-control" type="datetime-local"%}
+                    </div>
+
+                    <div class="col-6 mb-4">
+                        <label for="employees" class="form-label">Number of Employees *</label>
+                        {% render_field form.employee_count class="form-control"%}
+                    </div>
+                    <!-- Website -->
+                    <div class="col-6 mb-3">
+                        <label for="website" class="form-label">Company Website (Optional)</label>
+                        {% render_field form.website_url class="form-control" placeholder="https://www.example.com" %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="jobDescription" class="form-label">About Company</label>
+                    {% render_field form.about_us class="form-control" rows="5" placeholder="Enter about company" required=True %}
+                </div>
+
+                <hr>
+                <!-- Location -->
+                <div class="mb-4 row">
+                    <h4 for="employerAddress" class="form-label mb-3">Address</h4>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Region *</label>
+                        <select name="region" class="form-select form-select-md mb-2" id="region"></select>
+                        {% render_field address_form.region class="form-control form-control-md" name="region_text" id="region-text" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Province *</label>
+                        <select name="province" class="form-select form-select-md mb-2" id="province"></select>
+                        {% render_field address_form.province class="form-control form-control-md" name="province_text" id="province-text" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">City / Municipality *</label>
+                        <select name="city" class="form-select form-select-md mb-2" id="city"></select>
+                        {% render_field address_form.city class="form-control form-control-md" name="city_text" id="city-text" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Barangay *</label>
+                        <select name="barangay" class="form-select form-select-md mb-2" id="barangay"></select>
+                        {% render_field address_form.barangay class="form-control form-control-md" name="barangay_text" id="barangay-text" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="street-text" class="form-label">Street (Optional)</label>
+                        {% render_field address_form.street class="form-control form-control-md" id="street-text" %}
+                    </div>
+                </div>
+                <hr>
+
+                <h4 for="employerAddress" class="form-label mb-3">Operational Information</h4>
+                <div class="mb-3">
+                    <label for="tinNumber" class="form-label">TIN Number *</label>
+                    {% render_field form.tin_number class="form-control" placeholder="123-456-789-000"%}
+                </div>
+                <div class="mb-3">
+                    <label for="birfile" class="form-label">BIR Certificate of Registration (Docx, PDF)*</label>
+                    {% render_field form.bir_file class="form-control"%}
+                </div>
+                <div class="mb-3">
+                    <label for="dti_file" class="form-label">DTI Certificate of Registration *</label>
+                    {% render_field form.dti_file class="form-control"%}
+                </div>
+
+                <hr>
+                
+                <!-- Social Media Links -->
+                <h4 for="employerSocials" class="form-label mb-3">Socials (Optional)</h4>
+                <div class="mb-3">
+                    <label for="facebook" class="form-label">Facebook</label>
+                    {% render_field form.facebook class="form-control" placeholder="Enter your Facebook URL" %}
+                </div>
+                <div class="mb-3">
+                    <label for="twitter" class="form-label">Twitter</label>
+                    {% render_field form.twitter class="form-control" placeholder="Enter your Twitter URL" %}
+                </div>
+                <div class="mb-3">
+                    <label for="github" class="form-label">GitHub</label>
+                    {% render_field form.github class="form-control" placeholder="Enter your GitHub URL" %}
+                </div>
+                <!-- Submit Button -->
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-secondary w-100 p-3">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+{% endblock content %}
+

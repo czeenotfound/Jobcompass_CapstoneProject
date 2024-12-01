@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Compass | Admin Dashboard</title>
+
+    <link rel="stylesheet" href="{% static 'assets/dist/css/bootstrap.min.css' %}">
+    
+    <link rel="stylesheet" href="{% static 'fontawesome-free-6.5.1/css/all.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+    <script src="{% static 'JS/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'JS/sweetalert2@11.js' %}"></script>
+</head>
+<body>
+    {% include 'admin/admin-navbar.html' %}
+    <div class="container-fluid">
+        <div class="row">
+            {% include 'admin/admin-sidebar.html' %}
+            
+            {% block content %}
+            
+            {% endblock content %}
+
+            {% include 'admin/admin-footer.html' %}
+        </div>
+    </div>
+    
+    <script src="{% static 'assets/dist/js/bootstrap.bundle.min.js' %}"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js" integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp" crossorigin="anonymous"></script>
+     
+    {% if messages %}
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                {% for message in messages %}
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: '{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}',
+                    title: '{{ message }}',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: '{% if message.tags == 'success' %}#28a745{% elif message.tags == 'error' %}#dc3545{% elif message.tags == 'warning' %}#ffc107{% else %}#17a2b8{% endif %}',
+                    color: '#ffffff',
+                    customClass: {
+                        popup: 'colored-toast' // Custom class for extra styling if needed
+                    }
+                });
+                {% endfor %}
+            });
+        </script>
+    {% endif %}
+    
+    <script src="{% static 'JS/dashboard.js' %}"></script>
+    <script src="{% static 'JS/index.js' %}"></script>
+</body>
+</html>

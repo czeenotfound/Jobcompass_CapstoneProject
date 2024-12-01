@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Application Details</h1>
+    <p>Job: {{ application.job.title }}</p>
+    <p>Submitted by: {{ application.user.username }}</p>
+
+    <!-- Check if a conversation exists before showing the button -->
+    {% if application.conversation_set.count == 0 %}
+        <a href="{% url 'start_conversation' application.id %}" class="btn btn-primary">Start Conversation</a>
+    {% else %}
+        <a href="{% url 'view_conversation' application.conversation_set.first.id %}" class="btn btn-secondary">View Conversation</a>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,115 @@
+{% if not user.is_authenticated %}
+    <h1>oopppss</h1>
+{% elif request.user.is_superuser %}
+    <div class="sidebar border border-right col-md-3 col-lg-3 col-xl-2 p-0 py-md-3 bg-body-tertiary">
+        <div class="offcanvas-md offcanvas-start bg-body-tertiary" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+            <div class="offcanvas-header">
+                <h4 class="offcanvas-title fw-bold" id="sidebarMenuLabel">Job Compass</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body d-md-flex flex-column p-0 overflow-y-auto overflow-x-hidden">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'admin-dashboard' %}active{% endif %}" href="{% url 'admin-dashboard' %}">
+                            <div class="icon-container text-center">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="text-container">Dashboard</div>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <button 
+                            class="btn btn-toggle nav-link d-flex align-items-center collapsed border-0 w-100" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#manage-jobs-dropdown" 
+                            aria-expanded="false">
+                            <div class="icon-container text-center">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <div class="text-container">Posts</div>
+                            <i class="ms-auto fas fa-chevron-down"></i>
+                        </button>
+                        <div class="collapse" id="manage-jobs-dropdown">
+                            <ul class="customLinks list-unstyled ps-3">
+                                <li>
+                                    <a class="nav-link d-inline-flex align-items-center {% if request.resolver_match.url_name == 'admin-manage-jobs' %}active{% endif %}" href="{% url 'admin-manage-jobs' %}">
+                                        <i class="fas fa-tasks me-2"></i> Manage Jobs
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="nav-link d-inline-flex align-items-center {% if request.resolver_match.url_name == 'admin-manage-jobfairs' %}active{% endif %}" href="{% url 'admin-manage-jobfairs' %}">
+                                        <i class="fas fa-calendar-alt me-2"></i> Manage Job Fairs
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'admin-employers' %}active{% endif %}" href="{% url 'admin-employers' %}">
+                            <div class="icon-container text-center">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="text-container">Employers</div>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'admin-applicants' %}active{% endif %}" href="{% url 'admin-applicants' %}">
+                            <div class="icon-container text-center">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="text-container">Applicants</div>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'admin-verification' %}active{% endif %}" href="{% url 'admin-verification' %}">
+                            <div class="icon-container text-center">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="text-container">Verification</div>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'admin-reports' %}active{% endif %}" href="{% url 'admin-reports' %}">
+                            <div class="icon-container text-center">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="text-container">Reports</div>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center  {% if request.resolver_match.url_name == 'admin-settings' %}active{% endif %}" href="{% url 'admin-settings' %}">
+                            <div class="icon-container text-center">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <div class="text-container">Settings</div>
+                        </a>
+                    </li>
+
+                    <hr class="nav-item d-md-none">
+
+                    <li class="nav-item d-md-none">
+                        <a class="nav-link d-flex align-items-center" href="{% url 'admin-profile' %}">
+                            <div class="icon-container text-center">
+                                <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+                            </div>
+                            <div class="text-container">
+                                Profile
+                            </div>
+                        </a>
+                    </li>
+                    <li class="nav-item d-md-none">
+                        <a class="nav-link d-flex align-items-center" href="{% url 'admin-logout' %}">
+                            <div class="icon-container text-center">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                            </div>
+                            <div class="text-container">
+                                Logout
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+{% endif %}

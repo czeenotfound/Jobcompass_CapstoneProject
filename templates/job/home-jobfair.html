@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Compass</title>
+    <link rel="stylesheet" href="static/bootstrap-5.0.2-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/CSS/main.css">
+    <link rel="stylesheet" href="static/fontawesome-free-6.5.1/css/all.min.css">
+    
+    <!-- js -->
+    <script src="static/JS/jquery-3.7.1.js"></script>
+    <script src="static/JS/sweetalert2@11.js"></script>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div id="navbar" class="bg-light fixed-top sticky-top">
+        <nav class="py-2 bg-body-tertiary border-bottom">
+            <div class="container d-flex flex-wrap">
+                <ul class="nav me-auto">
+                    <li class="nav-item"><a href="index.html" class="nav-link link-body-emphasis px-2 active" aria-current="page">Home</a></li>
+                    <li class="nav-item"><a href="index.html#faqs" class="nav-link link-body-emphasis px-2">FAQs</a></li>
+                    <li class="nav-item"><a href="index.html#aboutus" class="nav-link link-body-emphasis px-2">About</a></li>
+                </ul>
+                <ul class="nav">
+                    <li class="nav-item"><a href="login.html" class="nav-link link-body-emphasis px-2">Login</a></li>
+                    <li class="nav-item"><a href="signup.html" class="nav-link link-body-emphasis px-2">Sign up</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div id="navbar" class="bg-light fixed-top sticky-top">
+            <nav class="navbar navbar-light bg-light navbar-expand-md bg-faded justify-content-center py-3 border-bottom">
+                <div class="container">
+                    <a href="/" class="navbar-brand d-flex w-50 me-auto">
+                        <span class="fw-bold fs-4">Job Compass</span>
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsingNavbar3">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse w-100 " id="collapsingNavbar3">
+                       
+                        <ul class="nav navbar-nav ms-auto w-100 justify-content-end gap-3 text-center">
+                            <li class="nav-item position-relative">
+                                <a href="index.html#findjobs" class="nav-link link-body-emphasis px-2" id="findjobs-link">Find Jobs</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="jobfair.html" class="nav-link link-body-emphasis px-2">Job Fairs</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div> 
+    </div>
+    <div>
+        <!-- Banner -->
+        <div class="banner2 mb-5">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-7">
+                        <h1 class="display-4 fw-bold mb-3">Connect With Top Companies</h1>
+                        <p class="lead mb-4">Attend our job fairs to network with leading employers and find your dream job. Register now for upcoming events!</p>
+                        <button class="btn btn-light btn-lg">View All Events</button>
+                    </div>
+                    <div class="col-md-5 text-center">
+                        <img src="static/images/undraw_connected_world_wuay.svg" class="img-fluid rounded" width="600px" height="400px" alt="Job Fair Header">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="container mb-5">
+            <!-- Featured Event -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="card event-card">
+                        <span class="featured-badge p-3">
+                            <span class="badge bg-warning text-dark">Featured Event</span>
+                        </span>
+                        <div class="card-body p-5">
+                            <div class="row align-items-center">
+                                
+                                <div class="col-md-3 text-center">
+                                    <img src="static/images/conventions.jpg" alt="Tech Career Fair" class="img-fluid rounded mb-3">
+                                    <div class="countdown-timer mb-3">
+                                        Starts in: 15 days
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="/" class="text-decoration-none text-dark"> <h2 class="mb-2">Tech Career Fair 2024</h2>  </a>
+                                    <p class="text-muted mb-3">
+                                        <i class="fas fa-calendar-alt me-2"></i> November 15, 2024
+                                        <i class="fas fa-clock ms-3 me-2"></i> 10:00 AM - 4:00 PM
+                                        <i class="fas fa-map-marker-alt ms-3 me-2"></i> Convention Center, Bangalore
+                                    </p>
+                                    <p class="mb-3">Join us for the biggest tech career fair of the year! Meet recruiters from top tech companies and explore opportunities in software development, data science, and more.</p>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <small class="text-muted me-3">Participating Companies:</small>
+                                        <img src="static/images/employer (Small).png" width="32px" class="rounded-circle me-2 bg-dark">
+                                        <img src="static/images/employer (Small).png" width="32px" class="rounded-circle me-2 bg-dark">
+                                        <img src="static/images/employer (Small).png" width="32px" class="rounded-circle me-2 bg-dark">
+                                        <span class="text-muted">+15 more</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-center text-md-end">
+                                    <button class="btn btn-primary btn-lg mb-2 w-100">Register Now</button>
+                                    <small class="text-muted d-block">Limited seats available!</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Upcoming Events -->
+            <div class="d-flex justify-content-start gap-5 align-items-center mb-4">
+                <h3 class="mb-0">Upcoming Job Fairs</h3>
+                <a href="login.html" class="text-decoration-none text-dark">See All Job Fairs <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+            <div class="row g-4">
+                <!-- Event 1 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card event-card h-100">
+                        <img src="static/images/conventions.jpg" alt="Tech Career Fair" class="img-fluid mb-3" style="border-radius: 1.5rem 1.5rem 0 0;">
+                        <div class="card-body">
+                            <h4 class="card-title">Finance & Banking Career Fair</h4>
+                            <p class="text-muted mb-3">
+                                <i class="fas fa-calendar-alt me-2"></i> November 20, 2024
+                                <br>
+                                <i class="fas fa-clock me-2"></i> 11:00 AM - 3:00 PM
+                                <br>
+                                <i class="fas fa-map-marker-alt me-2"></i> Hotel Grand, Mumbai
+                            </p>
+                            <p class="card-text">Connect with leading banks and financial institutions. Perfect for fresh graduates and experienced professionals.</p>
+                        </div>
+                        <div class="up-event-card-footer bg-white p-4">
+                            <button class="btn btn-outline-primary w-100">Register</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event 2 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card event-card h-100">
+                        <img src="static/images/conventions.jpg" alt="Tech Career Fair" class="img-fluid mb-3" style="border-radius: 1.5rem 1.5rem 0 0;">
+                        <div class="card-body">
+                            <h4 class="card-title">Startup Career Connect</h4>
+                            <p class="text-muted mb-3">
+                                <i class="fas fa-calendar-alt me-2"></i> December 5, 2024
+                                <br>
+                                <i class="fas fa-clock me-2"></i> 10:00 AM - 5:00 PM
+                                <br>
+                                <i class="fas fa-map-marker-alt me-2"></i> Startup Hub, Delhi
+                            </p>
+                            <p class="card-text">Meet innovative startups looking for talented individuals across various roles. Great networking opportunity!</p>
+                        </div>
+                        <div class="up-event-card-footer bg-white p-4">
+                            <button class="btn btn-outline-primary w-100">Register</button>
+                        </div>
+                    </div>
+                </div>
+
+                    <!-- Event 3 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card event-card h-100">
+                        <img src="static/images/conventions.jpg" alt="Tech Career Fair" class="img-fluid mb-3" style="border-radius: 1.5rem 1.5rem 0 0;">
+                        <div class="card-body">
+                            <h5 class="card-title">Healthcare & Medical Fair</h5>
+                            <p class="text-muted mb-3">
+                                <i class="fas fa-calendar-alt me-2"></i> December 15, 2024
+                                <br>
+                                <i class="fas fa-clock me-2"></i> 9:00 AM - 4:00 PM
+                                <br>
+                                <i class="fas fa-map-marker-alt me-2"></i> Medical Center, Chennai
+                            </p>
+                            <p class="card-text">Opportunities for healthcare professionals, medical staff, and support roles in leading hospitals.</p>
+                        </div>
+                        <div class="up-event-card-footer bg-white p-4">
+                            <button class="btn btn-outline-primary w-100">Register</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <section class="about-section">
+            <div class="container text-center py-5">
+                <div class="mb-5">
+                    <h1>Why Attend Our Job Fairs?</h1>
+                </div>
+                
+                
+                <div class="row g-4">
+                    <div class="col-12 col-md-4">
+                        <div class="card card-hover py-5 h-100 text-center">
+                            <div class="card-body">
+                                <i class="fas fa-handshake fa-3x mb-3" style="font-size: 5rem;"></i>
+                                <h4 class="card-title fs-4 fw-bold mb-3">Direct Networking</h4>
+                                <p class="card-text text-muted">Meet recruiters face-to-face and make lasting impressions that online applications can't match.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="card card-hover py-5 h-100 text-center">
+                            <div class="card-body">
+                                <i class="fas fa-lightbulb fa-3x mb-3" style="font-size: 5rem;"></i>
+                                <h4 class="card-title fs-4 fw-bold mb-3">Industry Insights</h4>
+                                <p class="card-text text-muted">Learn about industry trends and requirements directly from company representatives.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="card card-hover py-5 h-100 text-center">
+                            <div class="card-body">
+                                <i class="fas fa-rocket fa-3x mb-3" style="font-size: 5rem;"></i>
+                                <h4 class="card-title fs-4 fw-bold mb-3">Instant Opportunities</h4>
+                                <p class="card-text text-muted">Get interviewed on the spot and receive immediate feedback on your applications.</p>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Footer -->
+        <footer class="bg-light py-5">
+            <div class="container">
+                <div class="">
+                    <div class="col-md-6 col-lg-3">
+                        <a class="logoName fs-2 text-decoration-none brand text-dark fw-bold" href="index.html"><img src="#" alt="" width="40px">Job Compass</a>
+                    </div>
+                </div>
+                <hr class="mt-5">
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-5">
+                        <p class="fs-4">Contact Us</p>
+                        <ul class="list-unstyled">
+                            <li class="my-3">
+                                <span>666 John Doe Rd, Boulevard, CO
+                                    7000, Zamboanga City
+                                </span>
+                            </li>
+                            <li class="my-3">
+                                <span> +63662323122</span>
+                            </li>
+                            <li class="my-3">
+                                <span> jobcompassCO@sample.com</span>
+                            </li>
+                        </ul>
+                        
+                    </div>
+                    <div class="col-md-6 col-lg-3 socials">
+                        <p class="fs-4">Follow Us</p>
+                        <ul class="list-unstyled">
+                            <li class="my-3">
+                                <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-facebook footer-link"></i></a>
+                            </li>
+                            <li class="my-3">
+                                <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-x-twitter footer-link"></i></a>
+                            </li>
+                            <li class="my-3">
+                                <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-instagram footer-link"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer> 
+    
+    
+        <div class="card-footer text-center bg-dark text-white py-3">
+            &copy; 2024 Job Compass. All rights reserved.
+        </div>
+        <button id="scroll-to-top" onclick="scrollToTop()"><i class="fa-solid fa-chevron-up"></i></button>
+    </div>
+    
+    <script src="static/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="static/JS/index.js"></script>
+    
+</body>
+</html>

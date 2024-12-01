@@ -1,0 +1,131 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+    <div aria-label="breadcrumb" class="custombreadcrumb container bg-light p-4 mb-3 shadow-sm">
+        <ol class="breadcrumb mb-0 d-flex justify-content-end">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+            <li class="breadcrumb-item active text-dark" aria-current="page">Company Profile</li>
+        </ol>
+    </div>
+    <!-- COMPANY PROFILE MAIN -->
+    <div class="container employerProfile-card bg-white">
+        <div class="p-5">
+            <h2 class="mb-5">Company Profile</h2>
+            <div class="profile-header row d-flex align-items-center justify-content-between">
+                <div class="col-md-12 col-lg-2">
+                    <img src="{{user.company.avatar.url}}" alt="Profile Image" class="profile-image bg-light">
+                </div>
+                <div class="col-md-12 col-lg-6 mb-3">
+                    <h1 class="mb-3 text-white">{{user.company.company_name}}</h1>
+                    <span class="skillbadge fw-bold">{{user.company.industry}}</span>
+                    <p class="text-white mt-4">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        {{user.company.address.street}}, {{user.company.address.barangay}}, {{user.company.address.city}}
+                    </p>
+                    <span class="text-white">Founded: {{user.company.dateFounded|date:'F d, Y' }}</span>
+                    <br>
+                    <br>
+                    {% if user.company.verification_status == 'Pending' %}
+                        <span class="pendingbadge bg-info text-white fw-bold">Pending</span>
+                    {% elif user.company.verification_status == 'Verified' %}
+                        <span class="verifiedbadge fw-bold">Verified</span>
+                    {% elif user.company.verification_status == 'Rejected' %}
+                        <span class="rejectedbadge fw-bold">Rejected</span>
+                    {% endif %}
+                </div>
+                <div class="col-md-12 col-lg-3 d-flex justify-content-center gap-3">
+                    
+                    <a href="{% url 'register-company' %}" class="btn btn-outline-light customButton px-3">
+                        <i class="fas fa-edit me-2"></i>Edit Company
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="mb-4">
+                        <h4>About Us</h4>
+                        <p>{{user.company.about_us}}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5>Employee Count</h5>
+                        <div class="contact-info mb-2 p-3">
+                            <i class="fa-solid fa-people-group fs-3 me-3"></i>
+                            <span class="fs-5">{{user.company.employee_count}}</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5>Company Website</h5>
+                        <div class="contact-info mb-2 p-3">
+                            <span class="fs-5">{{user.company.website_url}}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    {% if user.company.dti_file or user.company.bir_file %}
+                    <div class="stats-card">
+                        <h5>Operational Information</h5>
+                        <div class="mt-3">
+                            {% if user.company.dti_file %}
+                                <p>Download your DTI file:</p>
+                                <a href="{{ user.company.dti_file.url }}" class="customButton btn btn-outline-secondary px-3 text-dark" target="_blank">View</a>
+                            {% else %}
+                                <p>No DTI file uploaded.</p>
+                            {% endif %}
+                            
+                            {% if user.company.bir_file %}
+                                <p>Download your BIR file:</p>
+                                <a href="{{ user.company.bir_file.url }}" class="customButton btn btn-outline-secondary px-3 text-dark" target="_blank">View</a>
+                            {% else %}
+                                <p>No BIR file uploaded.</p>
+                            {% endif %}
+                        </div>
+                    </div> 
+                    {% endif %}
+                    
+
+                    <div class="stats-card mb-3">
+                        <h5>Contact Information</h5>
+                        <div class="contact-info mb-2">
+                            <i class="fas fa-phone me-2"></i>
+                            <span>{{user.company.phone}}</span>
+                        </div>
+                        <div class="contact-info mb-2">
+                            <i class="fas fa-envelope me-2"></i>
+                            <span>{{user.company.email}}</span>
+                        </div>
+                    </div>
+
+                    {% if user.company.facebook or user.company.twitter or user.company.github %}
+                        <div class="stats-card">
+                            <h5>Social Links</h5>
+                            <div class="social-links">
+                                {% if user.company.facebook %}
+                                    <a href="{{ user.company.facebook }}" target="_blank">
+                                        <i class="fab fa-facebook fa-2x"></i>
+                                    </a>
+                                {% endif %}
+                                {% if user.company.twitter %}
+                                    <a href="{{ user.company.twitter }}" target="_blank">
+                                        <i class="fab fa-twitter fa-2x"></i>
+                                    </a>
+                                {% endif %}
+                                {% if user.company.github %}
+                                    <a href="{{ user.company.github }}" target="_blank">
+                                        <i class="fab fa-github fa-2x"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+               
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

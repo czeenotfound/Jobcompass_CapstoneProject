@@ -1,0 +1,204 @@
+{% if not user.is_authenticated %}
+<!-- NAVBAR -->
+<div id="navbar" class="bg-light fixed-top sticky-top">
+    <nav class="py-2 bg-body-tertiary border-bottom">
+        <div class="container d-flex flex-wrap">
+            <ul class="nav me-auto">
+                <li class="nav-item"><a href="{% url 'home' %}" class="nav-link link-body-emphasis px-2 active" aria-current="page">Home</a></li>
+                <li class="nav-item"><a href="{% url 'home' %}#faqs" class="nav-link link-body-emphasis px-2">FAQs</a></li>
+                <li class="nav-item"><a href="{% url 'home' %}#aboutus" class="nav-link link-body-emphasis px-2">About</a></li>
+            </ul>
+            <ul class="nav">
+                <li class="nav-item"><a href="{% url 'login' %}" class="nav-link link-body-emphasis px-2">Login</a></li>
+                <li class="nav-item"><a href="{% url 'register' %}" class="nav-link link-body-emphasis px-2">Sign up</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div id="navbar" class="bg-light fixed-top sticky-top">
+        <nav class="navbar navbar-light bg-light navbar-expand-md bg-faded justify-content-center py-3">
+            <div class="container">
+                <a href="{% url 'home' %}" class="navbar-brand d-flex w-50 me-auto">
+                    <span class="fw-bold fs-4">Job Compass</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsingNavbar3">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse w-100 " id="collapsingNavbar3">
+                   
+                    <ul class="nav navbar-nav ms-auto w-100 justify-content-end gap-3 text-center">
+                        <li class="nav-item position-relative">
+                            <a href="{% url 'home' %}#findjobs" class="nav-link link-body-emphasis px-2" id="findjobs-link">Find Jobs</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'jobfair' %}" class="nav-link link-body-emphasis px-2">Job Fairs</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+    
+</div>
+
+{% elif request.user.is_applicant %}
+    
+    <!-- NAVBAR -->
+    <div id="navbar" class="bg-light fixed-top sticky-top shadow-sm">
+        <nav class="navbar navbar-light bg-light navbar-expand-md bg-faded justify-content-center py-3 mb-3">
+            <div class="container">
+                <a href="{% url 'dashboard' %}" class="navbar-brand d-flex w-50 me-auto">
+                    <span class="fw-bold fs-4">Job Compass</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsingNavbar3">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse w-100 " id="collapsingNavbar3">
+                    <ul class="nav navbar-nav ms-auto w-100 justify-content-end gap-3 text-center">
+                        {% if request.user.has_resume %}
+                            <li class="nav-item dropdown custom-dropdown">
+                                <a 
+                                    href="#" 
+                                    class="nav-link px-2 custom-dropdown-toggle" 
+                                    id="jobFairDropdown" 
+                                    role="button" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false"
+                                >
+                                    Job Fairs
+                                </a>
+                                <ul class="dropdown-menu custom-dropdown-menu" aria-labelledby="jobFairDropdown">
+                                    <li>
+                                        <a class="dropdown-item custom-dropdown-item" href="{% url 'job-fair' %}">
+                                            Job Fair Feature
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item custom-dropdown-item" href="{% url 'all-job-fair' %}">
+                                            All Job Fairs
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'dashboard' %}"><i class="fa-solid fa-house"></i> <span class="d-md-none">Home</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'inbox' %}"><i class="fas fa-inbox me-1"></i> <span class="d-md-none">Inbox</span></a>
+                            </li>
+                            
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'create-resume' %}"><i class="fa-solid fa-square-plus"></i><span class=""> Register Resume</span></a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="nav-item dropdown profile-dropdown">
+                            <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="{{user.avatar.url}}" alt="mdo" width="32" height="32" class="rounded-circle">
+                            </a>
+                            <ul class="dropdown-menu profile-dropdown-menu dropdown-menu-end" aria-labelledby="navbarScrollingDropdown">
+                                <li><span class="dropdown-item custom-dropdown-item disabled fw-bold text-dark">{{user.get_full_name|title }}</span></li>
+                                    <hr class="dropdown-divider">
+                                <li><a class="dropdown-item custom-dropdown-item" href="{% url 'applicant-profile' user.pk %}">Profile</a></li>
+                                <li><a class="dropdown-item custom-dropdown-item" href="{% url 'job-application' %}">Applications</a></li>
+                                <li><a class="dropdown-item custom-dropdown-item" href="{% url 'jobfair-registration' %}">Job Fair Registration</a></li>
+                                <li><a class="dropdown-item custom-dropdown-item" href="{% url 'job-savedjobs' %}">Saved Jobs</a></li>
+                                <li><a class="dropdown-item custom-dropdown-item" href="{% url 'application-analytics' %}">Application Analytics</a></li>
+                                <li><a class="dropdown-item custom-dropdown-item" href="#">Settings</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item custom-dropdown-item" href="{% url 'logout' %}">Log Out</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+    
+{% elif request.user.is_employer %}
+    <!-- NAVBAR -->
+    <div id="navbar" class="bg-light fixed-top sticky-top mb-4 shadow">
+        <nav class="navbar navbar-dark bg-dark navbar-expand-md bg-faded justify-content-center py-3 mb-3">
+            <div class="container">
+                <a href="{% url 'dashboard' %}" class="navbar-brand d-flex w-50 me-auto flex-column">
+                    <span class="fw-bold fs-4">Job Compass</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsingNavbar3">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse w-100 " id="collapsingNavbar3">
+                    <ul class="nav navbar-nav ms-auto w-100 justify-content-end gap-3 text-center">
+                        {% if request.user.has_company %}
+                            <li class="nav-item dropdown custom-dropdown">
+                                <a 
+                                    href="#" 
+                                    class="nav-link px-2 custom-dropdown-toggle" 
+                                    id="jobFairDropdown" 
+                                    role="button" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false"
+                                >
+                                    Post
+                                </a>
+                                <ul class="dropdown-menu custom-dropdown-menu" aria-labelledby="jobFairDropdown">
+                                    <li>
+                                        <a class="dropdown-item custom-dropdown-item" href="{% url 'create-job' %}"><i class="fa-solid fa-briefcase me-3"></i>
+                                            <span>
+                                             Post Job
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item custom-dropdown-item" href="{% url 'create-job-fair' %}"><i class="fa-regular fa-calendar me-3"></i>
+                                            <span>
+                                             Post Job Fair
+                                            </span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'dashboard' %}"><i class="fa-solid fa-house"></i> <span class="d-md-none">Home</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'inbox' %}"><i class="fas fa-inbox me-1"></i> <span class="d-md-none">Inbox</span></a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'register-company' %}"><i class="fa-solid fa-square-plus"></i><span> Register Company</span></a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="nav-item dropdown profile-dropdown">
+                            <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="{{user.avatar.url}}" alt="mdo"  width="32" height="32" class="profile-picture-mini rounded-circle bg-white">
+                            </a>
+                            <ul class="dropdown-menu profile-dropdown-menu dropdown-menu-end" aria-labelledby="navbarScrollingDropdown">
+                                <!-- Company Dropdown -->
+                                {% if request.user.has_company %} 
+                                <li><span class="dropdown-item custom-dropdown-item disabled text-dark fw-bold mb-2">{{user.company.company_name|title }}</span></li>
+                                <li><a class="dropdown-item custom-dropdown-item" href="{% url 'company-profile' user.pk %}">Company Profile</a></li>
+                                <!-- <li><a class="dropdown-item" href="#">Manage Users</a></li> -->
+                                <li><a class="dropdown-item custom-dropdown-item" href="{% url 'manage-jobs' %}">Manage Jobs</a></li>
+                                <li><a class="dropdown-item custom-dropdown-item" href="{% url 'manage-job-fairs' %}">Manage Job Fairs</a></li>
+                                <hr class="dropdown-divider">
+                                {% endif %}
+                                <!-- Personal Account Dropdown -->
+                                <li><span class="dropdown-item custom-dropdown-item disabled text-dark fw-bold mb-2">{{user.get_full_name|title }}</span></li>
+                                <li><a class="dropdown-item custom-dropdown-item" href="{% url 'employer-profile' user.pk %}">Account Profile</a></li>
+                               
+                                <li><a class="dropdown-item custom-dropdown-item" href="#">Settings</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item custom-dropdown-item" href="{% url 'logout' %}">Log Out</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+{% endif %}

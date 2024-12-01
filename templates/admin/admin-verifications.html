@@ -1,0 +1,90 @@
+{% extends 'admin/admin.html' %}
+{% load static %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/buttons.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.bootstrap5.css' %}">
+
+    <script src="{% static 'JS/datatables/dataTables.js' %}"></script>
+{% endblock scripts %}
+
+
+{% block content %}
+   
+    <main class="col-md-9 ms-sm-auto col-lg-9 col-xl-10 py-3 px-md-4">
+         <div class="d-flex align-items-center">
+            <section class="employerbanner w-100  h-100 p-5 bg-light mb-4">
+                <h1 class="hero-heading">Verification Management</h1>
+            </section>
+        </div>
+        
+        <div class="custom-container bg-light p-3 shadow-sm">
+            <div class="mb-5">
+                <div class="tableBg">
+                    <table id="companyverifiedTable" class="table table-responsive w-100">
+                        <thead>
+                            <tr>
+                                <th>Company Name</th>
+                                <th>Company Email</th>
+                                <th>Status</th>
+                                <th>Document</th>
+                                <th>Post Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for company in companies %}
+                                <tr>
+                                    <td class="fw-semibold">
+                                        <h1 style="font-size: 1.5rem;">{{ company.company_name }}</h1>
+                                        <div class="location-badge">
+                                            <i class="fas fa-location-dot"></i>
+                                            {{company.address.street}},{{company.address.city}}
+                                        </div>
+                                    </td>
+                                    <td>{{company.email}}</td>
+                                    {% if company.verification_status == 'Pending' %}
+                                    <td>
+                                        <span class="status-badge status-pending">{{ company.verification_status }}</span>
+                                    </td>   
+                                    {% elif company.verification_status == 'Verified' %}
+                                    <td>
+                                        <span class="status-badge status-open">{{ company.verification_status }}</span>
+                                    </td>    
+                                    {% else %}
+                                    <td>
+                                        <span class="status-badge status-close">{{ company.verification_status }}</span>
+                                    </td>
+                                    {% endif %}
+                                    <td>
+                                        {% if company.bir_file or dti_file %}
+                                            <a href="{{ company.bir_file.url }}" target="_blank">View BIR</a>
+                                            <a href="{{ company.dti_file.url }}" target="_blank">View DTI</a>
+                                        {% else %}
+                                            <p>No resume uploaded</p>
+                                        {% endif %}</td>
+                                    </td>
+                                    <td>{{company.dateFounded|date:'F d, Y'}}</td>
+                                    <td>
+                                        <form method="post" class="action-buttons" style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="company_id" value="{{ company.id }}">
+                                            <select name="verification_status" class="form-select form-select-sm d-inline-block w-auto">
+                                                <option value="Pending" {% if company.verification_status == "Pending" %}selected{% endif %}>Pending</option>
+                                                <option value="Verified" {% if company.verification_status == "Verified" %}selected{% endif %}>Verified</option>
+                                                <option value="Rejected" {% if company.verification_status == "Rejected" %}selected{% endif %}>Rejected</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+            
+{% endblock content %}

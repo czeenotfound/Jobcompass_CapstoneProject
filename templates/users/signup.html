@@ -1,0 +1,208 @@
+{% extends 'users/base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+<!-- Add intl-tel-input CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.min.css">
+
+<style>
+    .invalid {
+        color: red;
+    }
+    .valid {
+        color: green;
+    }
+</style>
+
+<div id="signupBG" class="mt-5 mb-5">
+    <div id="signupSection" class="container-fluid d-lg-flex justify-content-center">
+        <!-- Signup Form Section -->
+        
+        <div class="w-100 signup-form d-flex flex-column gap-5 align-items-center justify-content-center h-100 p-3">
+            <h2 class="mb-4 fw-normal text-center">Create an Account</h2>
+            <form method="POST" id="signupForm">
+                {% csrf_token %}
+                
+                <!-- Step 1: Name Fields -->
+                <div id="step1" class="step row mb-5">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-center">
+                            <label class="form-label">I am an</label>
+                        </div>
+                       
+                        <div class="d-flex gap-3 w-100" role="group" aria-label="Role Selection">
+                            <input class="btn-check" type="radio" name="role" id="applicant" value="applicant" required {% if form.role.value == "applicant" %}checked{% endif %}>
+                            <label class="choiceButton btn btn-outline-primary w-50" for="applicant"><img src="{% static 'images/applicant (Small).png' %}" width="100px" alt="">Applicant</label>
+                    
+                            <input class="btn-check" type="radio" name="role" id="employer" value="employer" required {% if form.role.value == "employer" %}checked{% endif %}>
+                            <label class="choiceButton btn btn-outline-primary w-50" for="employer"><img src="{% static 'images/employer (Small).png' %}" width="100px" alt="">Employer</label>
+                        </div>  
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="firstName" class="form-label">First Name</label> 
+                        <div class="bubbleform mb-3">
+                            <input type="text" class="form-control border-0 p-0" id="firstName" name="first_name" placeholder="John" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-sm-6">
+                        <label for="lastName" class="form-label">Last Name</label>
+                        <div class="bubbleform mb-3">
+                            <input type="text" class="form-control border-0 p-0" id="lastName" name="last_name" placeholder="Doe" required>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="customButton btn-primary w-50 mt-3" onclick="nextStep(1)">Next</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Contact Info -->
+                <div id="step2" class="step d-none row ">
+                    <div class="col-sm-6">
+                        <label for="email" class="form-label">Email Address</label>
+                        <div class="bubbleform d-flex gap-3 align-items-center">
+                            <i class="fa-regular fa-envelope"></i>
+                            {% render_field form.email class="form-control border-0 p-0" placeholder="name@sample.com"%}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <div class="bubbleform mb-3">
+                            <input type="tel" id="phone" name="phone" class=" border-0 bg-transparent" placeholder="Enter your phone number">
+                        </div>
+                    </div>
+                    
+                    <div class="col-12 mt-2">
+                        <label for="password" class="form-label">Create Password</label>
+                        <div class="bubbleform mb-3 position-relative">
+                            <div class="position-relative">
+                                {% render_field form.password1 id="password" class="form-control border-0 p-0" oninput="validatePassword()" placeholder="Create Password" %}
+                                <span id="toggle-password" class="position-absolute end-0 top-50 translate-middle-y pe-3">
+                                    <i class="fa-solid fa-eye-slash cursor-pointer"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div id="requirements" class="text-muted mt-1 my-auto">
+                            <span id="length" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must be At least 8 characters</span>
+                            <br>
+                            <span id="uppercase" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must Contain At least 1 uppercase letter</span>
+                            <br>
+                            <span id="lowercase" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must Contain At least 1 lowercase letter</span>
+                            <br>
+                            <span id="digit" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must Contain At least 1 number</span>
+                            <br>
+                            <span id="special" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must Contain At least 1 special character</span>
+                        </div>
+                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        <div class="bubbleform mb-3 position-relative">
+                            {% render_field form.password2 id="confirmPassword" class="form-control border-0 p-0" placeholder="Confirm Password" %}
+                            <span id="toggle-confirm-password" class="position-absolute end-0 top-50 translate-middle-y pe-3">
+                                <i class="fa-solid fa-eye-slash cursor-pointer"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="customButton btn btn-primary w-50">Sign Up</button>
+                    </div>
+                </div>
+
+                <!-- Navigation (Hidden by default) -->
+                <div id="navigationButtons" class="d-none d-flex justify-content-center">
+                    <button type="button" class="customButton btn btn-secondary w-50 mt-3" onclick="previousStep()">Previous</button>
+                </div>
+
+                <p class="mt-3 text-center">Already have an account? <a class="text-decoration-none" href="{% url 'login' %}">Log In</a></p>
+            </form>
+            <!-- Hidden field to store the selected country code -->
+            <input type="hidden" id="country_code" name="country_code">
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/phone/intlTelInput.min.js' %}"></script>
+
+<script>
+    // Initialize the intl-tel-input plugin
+    var input = document.querySelector("#phone");
+    var iti = window.intlTelInput(input, {
+        preferredCountries: ["ph", "us", "sg"],  // Preferred countries
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"  // Utils script for formatting
+    });
+
+    // Add an event listener to capture the selected country code
+    input.addEventListener('input', function() {
+        var countryCode = iti.getSelectedCountryData().dialCode;  // Get the selected country dial code (e.g., +63 for Philippines)
+        document.querySelector('#country_code').value = countryCode;  // Set the country code in the hidden input field
+    });
+
+    document.querySelector("form").addEventListener("submit", function(e) {
+        var phoneNumber = iti.getNumber();  // Get the full phone number with country code
+        document.querySelector("#phone").value = phoneNumber;  // Update the phone number input with the full number
+    });
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const togglePassword = document.getElementById('toggle-password');
+        const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+
+        // Add toggle functionality for password field
+        togglePassword.addEventListener('click', () => {
+            const icon = togglePassword.querySelector('i');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.className = 'fa-solid fa-eye'; // Switch to eye icon
+            } else {
+                passwordInput.type = 'password';
+                icon.className = 'fa-solid fa-eye-slash'; // Switch to eye-slash icon
+            }
+        });
+
+        // Add toggle functionality for confirm password field
+        toggleConfirmPassword.addEventListener('click', () => {
+            const icon = toggleConfirmPassword.querySelector('i');
+            if (confirmPasswordInput.type === 'password') {
+                confirmPasswordInput.type = 'text';
+                icon.className = 'fa-solid fa-eye'; // Switch to eye icon
+            } else {
+                confirmPasswordInput.type = 'password';
+                icon.className = 'fa-solid fa-eye-slash'; // Switch to eye-slash icon
+            }
+        });
+    });
+    
+    function validatePassword() {
+        const password = document.getElementById("password").value;
+
+        // Requirements
+        const length = /.{8,}/;
+        const uppercase = /[A-Z]/;
+        const lowercase = /[a-z]/;
+        const digit = /[0-9]/;
+        const special = /[~!@#$%^&*()_+{}":;'[\]]/;
+
+        // Helper function to update the status
+        function updateStatus(id, condition) {
+            const element = document.getElementById(id);
+            const icon = element.querySelector("i");
+            if (condition) {
+                element.className = "valid";
+                icon.className = "fa-regular fa-circle-check"; // Green check icon
+            } else {
+                element.className = "invalid";
+                icon.className = "fa-solid fa-circle-xmark"; // Red cross icon
+            }
+        }
+
+        // Validate each requirement
+        updateStatus("length", length.test(password));
+        updateStatus("uppercase", uppercase.test(password));
+        updateStatus("lowercase", lowercase.test(password));
+        updateStatus("digit", digit.test(password));
+        updateStatus("special", special.test(password));
+    }
+</script>
+
+{% endblock content %}

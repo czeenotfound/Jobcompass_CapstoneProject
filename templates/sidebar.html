@@ -1,0 +1,100 @@
+{% if not user.is_authenticated %}
+
+
+{% elif request.user.is_applicant %}
+    <div class="col-12 col-lg-3 custom-sidebar mb-3 mb-lg-0 px-1">
+        <nav class="nav bg-white flex-column d-none d-lg-block text-center text-lg-start shadow-sm">
+            
+            <!-- Desktop Sidebar -->
+            <a class="largeScn nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'job-application' %}active{% endif %} " href="{% url 'job-application' %}">
+                <div class="icon-container text-center me-3">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="text-container">
+                    Applications
+                </div>
+            </a>
+            <a class="largeScn nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'jobfair-registration' %}active{% endif %} " href="{% url 'jobfair-registration' %}">
+                <div class="icon-container text-center me-3">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="text-container">
+                    Registrations
+                </div>
+            </a>
+            <a class="largeScn nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'job-savedjobs' %}active{% endif %} " href="{% url 'job-savedjobs' %}">
+                <div class="icon-container text-center me-3">
+                    <i class="fa-regular fa-calendar"></i>
+                </div>
+                <div class="text-container">
+                    Saved Jobs
+                </div>
+            </a>
+            <a class="largeScn nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'application-analytics' %}active{% endif %} " href="{% url 'application-analytics' %}">
+                <div class="icon-container text-center me-3">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i>
+                </div>
+                <div class="text-container">
+                    Application Analytics
+                </div>
+            </a>
+        </nav>
+        <!-- Tab Buttons for Small Screens -->
+        <nav class="nav nav-pills bg-white nav-justified d-lg-none">
+            <a class="nav-link" href="{% url 'job-application' %}">
+                <i class="fas fa-briefcase"></i><br>Applications
+            </a>
+            <a class="nav-link" href="{% url 'jobfair-registration' %}">
+                <i class="fas fa-briefcase"></i><br>Registrations
+            </a>
+            <a class="nav-link" href="{% url 'job-savedjobs' %}">
+                <i class="fa-regular fa-calendar"></i><br>Saved Jobs
+            </a>
+            <a class="nav-link" href="{% url 'application-analytics' %}">
+                <i class="fa-solid fa-magnifying-glass-chart"></i><br>Application Analytics
+            </a>
+        </nav>
+    </div>
+{% elif request.user.is_employer %}
+    <div class="col-12 col-lg-3 custom-sidebar mb-3 mb-lg-0 px-1">
+        <nav class="nav bg-white flex-column d-none d-lg-block text-center text-lg-start shadow-sm">
+            <!-- Desktop Sidebar -->
+            <a class="largeScn nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'manage-jobs' %}active{% endif %} " href="{% url 'manage-jobs' %}">
+                <div class="icon-container text-center me-3">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="text-container">
+                    Manage Jobs
+                </div>
+            </a>
+            <a class="largeScn nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'manage-job-fairs' %}active{% endif %} " href="{% url 'manage-job-fairs' %}">
+                <div class="icon-container text-center me-3">
+                    <i class="fa-regular fa-calendar"></i>
+                </div>
+                <div class="text-container">
+                    Manage Job Fairs
+                </div>
+            </a>
+            <a class="largeScn nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'job-analytics' %}active{% endif %} " href="{% url 'job-analytics' %}">
+                <div class="icon-container text-center me-3">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i>
+                </div>
+                <div class="text-container">
+                    Job Analytics
+                </div>
+            </a>
+        </nav>
+        <!-- Tab Buttons for Small Screens -->
+        <nav class="nav nav-pills bg-white nav-justified d-lg-none">
+            <a class="nav-link" href="{% url 'manage-jobs' %}">
+                <i class="fas fa-briefcase"></i><br>Manage Jobs
+            </a>
+            <a class="nav-link" href="{% url 'manage-job-fairs' %}">
+                <i class="fa-regular fa-calendar"></i><br>Manage Job Fairs
+            </a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'job-analytics' %}active{% endif %}" href="{% url 'job-analytics' %}"">
+                <i class="fa-solid fa-magnifying-glass-chart"></i><br>Job Analytics
+            </a>
+        </nav>
+    </div>
+{% endif %}

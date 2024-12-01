@@ -1,0 +1,135 @@
+{% extends 'users/base.html' %}
+{% load humanize %}
+{% load static %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/buttons.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.bootstrap5.css' %}">
+
+    <script src="{% static 'JS/datatables/dataTables.js' %}"></script>
+
+{% endblock scripts %}
+
+{% block content %}
+    <div class="container-container custom-container mb-5">
+        <div aria-label="breadcrumb" class="custombreadcrumb bg-light p-4 mb-3 shadow-sm">
+            <ol class="breadcrumb mb-0 d-flex justify-content-end">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+                <li class="breadcrumb-item active text-dark" aria-current="page">Job Analytics</li>
+            </ol>
+        </div>
+        
+        <!-- Welcome  -->
+        <div class="d-flex align-items-center">
+            <section class="employerbanner w-100  h-100 p-5 bg-light mb-4">
+                <h1 class="hero-heading">Job Analytics</h1>
+            </section>
+        </div>
+        
+        <div class="row flex-column flex-lg-row">
+            <!-- Sidebar -->
+            
+            {% include 'sidebar.html' %}
+
+            <!-- Main Content -->
+            <div class="mainTableContent col-12 col-lg-9">
+                <div class="custom-container mb-3">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm ">
+                                <div class="card-body">
+                                    <h3 class="h6 fw-semibold mb-2">Total Applications</h3>
+                                    <p class="display-6 fw-bold py-4" id="totalApplications">{{ total_jobs }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h3 class="h6 fw-semibold mb-2">Job Fair Registration</h3>
+                                    <p class="display-6 fw-bold py-4" id="totalRejected">{{ registered_job_fairs }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-2 mt-3">
+                         {% for status, count in status_counts.items %}
+                        <div class="col-md-4">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h3 class="h6 fw-semibold mb-2">{{ status|title }} Applicants</h3>
+                                    <p class="display-6 fw-bold py-4">{{ count }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                   
+
+                </div>
+
+                <!-- Main Section -->
+                <div class="custom-container bg-light p-3 shadow-sm">
+                    <div class="mb-5">
+                        <div class="tableBg">
+                            <table id="jobAnalyticsTable" class="table w-100">
+                                <thead>
+                                    <tr>
+                                        <th>Job Title</th>
+                                        <th>Job Type</th>
+                                        <th>Applications</th>
+                                        <th>Status</th>
+                                        <th>Post Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for job in jobs %}
+                                        <tr>
+                                            <td class="fw-semibold">
+                                                <h1 style="font-size: 1.5rem;">{{job.title}}</h1>
+                                                <div class="location-badge">
+                                                    <i class="fas fa-location-dot"></i>
+                                                    {{job.location.barangay}},{{job.location.city}}
+                                                </div>
+                                            </td>
+                                            <td>{{job.employment_job_type}}</td>
+                                            <td><span class="applicants-badge">{{job.application_set.all.count}} <a href="{% url 'job-applicants' job.pk %}"> Applicants</a></td></span></td>
+                                            {% if job.is_available %}
+                                                <td><span class="status-badge status-open">Open</span></td>
+                                            {% else %}
+                                                <td><span class="status-badge status-closed">Closed</span></td>
+                                            {% endif %}
+                                            <td>2024-09-10</td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    {% if job.is_available %}
+                                                        <!-- Deactivate Button -->
+                                                        <a href="{% url 'deactivate-job' job.pk %}" class="btn btn-danger" 
+                                                        onclick="return confirm('Are you sure you want to deactivate this job?')">
+                                                            Deactivate Job
+                                                        </a>
+                                                    {% else %}
+                                                        <!-- Activate Button -->
+                                                        <a href="{% url 'activate-job' job.pk %}" class="btn btn-success" 
+                                                        onclick="return confirm('Are you sure you want to activate this job?')">
+                                                            Activate Job
+                                                        </a>
+                                                    {% endif %}
+                                                    <button class="btn btn-edit"><i class="fa-regular fa-pen-to-square"></i></button>
+                                                    <a href="job-applicants.html" class="btn btn-view"><i class="fa-solid fa-eye"></i></a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% endblock content %}

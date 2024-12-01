@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" id="loginpage">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Compass | Admin Login</title>
+    <link rel="stylesheet" href="{% static 'bootstrap-5.0.2-dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome-free-6.5.1/css/all.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+    
+    <script src="{% static 'JS/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'JS/sweetalert2@11.js' %}"></script>
+</head>
+<body id="loginpage">
+    <div id="adminBG" style="margin-top: 20vh;">
+        <div id="loginSection" class="container mt-5 mb-5 features-section">
+            <div class="row h-100">
+                <div class="col-lg-6 hero-section d-none d-lg-flex align-items-center">
+                    <div>
+                        <h1 class="display-4 fw-bold text-center">Job Compass</h1>
+                        <h3 class="display-5 fw-regular">Admin</h3>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6 login-form d-flex align-items-center justify-content-center">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <h2 class="mb-4 fw-normal text-center">Login</h2>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <div class="bubbleform d-flex gap-3 align-items-center">
+                                <i class="fa-regular fa-envelope"></i>
+                                <input type="username" class="form-control border-0 p-0" id="username" name="username" placeholder="Username">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-group">
+                                <label for="password" class="form-label">Password</label>
+                                <div class="bubbleform d-flex gap-3 align-items-center">
+                                    <i class="fa-solid fa-key"></i>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control border-0 p-0" id="password" name="password" placeholder="Password" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="customButton btn btn-primary w-100">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <script src="{% static '../static/JS/jquery-3.7.1.js' %}"></script>
+    <script src="{% static '../static/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js' %}"></script>
+    
+    {% if messages %}
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                {% for message in messages %}
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: '{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}',
+                    title: '{{ message }}',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: '{% if message.tags == 'success' %}#28a745{% elif message.tags == 'error' %}#dc3545{% elif message.tags == 'warning' %}#ffc107{% else %}#17a2b8{% endif %}',
+                    color: '#ffffff',
+                    customClass: {
+                        popup: 'colored-toast' // Custom class for extra styling if needed
+                    }
+                });
+                {% endfor %}
+            });
+        </script>
+    {% endif %}
+    <script src="{% static '../static/JS/dashboard.js' %}"></script>
+</body>
+</html>

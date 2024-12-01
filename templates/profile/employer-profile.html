@@ -1,0 +1,89 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+    <div aria-label="breadcrumb" class="custombreadcrumb container bg-light p-4 mb-3 shadow-sm">
+        <ol class="breadcrumb mb-0 d-flex justify-content-end">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+            <li class="breadcrumb-item active text-dark" aria-current="page">Employer Profile</li>
+        </ol>
+    </div>
+    <!-- PROFILE MAIN -->
+    <div class="container employerProfile-card bg-white">
+        <div class="p-5">
+            {% if is_profile_complete %}
+                <h2 class="mb-5">Employer Profile</h2>
+                <div class="profile-header row d-flex align-items-center justify-content-between">
+                    <div class="col-md-12 col-lg-2">
+                        <img src="{{user.avatar.url}}" alt="Profile Image" class="profile-image bg-white">
+                    </div>
+                    <div class="col-md-12 col-lg-6">
+                        <h1 class="mb-3 text-white">{{employer.first_name|title}} {{employer.middle_name|title}} {{employer.last_name|title}}</h1>
+                        <span class="skillbadge fw-bold">{{ employer.get_employer_status_display }}</span>
+                        <p class="text-white mt-4">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            {{employer.address.street|title}}, {{employer.address.city|title}}
+                        </p>
+                    </div>
+                    <div class="col-md-12 col-lg-3 d-flex justify-content-center gap-3">
+                        <a href="{% url 'update-employer-profile' %}" class="btn btn-outline-light customButton px-3">
+                            <i class="fas fa-edit me-2"></i>Edit Profile
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-4">
+                            <h4>About Me</h4>
+                            <p>{{employer.about_me}}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="stats-card mb-3">
+                            <h5>Contact Information</h5>
+                            <div class="contact-info mb-2">
+                                <i class="fas fa-phone me-2"></i>
+                                <span>{{user.phone}}</span>
+                            </div>
+                            <div class="contact-info mb-2">
+                                <i class="fas fa-envelope me-2"></i>
+                                <span>{{user.email}}</span>
+                            </div>
+                        </div>
+
+                        {% if employer.facebook or employer.twitter or employer.github %}
+                        <div class="stats-card">
+                            <h5>Social Links</h5>
+                            <div class="social-links">
+                                {% if employer.facebook %}
+                                    <a href="{{ employer.facebook }}" target="_blank">
+                                        <i class="fab fa-facebook fa-2x"></i>
+                                    </a>
+                                {% endif %}
+                                {% if employer.twitter %}
+                                    <a href="{{ employer.twitter }}" target="_blank">
+                                        <i class="fab fa-twitter fa-2x"></i>
+                                    </a>
+                                {% endif %}
+                                {% if employer.github %}
+                                    <a href="{{ employer.github }}" target="_blank">
+                                        <i class="fab fa-github fa-2x"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12 text-center">
+                    <p class="text-dark">Your employer profile is incomplete. Set it up now to unlock full functionality!</p>
+                    <a href="{% url 'update-employer-profile' %}" class="btn btn-light customButton px-3">
+                        <i class="fas fa-plus me-2"></i>Set Up Employer Profile
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock content %}

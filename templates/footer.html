@@ -1,0 +1,62 @@
+{% load static %}
+   <!-- Footer -->
+    <footer class="bg-light py-5">
+        <div class="container">
+            <div class="">
+                <div class="col-md-6 col-lg-3">
+                    <a class="logoName fs-2 text-decoration-none brand text-dark fw-bold" href="{% url 'home' %}"><img src="#" alt="" width="40px">Job Compass</a>
+                </div>
+            </div>
+            <hr class="mt-5">
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-5">
+                    <p class="fs-4">Contact Us</p>
+                    <ul class="list-unstyled">
+                        <li class="my-3">
+                            <span>666 John Doe Rd, Boulevard, CO
+                                7000, Zamboanga City
+                            </span>
+                        </li>
+                        <li class="my-3">
+                            <span> +63662323122</span>
+                        </li>
+                        <li class="my-3">
+                            <span> jobcompassCO@sample.com</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- <div class="col-md-6 col-lg-3">
+                    <p class="fs-4">My Account</p>
+                    <ul class="list-unstyled">
+                        <li class="my-3">
+                            <a href="{% url 'login' %}" class="text-dark text-decoration-none text-muted footer-link"><i class="fa-solid fa-chevron-right"></i> Profile</a>
+                        </li>
+                    </ul>
+                </div> -->
+                <div class="col-md-6 col-lg-3 socials">
+                    <p class="fs-4">Follow Us</p>
+                    <ul class="list-unstyled">
+                        <li class="my-3">
+                            <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-facebook footer-link"></i></a>
+                        </li>
+                        <li class="my-3">
+                            <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-x-twitter footer-link"></i></a>
+                        </li>
+                        <li class="my-3">
+                            <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-instagram footer-link"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer> 
+
+    <div class="card-footer text-center bg-dark text-white py-3">
+        &copy; 2024 Job Compass. All rights reserved.
+    </div>
+    <button id="scroll-to-top" onclick="scrollToTop()"><i class="fa-solid fa-chevron-up"></i></button>
+    <!-- SCRIPTS -->
+    <script src="{% static 'bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'JS/index.js' %}"></script>
+</body>
+</html>

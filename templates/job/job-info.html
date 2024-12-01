@@ -1,0 +1,140 @@
+{% extends 'users/base.html' %}
+{% load humanize %}
+
+{% block content %}
+    <div aria-label="breadcrumb" class="custombreadcrumb container bg-light p-4 mb-3 shadow-sm">
+        <ol class="breadcrumb mb-0 d-flex justify-content-end">
+            <li class="breadcrumb-item"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+            <li class="breadcrumb-item active text-dark" aria-current="page">View Job</li>
+        </ol>
+    </div>
+<!-- Main Section -->
+    <div class="container">
+        <h4 class="mt-4 mb-4 col-lg-2"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
+    </div>
+
+    <div class="custom-container container bg-white applicantProfile-card">
+        <div class="p-5 mb-5">
+            <div class="row">
+                <h2>{{job.title}}</h2>
+                <p class="fs-4 text-muted mb-0">{{job.location_job_type|title}}</p>
+                <span class="mb-3 fs-5">Salary: ₱ {{job.salary_min}} - ₱ {{job.salary_max}}</span>
+
+                {% if user.is_authenticated and user.is_applicant %} 
+                <div class="mb-4">
+                    {% if job.has_applied %}
+                        {% if job.application_status == 'ACCEPTED' %}
+                            <a href="#" class="btn btn-success customButton disabled">Application Accepted</a>
+                        {% elif job.application_status == 'REJECTED' %}
+                            <a href="#" class="btn btn-danger customButton disabled">Application Rejected</a>
+                        {% else %}
+                            <a href="/" class="btn btn-danger customButton px-4" onclick="return confirm('Are you sure you want to withdraw your application?')">Unapply</a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'apply-job' job.pk %}" class="btn btn-primary customButton px-4">Apply</a>
+                    {% endif %}
+                
+                    {% if job.is_saved %}
+                        <a href="{% url 'save-job' job.pk %}" class="btn btn-secondary disabled customButton px-4">Saved</a>
+                    {% else %}
+                        <a href="{% url 'save-job' job.pk %}" class="btn btn-outline-secondary customButton px-4">Save</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="row">
+                <div class="col-sm-8">
+                    {% if job.job_description %}
+                    <div class="mb-4">
+                        <h4>Job Description</h4>
+                        <div>
+                            <p>{{job.job_description}}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if job.ideal_candidate %}
+                    <div class="mb-4">
+                        <h4>Ideal Candidate</h4>
+                        <div>
+                            <p>{{job.ideal_candidate}}</p>
+                        </div>
+                    </div>
+                    {% endif %}    
+
+                    
+                    {% if job.job_responsibilities_set.exists %}
+                    <div class="mb-4">
+                        <h4>Job Responsibilities</h4>
+                        <div>
+                            <ul>
+                                {% for responsibility in job.job_responsibilities_set.all %}
+                                    <li>{{ responsibility.res_name }}</li>
+                                {% empty %}
+                                    <li>No responsibilities listed</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+
+
+                    {% if job.job_experience_set.exists %}
+                        <div class="mb-4">
+                            <h4>Job Experience</h4>
+                            <ul class="list-unstyled">
+                                {% for experience in job.job_experience_set.all %}
+                                    <li>{{ experience.exp_name }} ({{ experience.exp_years }} years)
+                                        <p> • {{ experience.exp_description }}</p>
+                                    </li>
+                                {% empty %}
+                                    <li>No experience required</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+
+                    {% if job.requiredskill_set.exists %}
+                    <div class="mb-4">
+                        <h4>Skills</h4>
+                        <div>
+                            {% for skill in job.requiredskill_set.all %}
+                                <span class="skillbadge me-2 mb-1">{{ skill.skill_name }}</span>
+                            {% empty %}
+                                <span class="skillbadge me-2 mb-1">No skills specified</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card mb-3">
+                        <div class="mb-4">
+                            <p>Company Name</p>
+                            <h4>{{job.company|title}}</h4>
+                            <h6>{{job.company.industry|title}}</h6>
+                        </div>
+                    </div>
+                    <div class="stats-card mb-3">
+                        <h5>Contact Information</h5>
+                        <div class="contact-info mb-2">
+                            <i class="fas fa-phone me-2"></i>
+                            <span>{{job.company.phone}}</span>
+                        </div>
+                        <div class="contact-info mb-2">
+                            <i class="fas fa-envelope me-2"></i>
+                            <span>{{user.email}}</span>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+                
+        </div>
+    </div>
+        
+{% endblock content %}

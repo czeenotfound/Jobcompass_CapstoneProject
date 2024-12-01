@@ -1,0 +1,242 @@
+{% extends 'users/base.html' %}
+{% load humanize %}
+{% load static %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/buttons.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.bootstrap5.css' %}">
+
+    <script src="{% static 'JS/datatables/dataTables.js' %}"></script>
+
+{% endblock scripts %}
+
+{% block content %}
+    <div class="container-container custom-container mb-5">
+        <div aria-label="breadcrumb" class="custombreadcrumb bg-light p-4 mb-3 shadow-sm">
+            <ol class="breadcrumb mb-0 d-flex justify-content-end">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+                <li class="breadcrumb-item active text-dark" aria-current="page">My Application Analytics</li>
+            </ol>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="d-flex align-items-center">
+            <section class="applicantbanner w-100 h-100 p-5 bg-light rounded-start mb-4">
+                <h1 class="hero-heading">Application Analytics</h1>
+            </section>
+        </div>
+        <div class="row flex-column flex-lg-row">
+
+            {% include 'sidebar.html' %}
+            <!-- Main Content -->
+            <div class="mainTableContent col-12 col-lg-9">
+                <div class="custom-container mb-3">
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <div class="card shadow-sm ">
+                                <div class="card-body">
+                                    <h3 class="h6 fw-semibold mb-2">Total Applications</h3>
+                                    <p class="display-6 fw-bold py-4" id="totalApplications">{{ total_jobs }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h3 class="h6 fw-semibold mb-2">Accepted Applications</h3>
+                                    <p class="display-6 fw-bold py-4" id="totalAccepted">{{ accepted_count }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h3 class="h6 fw-semibold mb-2">Rejected Applications</h3>
+                                    <p class="display-6 fw-bold py-4" id="totalRejected">{{ rejected_count }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+
+                
+                <div class="custom-container bg-light p-3 shadow-sm">
+                    <div class="tableBg">
+                        <table id="applicationAnalyticsTable" class="table w-100">
+                            <thead>
+                                <tr>
+                                    <th>Application Title</th>
+                                    <th>Application Type</th>
+                                    <th>Saved Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for application in applications %}
+                                    <tr>
+                                        <td class="fw-semibold">
+                                            <h1 style="font-size: 1.5rem;">{{ application.job.title }}</h1>
+                                            <div class="location-badge">
+                                                <i class="fas fa-location-dot"></i>
+                                                {{ application.job.location.barangay }}, {{ application.job.location.city }}
+                                            </div>
+                                        </td>
+                                        <td>{{ application.job.employment_job_type }}</td>
+                                        <td>{{ application.job.posted_date_time|date:'F d, Y h:m A' }}</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a href="job-applicants.html" class="btn btn-view"><i class="fa-solid fa-eye"></i></a>
+                                                <a href="/" class="deleteButton btn btn-outline-danger" 
+                                                onclick="return confirm('Are you sure you want to unsave this job?')">
+                                                <i class="fa-solid fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="custom-container p-3">
+            <!-- Row 1 -->
+            <div class="mb-3">
+                <div class="bg-white p-4 shadow-sm">
+                    <h5 class="text-center mb-3">Status Distribution</h5>
+                    <canvas id="statusChart" class="chart-container"></canvas>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="bg-white p-4 shadow-sm">
+                    <h5 class="text-center mb-3">Salary Ranges</h5>
+                    <canvas id="salaryChart" class="chart-container"></canvas>
+                </div>
+            </div>
+            <div class=" b-3">
+                <div class="bg-white p-4 shadow-sm">
+                    <h5 class="text-center mb-3">Industry Breakdown</h5>
+                    <canvas id="industryChart" class="chart-container"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        
+        const statusLabels = {{ status_labels|safe }};
+        const statusValues = {{ status_values|safe }};
+        
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        const statusChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    label: 'Application Status',
+                    data: statusValues,
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)', 
+                        'rgba(255, 99, 132, 0.2)', 
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(153, 102, 255, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'left' },
+                    tooltip: { 
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw + ' applications';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        // Prepare the Industry Data
+        const industryLabels = {{ industry_names|safe }};
+        const industryData = {{ industry_values|safe }};
+
+        // Industry chart
+        const ctxIndustry = document.getElementById('industryChart').getContext('2d');
+        const industryChart = new Chart(ctxIndustry, {
+            type: 'bar',
+            data: {
+                labels: industryLabels,
+                datasets: [{
+                    label: 'Applications per Industry',
+                    data: industryData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw + ' applications';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Prepare the Salary Data
+        const salaryData = {{ salary_averages|safe }};
+
+        // Salary chart
+        const ctxSalary = document.getElementById('salaryChart').getContext('2d');
+        const salaryChart = new Chart(ctxSalary, {
+            type: 'line', // Can be 'bar' or 'line' depending on the preference
+            data: {
+                labels: Array.from({ length: salaryData.length }, (_, i) => i + 1), // X-axis as sequential application numbers
+                datasets: [{
+                    label: 'Average Salary',
+                    data: salaryData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return 'Salary: ' + tooltipItem.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock content %}

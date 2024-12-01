@@ -1,0 +1,88 @@
+{% extends 'users/base.html' %}
+{% load humanize %}
+{% load static %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/buttons.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.bootstrap5.css' %}">
+
+    <script src="{% static 'JS/datatables/dataTables.js' %}"></script>
+{% endblock scripts %}
+
+{% block content %}
+
+    <div class="container-container custom-container mb-5">
+        <div aria-label="breadcrumb" class="custombreadcrumb bg-light p-4 mb-3 shadow-sm">
+            <ol class="breadcrumb mb-0 d-flex justify-content-end">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'manage-jobs' %}" class="text-decoration-none text-dark text-muted">Manage Jobs</a></li>
+                <li class="breadcrumb-item active text-dark" aria-current="page">View Application</li>
+            </ol>
+        </div>
+        <!-- Welcome  -->
+        <div class="d-flex align-items-center">
+            <section class="employerbanner w-100  h-100 p-5 bg-light mb-4">
+                <h1 class="hero-heading">Applications for {{job.title}}</h1>
+                <br>
+                <a href="{% url 'create-job' %}" class="btn btn-light customButton btn-md mt-3"><i class="fa-solid fa-plus"></i> Post a Job</a>
+            </section>
+        </div>
+    
+        <!-- Main Section -->
+        <div class="mainTableContent">
+            <!-- Table to display applications -->
+            <div class="custom-container bg-light p-3 shadow-sm">
+                <div class="mb-5">
+                    <div class="tableBg">
+                        <table id="jobApplicationStatusTable" class="table w-100">
+                            <thead>
+                                <tr>
+                                    <th class="text-start p-4">Applicant Details</th>
+                                    <th class="text-start p-4">Status</th>
+                                    <th class="text-start p-4">Application Date</th>
+                                    <th class="text-start p-4">Resume (PDF)</th>
+                                    <th class="text-start p-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Example row for an application -->
+                                {% for applicant in applicants %}
+                                    <tr>
+                                        <td class="fw-semibold">
+                                            <h1 style="font-size: 1.5rem;"> {{applicant.user.resume.last_name|title}}, {{applicant.user.resume.first_name|title}} {{applicant.user.resume.middle_name|title}}</h1>
+                                            <div class="location-badge">
+                                                <i class="fa-solid fa-at"></i>
+                                                {{applicant.user.email}}
+                                            </div>
+                                            <div class="location-badge">
+                                                <i class="fa-solid fa-phone"></i>
+                                                {{applicant.user.phone}}
+                                            </div>
+                                        </td>
+                                        <td>{{applicant.applicationstatus.status}}</td>
+                                        <td>{{applicant.applicationstatus.status_date|date:'F m, Y h:m A'}}</td>
+                                        
+                                        <td>
+                                            <!-- Check if resume exists and display it -->
+                                            {% if applicant.user.resume.upload_resume %}
+                                                <a href="{{ applicant.user.resume.upload_resume.url }}" target="_blank">View Resume</a>
+                                            {% else %}
+                                                <p>No resume uploaded</p>
+                                            {% endif %}
+                                        </td>
+                                        <td class="action-buttons">
+                                            <a href="{% url 'update-application-status' applicant.pk %}" class="btn btn-edit" title="Update Status"><i class="fa-regular fa-pen-to-square"></i></a>
+                                            <a href="{% url 'applicant-profile' user.pk %}" class="btn btn-view" title="View Profile"><i class="fa-solid fa-eye"></i></a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                <!-- Repeat similar rows for each applicant -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

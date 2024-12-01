@@ -1,0 +1,189 @@
+{% extends 'users/base.html' %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <!-- Main Content -->
+    <div class="container mb-5">
+        <div aria-label="breadcrumb" class="custombreadcrumb bg-light p-4 mb-3 shadow-sm">
+            <ol class="breadcrumb mb-0 d-flex justify-content-end">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'job-fair' %}" class="text-decoration-none text-dark text-muted">Job Fairs</a></li>
+                <li class="breadcrumb-item active text-dark" aria-current="page">All Job Fairs</li>
+            </ol>
+        </div>
+        <div class="bannerjobfair mb-4">
+            <form class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                        <i class="fa-solid fa-magnifying-glass text-dark"></i>
+                        {% render_field jobfair_filter.form.title class="searchbar form-control form-control-lg border-0 p-0" placeholder="Search for jobs fairs..." %}
+                        <button class="searchbar btn btn-primary custom-button" type="submit">Search</button>
+                        <a href="{% url 'all-job-fair' %}" class="searchbar btn btn-outline-secondary custom-button" style="border-radius: 1.5rem;" type="submit">Reset</a>
+                    </div>
+                </div>
+            
+                <div class="row g-3 mb-4 justify-content-center input-group text-center">
+                    <div class="col-xs-12 col-sm-6 col-md-3">
+                        <label for="location">Location</label>
+                        <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                            <i class="fa-solid fa-location-dot text-dark"></i>
+                            <div class="input-group">
+                                {% render_field jobfair_filter.form.location class="form-control border-0 p-0" placeholder="barangay, city, or region" %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-sm-6 col-md-3">
+                        <label for="industry">Industry</label>
+                        <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                            <i class="fa-solid fa-briefcase text-dark"></i>
+                            <select class="form-control border-0 p-0" name="industry" id="industry">
+                                <option value="" disabled selected>Select Industry</option>
+                                {% for choice in jobfair_filter.form.industry.field.choices %}
+                                    <option value="{{ choice.0 }}" {% if form.industry.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+            
+                    <div class="col-xs-12 col-sm-6 col-md-3">
+                        <label for="date">Date</label>
+                        <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                            <i class="fa-solid fa-calendar text-dark"></i>
+                            <input type="date" class="form-control border-0 p-0" id="date" name="date">
+                        </div>
+                    </div>
+                    
+                    <div class="col-xs-12 col-sm-6 col-md-3">
+                        <label for="type">Type</label>
+                        <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                            <i class="fa-solid fa-building text-dark"></i>
+                            <select class="form-control border-0 p-0" name="fair_event_held" id="fair_event_held">
+                                <option value="" disabled selected>Select Job Type</option>
+                                {% for choice in jobfair_filter.form.fair_event_held.field.choices %}
+                                    <option value="{{ choice.0 }}" {% if form.fair_event_held.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- All Job Fairs Section -->
+        <div id="alljobfairs" class="container py-4">
+            <h3 class="mb-4">All Job Fairs</h3>
+
+            <div class="jobfair-listing py-2">
+                {% for jobfair in jobfair_filter.qs %}
+                    <!-- Job Fair 1 -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card jobfair-card shadow-sm">
+                                <div class="row g-0">
+                                    <div class="col-md-4">
+                                        <img src="{{jobfair.image.url}}" alt="Tech Career Fair" class="img-fluid h-100 " style="object-fit: cover;">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <a href="{% url 'job-fair-info' jobfair.pk %}" class="jobfairlink text-decoration-none fs-3 fw-bold"> {{ jobfair.title }}</a>
+                                            <p class="text-muted mb-1"><i class="fas fa-calendar-alt me-2"></i> {{ jobfair.start_date|date:'F d, Y' }} - {{ jobfair.end_date|date:'F d, Y'}}</p>
+                                            <p class="text-muted mb-1"><i class="fas fa-clock me-2"></i> {{ jobfair.start_date|date:'H:i'  }}</p>
+                                            <p class="text-muted mb-3"><i class="fas fa-map-marker-alt me-2"></i> Convention Center, Bangalore</p>
+                                            <p class="card-text">{{ jobfair.description|slice:":100" }} ...See more</p>
+                                        </div>
+                                        <div class="card-footer border-0 bg-white d-flex justify-content-between align-items-center" title="{{ jobfair.posted_date|date:'F d, Y H:i:s' }}">
+                                            <p class="text-muted">Posted {{jobfair.posted_date|naturaltime}}</p>
+                                            {% if user.is_authenticated %}
+                                                {% if jobfair.is_active %}
+                                                    {% if jobfair.is_registered %}
+                                                        <div class="up-event-card-footer bg-white p-4">
+                                                            <a href="#" class="customButton btn btn-secondary w-100 disabled px-5">Registered</a>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="up-event-card-footer bg-white p-4">
+                                                            <a href="{% url 'jobfair_register' jobfair.pk %}" class="customButton btn btn-outline-primary w-100 px-5">Register</a>
+                                                        </div>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <div class="up-event-card-footer bg-white p-4">
+                                                        <button class="btn btn-secondary customButton px-5 w-100 " disabled>Event Closed</button>
+                                                    </div>
+                                                {% endif %}
+                                            {% else %}
+                                                <div class="up-event-card-footer bg-white p-4">
+                                                    <a href="{% url 'login' %}" class="customButton btn btn-secondary w-100 text-decoration-none">Login to register for the event.</a> 
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+        </div>
+    </div>
+    
+    {% endblock content %}
+    <!-- Footer -->
+
+    <footer class="bg-light py-5">
+        <div class="container">
+            <div class="">
+                <div class="col-md-6 col-lg-3">
+                    <a class="logoName fs-2 text-decoration-none brand text-dark fw-bold" href="index.html"><img src="#" alt="" width="40px">Job Compass</a>
+                </div>
+            </div>
+            <hr class="mt-5">
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-5">
+                    <p class="fs-4">Contact Us</p>
+                    <ul class="list-unstyled">
+                        <li class="my-3">
+                            <span>666 John Doe Rd, Boulevard, CO
+                                7000, Zamboanga City
+                            </span>
+                        </li>
+                        <li class="my-3">
+                            <span> +63662323122</span>
+                        </li>
+                        <li class="my-3">
+                            <span> jobcompassCO@sample.com</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <p class="fs-4">My Account</p>
+                    <ul class="list-unstyled">
+                        <li class="my-3">
+                            <a href="login.html" class="text-dark text-decoration-none text-muted footer-link"><i class="fa-solid fa-chevron-right"></i> Profile</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6 col-lg-3 socials">
+                    <p class="fs-4">Follow Us</p>
+                    <ul class="list-unstyled">
+                        <li class="my-3">
+                            <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-facebook footer-link"></i></a>
+                        </li>
+                        <li class="my-3">
+                            <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-x-twitter footer-link"></i></a>
+                        </li>
+                        <li class="my-3">
+                            <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-instagram footer-link"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer> 
+
+
+    <div class="card-footer text-center bg-dark text-white py-2">
+        &copy; 2024 Job Compass. All rights reserved.
+    </div>
+</body>
+</html>

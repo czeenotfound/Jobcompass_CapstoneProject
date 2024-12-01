@@ -1,0 +1,58 @@
+{% extends 'admin/admin.html' %}
+
+{% block content %}
+    <main class="col-md-9 ms-sm-auto col-lg-9 col-xl-10 py-3 px-md-4">
+        <div class="d-flex align-items-center">
+            <section class="employerbanner w-100  h-100 p-5 bg-light mb-4">
+                <h1 class="hero-heading">Job Fairs Management</h1>
+            </section>
+        </div>
+
+        <div class="p-4">
+            <h3 class="fw-bold text-dark mb-4">Manage Job Fairs</h3>
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h5 fw-bold">Platform Activity</h2>
+                        <select id="reportType" class="form-select w-auto">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly" selected>Monthly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                    <div class="h-96">
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h3 class="h6 fw-semibold mb-2">Total Job Seekers</h3>
+                            <p class="display-6 fw-bold" id="totalJobSeekers">1,955</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h3 class="h6 fw-semibold mb-2">Total Employers</h3>
+                            <p class="display-6 fw-bold" id="totalEmployers">3,039</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h3 class="h6 fw-semibold mb-2">Total Job Postings</h3>
+                            <p class="display-6 fw-bold" id="totalJobPostings">1,568</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock content %}

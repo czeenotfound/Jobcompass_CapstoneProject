@@ -1,0 +1,213 @@
+{% load humanize %}
+
+<div class="container">
+    <div class="row">
+        <!-- Left Column (70% width on large screens) -->
+        <div class="col-md-12 mb-5">
+            <p class="fs-4">Job Postings</p>
+
+            {% if jobs %}
+                {% for job in jobs %}
+                    <div class="card mb-3">
+                        <div class="card-body row">
+                            <div class="col-md-9 mb-3">
+                                <p class="card-title fs-4 fw-bold">{{job.title}}</p>
+                                <p class="card-text text-muted mt-3">Company: <strong>Tech Solutions</strong></p>
+                                <p class="card-text text-muted">Location: <strong>New York, NY</strong></p>
+                                <p class="card-text text-muted">Job Type: <strong>Full-Time</strong></p>
+                                <p class="card-text text-muted">Salary: <strong>$80,000 - $100,000</strong></p>
+                                <p class="card-text mt-3 text-muted">
+                                    Join our dynamic team as a Software Engineer, working on cutting-edge technologies and developing innovative solutions.
+                                </p>
+                            </div>
+                            <div class="col-md-3">
+                                <!-- Internal Details -->
+                                <p class="card-text mt-3 text-muted">
+                                    <strong>Applicants:</strong> 15 <br>
+                                    <strong>Status:</strong> Open <br>
+                                    <strong>Post Date:</strong> {{job.timestamp|naturaltime}}
+                                </p>
+                            </div>
+                            
+                        </div>
+                        <div class="card-footer bg-light d-flex align-items-center justify-content-between">
+                            <a href="#" class="btn btn-secondary">Edit Posting</a>
+                            <a href="#" class="btn btn-primary">View Applicants</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <!-- Software Engineer Job Posting -->
+            <div class="card mb-3">
+                <div class="card-body row">
+                    <div class="col-md-9 mb-3">
+                        <p class="card-title fs-4 fw-bold">Software Engineer</p>
+                        <p class="card-text text-muted mt-3">Company: <strong>Tech Solutions</strong></p>
+                        <p class="card-text text-muted">Location: <strong>New York, NY</strong></p>
+                        <p class="card-text text-muted">Job Type: <strong>Full-Time</strong></p>
+                        <p class="card-text text-muted">Salary: <strong>$80,000 - $100,000</strong></p>
+                        <p class="card-text mt-3 text-muted">
+                            Join our dynamic team as a Software Engineer, working on cutting-edge technologies and developing innovative solutions.
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <!-- Internal Details -->
+                        <p class="card-text mt-3 text-muted">
+                            <strong>Applicants:</strong> 15 <br>
+                            <strong>Status:</strong> Open <br>
+                            <strong>Post Date:</strong> 2024-09-10
+                        </p>
+                    </div>
+                    
+                </div>
+                <div class="card-footer bg-light d-flex align-items-center justify-content-between">
+                    <a href="#" class="btn btn-secondary">Edit Posting</a>
+                    <a href="#" class="btn btn-primary">View Applicants</a>
+                </div>
+            </div>
+        
+            <!-- Frontend Developer Job Posting -->
+            <div class="card mb-3">
+                <div class="card-body row">
+                    <div class="col-md-9">
+                        <p class="card-title fs-4 fw-bold">Frontend Developer</p>
+                        <p class="card-text text-muted mt-3">Company: <strong>Creative Minds Inc.</strong></p>
+                        <p class="card-text text-muted">Location: <strong>San Francisco, CA</strong></p>
+                        <p class="card-text text-muted">Job Type: <strong>Full-Time</strong></p>
+                        <p class="card-text text-muted">Salary: <strong>$70,000 - $90,000</strong></p>
+                        <p class="card-text mt-3 text-muted">
+                            We are seeking a skilled frontend developer with experience in React.js and JavaScript frameworks to join our growing team.
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <!-- Internal Details -->
+                        <p class="card-text mt-3 text-muted">
+                            <strong>Applicants:</strong> 8 <br>
+                            <strong>Status:</strong> Closed <br>
+                            <strong>Post Date:</strong> 2024-08-20
+                        </p>
+                    </div>
+                    
+                </div>
+                <div class="card-footer bg-light d-flex align-items-center justify-content-between">
+                    <a href="#" class="btn btn-secondary">Edit Posting</a>
+                    <a href="#" class="btn btn-primary">View Applicants</a>
+                </div>
+            </div>
+        
+            <!-- Construction Worker Job Posting -->
+            <div class="card mb-3">
+                <div class="card-body row">
+                    <div class="col-md-9">
+                        <p class="card-title fs-4 fw-bold">Construction Worker</p>
+                        <p class="card-text text-muted mt-3">Company: <strong>BuildStrong LLC</strong></p>
+                        <p class="card-text text-muted">Location: <strong>Dallas, TX</strong></p>
+                        <p class="card-text text-muted">Job Type: <strong>Contract</strong></p>
+                        <p class="card-text text-muted">Salary: <strong>$20 - $25 per hour</strong></p>
+                        <p class="card-text mt-3 text-muted">
+                            Looking for experienced construction workers to join our team for multiple building projects in the Dallas area.
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                         <!-- Internal Details -->
+                        <p class="card-text mt-3 text-muted">
+                            <strong>Applicants:</strong> 12 <br>
+                            <strong>Status:</strong> Open <br>
+                            <strong>Post Date:</strong> 2024-09-01
+                        </p>
+                    </div>
+                </div>
+                <div class="card-footer bg-light d-flex align-items-center justify-content-between">
+                    <a href="#" class="btn btn-secondary">Edit Posting</a>
+                    <a href="#" class="btn btn-primary">View Applicants</a>
+                </div>
+            </div>
+        
+            <!-- Helper Job Posting -->
+            <div class="card mb-3">
+                <div class="card-body row">
+                    <div class="col-md-9">
+                        <p href="#" class="card-title fs-4 fw-bold">Helper</p>
+                        <p class="card-text text-muted mt-3">Company: <strong>AssistPro Services</strong></p>
+                        <p class="card-text text-muted">Location: <strong>Miami, FL</strong></p>
+                        <p class="card-text text-muted">Job Type: <strong>Part-Time</strong></p>
+                        <p class="card-text text-muted">Salary: <strong>$15 - $18 per hour</strong></p>
+                        <p class="card-text mt-3 text-muted">
+                            We are looking for a reliable helper to assist with various tasks including moving, cleaning, and setup for events.
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <!-- Internal Details -->
+                        <p class="card-text mt-3 text-muted">
+                            <strong>Applicants:</strong> 5 <br>
+                            <strong>Status:</strong> Open <br>
+                            <strong>Post Date:</strong> 2024-09-12
+                        </p>
+                    </div>
+                  
+                </div>
+                <div class="card-footer bg-light d-flex align-items-center justify-content-between">
+                    <a href="#" class="btn btn-secondary">Edit Posting</a>
+                    <a href="#" class="btn btn-primary">View Applicants</a>
+                </div>
+            </div>
+        
+            <!-- Salesman Job Posting -->
+            <div class="card mb-3">
+                <div class="card-body row">
+                    <div class="col-md-9">
+                        <p class="card-title fs-4 fw-bold">Salesman</p>
+                        <p class="card-text text-muted mt-3">Company: <strong>RetailPro Corp.</strong></p>
+                        <p class="card-text text-muted">Location: <strong>Los Angeles, CA</strong></p>
+                        <p class="card-text text-muted">Job Type: <strong>Full-Time</strong></p>
+                        <p class="card-text text-muted">Salary: <strong>$50,000 - $60,000 + Commission</strong></p>
+                        <p class="card-text mt-3 text-muted">
+                            Energetic and experienced sales professionals needed to join our retail team. Build relationships and drive sales.
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                         <!-- Internal Details -->
+                        <p class="card-text mt-3 text-muted">
+                            <strong>Applicants:</strong> 7 <br>
+                            <strong>Status:</strong> Open <br>
+                            <strong>Post Date:</strong> 2024-09-08
+                        </p>
+                    </div>
+                </div>
+                <div class="card-footer bg-light d-flex align-items-center justify-content-between">
+                    <a href="#" class="btn btn-secondary">Edit Posting</a>
+                    <a href="#" class="btn btn-primary">View Applicants</a>
+                </div>
+            </div>
+        
+            <!-- Marketing Manager Job Posting -->
+            <div class="card mb-3">
+                <div class="card-body row">
+                    <div class="col-md-9">
+                        <p class="card-title fs-4 fw-bold">Marketing Manager</p>
+                        <p class="card-text text-muted mt-3">Company: <strong>Bright Future Marketing</strong></p>
+                        <p class="card-text text-muted">Location: <strong>Remote</strong></p>
+                        <p class="card-text text-muted">Job Type: <strong>Full-Time</strong></p>
+                        <p class="card-text text-muted">Salary: <strong>$90,000 - $110,000</strong></p>
+                        <p class="card-text mt-3 text-muted">
+                            Lead our marketing team to develop and implement strategic campaigns. Proven experience in digital marketing is a must.
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <!-- Internal Details -->
+                        <p class="card-text mt-3 text-muted">
+                            <strong>Applicants:</strong> 10 <br>
+                            <strong>Status:</strong> Open <br>
+                            <strong>Post Date:</strong> 2024-09-05
+                        </p>
+                    </div>
+                </div>
+                <div class="card-footer bg-light d-flex align-items-center justify-content-between">
+                    <a href="#" class="btn btn-secondary">Edit Posting</a>
+                    <a href="#" class="btn btn-primary">View Applicants</a>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>

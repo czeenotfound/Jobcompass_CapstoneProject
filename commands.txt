@@ -1,0 +1,24 @@
+### 
+TO RUN LOCALHOST SERVER
+ - py manage.py runserver
+
+TO INITIATE THE DATABASE
+ - py manage.py makemigrations
+
+ - py manage.py migrate
+
+###
+ERD diagram
+ - py manage.py graph_models --pydot -a -g -o my_project_visualized.png
+
+### 
+For adding multiple data for industries
+ - py manage.py add_industries
+
+### 
+For python libraries
+ - pip uninstall <package-name>
+
+### 
+deployment production needed
+ - pip freeze > requirements.txt
