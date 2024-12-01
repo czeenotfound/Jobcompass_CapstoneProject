@@ -111,18 +111,18 @@ WSGI_APPLICATION = 'web_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 # DATABASES = {
-#     "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
 # }
 
-# postgresql://jobcompass_db_eezv_user:Js0TmVagCqilM0ZptjnGAbNhLSnNzLGB@dpg-ct5spd5ds78s73bpu2og-a.singapore-postgres.render.com/jobcompass_db_eezv
+DATABASES = {
+    "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
+}
+
+# postgresql://jobcompass_db_er34_user:bNrLtNwnaPNfHESSDNCHgjCqywz2tLcN@dpg-ct62j85umphs7391e2u0-a.oregon-postgres.render.com/jobcompass_db_er34
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

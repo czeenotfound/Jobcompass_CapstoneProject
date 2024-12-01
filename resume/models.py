@@ -21,7 +21,6 @@ def validate_file_size(value):
     if value.size > limit:
         raise ValidationError(f"File size must not exceed 5MB.")
 
-# Custom validator for avatar
 def validate_avatar(image):
     # Check file size (e.g., max 2MB)
     max_file_size = 2 * 1024 * 1024  # 2MB
@@ -42,7 +41,6 @@ def validate_avatar(image):
     except Exception as e:
         raise ValidationError("Invalid image file.") from e
 
-# Resize image function
 def resize_image(image, max_size=(1280, 1280)):
     """
     """
@@ -117,6 +115,11 @@ class Resume(models.Model):
     def __str__(self):
         return f"Resume - {self.first_name} {self.last_name}"
 
+    def save(self, *args, **kwargs):
+        # Resize the avatar if one is provided
+        if self.avatar:
+            self.avatar = resize_image(self.avatar)
+        super().save(*args, **kwargs)
 
 class Skill(models.Model):
     user_profile = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='skills')
