@@ -35,7 +35,10 @@ def manage_jobs(request):
 def manage_job_fair(request):
     if request.user.is_employer:
         jobfairs = JobFair.objects.filter(user=request.user, company=request.user.company)
-        context = {'jobfairs': jobfairs}
+
+        context = {
+            'jobfairs': jobfairs
+        }
 
         return render(request, 'company/manage-job-fairs.html', context)
     else:

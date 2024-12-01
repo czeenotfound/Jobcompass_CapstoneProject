@@ -9,83 +9,19 @@ from io import BytesIO
 from django.core.files import File
 import os
 from uuid import uuid4
-
-
-def validate_file_extension(value):
-    """
-    Validator to check the file extension. For example, only DOCX and PDF files.
-    """
-    valid_extensions = ['docx', 'pdf']
-    extension = os.path.splitext(value.name)[1][1:].lower()  # Extract the file extension
-    if extension not in valid_extensions:
-        raise ValidationError(f"File extension must be one of: {', '.join(valid_extensions)}")
-
-def validate_file_size(value):
-    """
-    Validator to ensure file size does not exceed 5MB.
-    """
-    limit = 5 * 1024 * 1024  # 5 MB
-    if value.size > limit:
-        raise ValidationError(f"File size must not exceed 5MB.")
-    
-# Custom validator for avatar
-def validate_avatar(image):
-    # Check file size (e.g., max 2MB)
-    max_file_size = 2 * 1024 * 1024  # 2MB
-    if image.size > max_file_size:
-        raise ValidationError("Avatar file size must not exceed 2MB.")
-    
-    # Check file format
-    valid_formats = ['JPEG', 'JPG', 'PNG', 'WEBP']
-    try:
-        img = Image.open(image)
-        if img.format.upper() not in valid_formats:
-            raise ValidationError(f"Unsupported file format. Use one of the following: {', '.join(valid_formats)}.")
-        
-        # Check dimensions (e.g., minimum 128x128 pixels)
-        min_width, min_height = 128, 128
-        if img.width < min_width or img.height < min_height:
-            raise ValidationError(f"Avatar dimensions must be at least {min_width}x{min_height} pixels.")
-    except Exception as e:
-        raise ValidationError("Invalid image file.") from e
-
-# Resize image function
-def resize_image(image, max_size=(1280, 1280)):
-    """
-    """
-    img = Image.open(image)
-    img = img.convert('RGB')  # Ensure compatibility for saving as JPEG
-    
-    # Check if the image exceeds the maximum dimensions
-    img.thumbnail(max_size, Image.Resampling.LANCZOS)  # Maintain aspect ratio and fit within max_size
-    
-    # Save the resized image into a buffer
-    buffer = BytesIO()
-    img.save(buffer, format='JPEG', quality=85)  # Adjust quality to reduce file size further if needed
-    buffer.seek(0)
-    return File(buffer, name=image.name)
-
-def company_file_upload_path(instance, filename):
-    ext = filename.split('.')[-1]  # Get the file extension
-    filename = f"{uuid4()}.{ext}"  # Generate a unique filename
-    return os.path.join('company-file', filename)
-
-def company_avatar_upload_path(instance, filename):
-    ext = filename.split('.')[-1]  # Get the file extension
-    filename = f"{uuid4()}.{ext}"  # Generate a unique filename
-    return os.path.join('company', filename)
+from cloudinary.models import CloudinaryField
 
 # Create your models here.
 class Company(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-        
     company_name = models.CharField(max_length=100, null=True, blank=True)
-    avatar = models.ImageField(
-        upload_to=company_avatar_upload_path,
-        null=True, 
-        default="office-building.png",
-        validators=[validate_avatar]  
+    
+    avatar = CloudinaryField(
+        'avatar',
+        folder='company-avatar',
+        default="https://res.cloudinary.com/di2hrzuyq/image/upload/v1733062520/lvehkmmijnwrvxvtm1mb.png"
     )
+    
     email = models.EmailField(null=True, blank=True)
     phone = models.CharField(max_length=15, null=True, blank=True)
     website_url = models.URLField(null=True, blank=True)
@@ -97,25 +33,10 @@ class Company(models.Model):
     employee_count = models.PositiveIntegerField(null=True, blank=True)
     
     tin_number = models.CharField(max_length=15, null=True, blank=True)
-    bir_file = models.FileField(
-        upload_to=company_file_upload_path,
-        null=True,
-        blank=True,
-        validators=[
-            FileExtensionValidator(allowed_extensions=['pdf', 'docx']),
-            validate_file_size
-        ]
-    )
+    
+    bir_file = CloudinaryField('file', resource_type='raw', folder='company-dti')
 
-    dti_file = models.FileField(
-        upload_to=company_file_upload_path,
-        null=True,
-        blank=True,
-        validators=[
-            FileExtensionValidator(allowed_extensions=['pdf', 'docx']),
-            validate_file_size 
-        ]
-    )
+    dti_file = CloudinaryField('file', resource_type='raw', folder='company-dti')
 
     facebook = models.URLField(max_length=200, null=True, blank=True)
     twitter = models.URLField(max_length=200, null=True, blank=True)

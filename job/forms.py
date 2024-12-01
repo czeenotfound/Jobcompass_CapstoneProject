@@ -46,12 +46,9 @@ class ApplicationStatusForm(forms.ModelForm):
 class CreateJobFairForm(forms.ModelForm):
     class Meta:
         model = JobFair
-        exclude = ('user', 'company', 'industry', )
+        exclude = ('user', 'company', 'industry',)
 
 class UpdateJobFairForm(forms.ModelForm):
     class Meta:
         model = JobFair
         exclude = ('user', 'company', 'industry', 'is_featured', 'is_active')
-        widgets = {
-            'image': forms.FileInput(attrs={'class': 'form-control'}),  # Use FileInput instead of ClearableFileInput
-        }

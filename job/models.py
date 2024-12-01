@@ -3,13 +3,7 @@ from users.models import User
 from company.models import Company
 from address.models import Address
 from industry.models import Industry
-from resume.models import Resume
-from django.core.exceptions import ValidationError
-from PIL import Image  # For image processing
-from io import BytesIO
-from django.core.files import File
-import os
-from uuid import uuid4
+from cloudinary.models import CloudinaryField
 
 class Job(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -216,61 +210,6 @@ class SaveJob(models.Model):
     
 # JOB FAIRS
 # Custom validator for avatar
-def validate_image(image):
-    # Check file size (e.g., max 2MB)
-    max_file_size = 2 * 1024 * 1024  # 2MB
-    if image.size > max_file_size:
-        raise ValidationError("Avatar file size must not exceed 2MB.")
-    
-    # Check file format
-    valid_formats = ['JPEG', 'JPG', 'PNG', 'WEBP']
-    try:
-        img = Image.open(image)
-        if img.format.upper() not in valid_formats:
-            raise ValidationError(f"Unsupported file format. Use one of the following: {', '.join(valid_formats)}.")
-        
-        # Check dimensions (e.g., minimum 128x128 pixels)
-        min_width, min_height = 128, 128
-        if img.width < min_width or img.height < min_height:
-            raise ValidationError(f"Avatar dimensions must be at least {min_width}x{min_height} pixels.")
-    except Exception as e:
-        raise ValidationError("Invalid image file.") from e
-
-# Resize image function
-def resize_image(image, max_width=1024):
-    """
-    Resize an image to have a maximum width while maintaining its aspect ratio.
-    This function ensures landscape or portrait images are resized appropriately.
-
-    Args:
-        image: The uploaded image file.
-        max_width: The maximum width of the resized image.
-
-    Returns:
-        A resized image as a Django File object.
-    """
-    img = Image.open(image)
-    img = img.convert('RGB')  # Ensure compatibility for saving as JPEG
-
-    # Calculate the new dimensions maintaining the aspect ratio
-    if img.width > max_width:
-        ratio = max_width / img.width
-        new_width = max_width
-        new_height = int(img.height * ratio)
-        img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
-
-    # Save the resized image to a buffer
-    buffer = BytesIO()
-    img.save(buffer, format='JPEG', quality=90)  # Save resized image with 90% quality
-    return File(buffer, name=image.name)
-
-
-
-def jobfair_image_upload_path(instance, filename):
-    ext = filename.split('.')[-1]  # Get the file extension
-    filename = f"{uuid4()}.{ext}"  # Generate a unique filename
-    return os.path.join('jobfair/', filename)
-
 
 class JobFair(models.Model):
     event_held_choices = (
@@ -304,12 +243,10 @@ class JobFair(models.Model):
     application_starts =models.DateTimeField(null=True, blank=True)
     application_deadline = models.DateTimeField(null=True, blank=True)
     
-    image = models.ImageField(
-        upload_to=jobfair_image_upload_path, 
-        null=True, 
-        blank=True,
-        default="conventions.jpg",
-        validators=[validate_image]
+    image = CloudinaryField(
+        'images', 
+        folder='job-fair',
+        default = "https://res.cloudinary.com/di2hrzuyq/image/upload/v1733062519/luabhrtwak2aeu98sq71.jpg"
     )
     
     is_featured = models.BooleanField(default=False)
@@ -317,17 +254,8 @@ class JobFair(models.Model):
 
     posted_date = models.DateTimeField(auto_now_add=True)
     
-
     def __str__(self):
         return self.title
-    
-    def save(self, *args, **kwargs):
-        # Check if an image is provided
-        if self.image:
-            # Replace the original image with the resized one
-            self.image = resize_image(self.image)
-        super().save(*args, **kwargs)
-
     
 class JobFairRegistration(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

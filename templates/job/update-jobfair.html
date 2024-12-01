@@ -86,20 +86,20 @@
 
                 <hr>
                 
-                <div class="mb-3">
-                    <label for="jobfairimage" class="form-label fw-bold">Job Fair Cover Image</label>
-                
-                    <!-- Display the current image if it exists -->
-                    {% if form.image.value %}
-                        <div class="mb-2">
-                            <img src="{{ form.image.value.url }}" alt="Current Job Fair Image" class="img-fluid" style="max-width: 200px;">
-                        </div>
-                    {% endif %}
-                
-                    <!-- File input for a new image -->
-                    {% render_field form.image class="form-control" %}
+                <div class="row">
+                     <label for="jobfairimage" class="form-label fw-bold">Job Fair Cover Image</label>
+                    <div class="col-6 d-flex align-items-center justify-content-center">
+                        {% if form.image.value %}
+                            <div class="mb-2 row">
+                                <img src="{{ form.image.value.url }}" alt="Current Avatar" class="img-fluid" style="max-width: 450px; max-height: 450px;">
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-6 mb-3 bg-light p-3">
+                        <label for="userAvatar" class="form-label fw-bold">User Avatar</label>
+                        {% render_field form.image class="form-control" id="userAvatar" %}
+                    </div>
                 </div>
-
                 <hr>
                 <div class="row">
                     <h4 for="employerAddress" class="form-label mb-3">Location Venue</h4>

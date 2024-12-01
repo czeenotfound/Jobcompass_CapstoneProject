@@ -17,6 +17,14 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+# cloudinary imports
+
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -55,6 +63,8 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'django_filters',
     'django_extensions',
+
+    'cloudinary',
 
     "debug_toolbar",
 ]
@@ -122,7 +132,7 @@ DATABASES = {
     "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
 }
 
-# postgresql://jobcompass_db_er34_user:bNrLtNwnaPNfHESSDNCHgjCqywz2tLcN@dpg-ct62j85umphs7391e2u0-a.oregon-postgres.render.com/jobcompass_db_er34
+# postgresql://jobcompass_app_user:jSrQGtdfpdxWEVbtaHF2172dNK8OMfOi@dpg-ct684k3v2p9s7398nk1g-a.singapore-postgres.render.com/jobcompass_app
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -172,15 +182,27 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
-MEDIA_URL = '/images/'
-
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')  
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  
+
+
+# cloudinary 
+
+cloudinary.config(
+
+    cloud_name = "di2hrzuyq",
+    api_key = "851264126552968",
+    api_secret = "GzOPXkOsSrDbOqvmXELiLdkEDNo",
+
+)
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -12,7 +12,7 @@
     <div class="container">
         <div class="row">
             <h4 class="mt-4 mb-4 col-lg-2"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
-            <form class="col-lg-10 card p-5 mb-5" method="POST" >
+            <form class="col-lg-10 card p-5 mb-5" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <h1 class="mb-4">Post Job Fair</h1>
                 <hr>
@@ -95,8 +95,6 @@
                             <img src="{{ form.image.value.url }}" alt="Current Job Fair Image" class="img-fluid" style="max-width: 200px;" required>
                         </div>
                     {% endif %}
-                
-                    <!-- File input for a new image -->
                     {% render_field form.image class="form-control" %}
                 </div>
 

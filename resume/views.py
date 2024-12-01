@@ -257,7 +257,7 @@ def create_resume(request):
                 resume_instance = form.save(commit=False)
                 user.has_resume = True
                 user.save()
-
+                
                 # Save the address
                 address_instance = address_form.save(commit=False)
                 address_instance.user = user

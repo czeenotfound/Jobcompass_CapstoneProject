@@ -8,73 +8,25 @@ from django.core.files import File
 from PIL import Image 
 import os
 from uuid import uuid4
+from cloudinary.models import CloudinaryField
 
-def validate_pdf(value):
-    if not value.name.endswith('.pdf'):
-        raise ValidationError("Only PDF files are allowed.")
-
-def validate_file_size(value):
-    """
-    Validator to ensure file size does not exceed 5MB.
-    """
-    limit = 5 * 1024 * 1024  # 5 MB
-    if value.size > limit:
-        raise ValidationError(f"File size must not exceed 5MB.")
-
-def validate_avatar(image):
-    # Check file size (e.g., max 2MB)
-    max_file_size = 2 * 1024 * 1024  # 2MB
-    if image.size > max_file_size:
-        raise ValidationError("Avatar file size must not exceed 2MB.")
-    
-    # Check file format
-    valid_formats = ['JPEG', 'JPG', 'PNG', 'WEBP']
-    try:
-        img = Image.open(image)
-        if img.format.upper() not in valid_formats:
-            raise ValidationError(f"Unsupported file format. Use one of the following: {', '.join(valid_formats)}.")
-        
-        # Check dimensions (e.g., minimum 128x128 pixels)
-        min_width, min_height = 128, 128
-        if img.width < min_width or img.height < min_height:
-            raise ValidationError(f"Avatar dimensions must be at least {min_width}x{min_height} pixels.")
-    except Exception as e:
-        raise ValidationError("Invalid image file.") from e
-
-def resize_image(image, max_size=(1280, 1280)):
-    """
-    """
-    img = Image.open(image)
-    img = img.convert('RGB')  # Ensure compatibility for saving as JPEG
-    
-    # Check if the image exceeds the maximum dimensions
-    img.thumbnail(max_size, Image.Resampling.LANCZOS)  # Maintain aspect ratio and fit within max_size
-    
-    # Save the resized image into a buffer
-    buffer = BytesIO()
-    img.save(buffer, format='JPEG', quality=85)  # Adjust quality to reduce file size further if needed
-    buffer.seek(0)
-    return File(buffer, name=image.name)
-
-def resume_file_upload_path(instance, filename):
-    ext = filename.split('.')[-1]  # Get the file extension
-    filename = f"{uuid4()}.{ext}"  # Generate a unique filename
-    return os.path.join('resume', filename)
-
-def resume_avatar_upload_path(instance, filename):
-    ext = filename.split('.')[-1]  # Get the file extension
-    filename = f"{uuid4()}.{ext}"  # Generate a unique filename
-    return os.path.join('resume-avatar', filename)
-
+def validate_resume_file(value):
+    valid_extensions = ['pdf', 'docx']
+    extension = os.path.splitext(value.name)[1][1:].lower()
+    if extension not in valid_extensions:
+        raise ValidationError(f"File extension must be one of: {', '.join(valid_extensions)}.")
+    if value.size > 10 * 1024 * 1024:  # 10 MB size limit
+        raise ValidationError("File size must not exceed 10MB.")
     
 class Resume(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.ImageField(
-        upload_to=resume_avatar_upload_path,
-        null=True, 
-        default="icons8-male-user-96.png",
-        validators=[validate_avatar]  
+
+    avatar = CloudinaryField(
+        'avatar', 
+        folder='avatar-resume', 
+        default="https://res.cloudinary.com/di2hrzuyq/image/upload/v1733062519/pbnrwanwq7rp17jfr92z.png"
     )
+
     first_name = models.CharField(max_length=100, blank=True)
     middle_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
@@ -105,21 +57,15 @@ class Resume(models.Model):
     )
     employment_job_type = models.CharField(max_length=20, choices=employment_type_choices, blank=True)
     
-    upload_resume = models.FileField(
-        upload_to=resume_file_upload_path,
-        null=True,
-        blank=True,
-        validators=[validate_pdf]
+    upload_resume = CloudinaryField(
+        'file', 
+        resource_type='raw', 
+        folder='resume',
+        validators=[validate_resume_file]
     )
-    
+
     def __str__(self):
         return f"Resume - {self.first_name} {self.last_name}"
-
-    def save(self, *args, **kwargs):
-        # Resize the avatar if one is provided
-        if self.avatar:
-            self.avatar = resize_image(self.avatar)
-        super().save(*args, **kwargs)
 
 class Skill(models.Model):
     user_profile = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='skills')

@@ -62,7 +62,7 @@
                                                 </div>
                                             </td>
                                             <td>{{jobfair.fair_event_held}}</td>
-                                            <td><span class="applicants-badge">{{jobfair.application_set.all.count}} Registered  <a href="{% url 'job-applicants' jobfair.pk %}"> View All</a></td></span></td>
+                                            <td><span class="applicants-badge">{{ jobfair.jobfairregistration_set.count }} Registered</span></td>
                                             {% if jobfair.is_active %}
                                                 <td><span class="status-badge status-open">Open</span></td>
                                             {% else %}
