@@ -9,75 +9,35 @@
             </section>
         </div>
 
-        <div class="tableBg bg-white shadow">
-            <div class="  mb-4">
-                <div class="p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h5">Registered Employers</h2>
+        <div class="p-4">
+            <h3 class="fw-bold text-dark mb-4">Manage Employers</h3>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h3 class="h6 fw-semibold mb-2">Total Jobs Posted</h3>
+                            <p class="display-6 fw-bold" id="totalJobSeekers">17</p>
+                        </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead class="table-light">
-                                <tr>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Industry</th>
-                                    <th scope="col">Location</th>
-                                    <th scope="col">Jobs Posted</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="employersTableBody">
-                                <!-- Table rows will be dynamically added here -->
-                            </tbody>
-                        </table>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h3 class="h6 fw-semibold mb-2">Total Job Fairs Posted</h3>
+                            <p class="display-6 fw-bold" id="totalEmployers">4</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h3 class="h6 fw-semibold mb-2">Total Pending Request</h3>
+                            <p class="display-6 fw-bold" id="totalJobPostings">10</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
             
-    <!-- Add Employer Modal -->
-    <div id="addEmployerModal" class="modal fade" tabindex="-1" aria-labelledby="addEmployerModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addEmployerModalLabel">Add New Employer</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addEmployerForm">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" name="name">
-                        </div>
-                        <div class="mb-3">
-                            <label for="industry" class="form-label">Industry</label>
-                            <input type="text" class="form-control" id="industry" name="industry">
-                        </div>
-                        <div class="mb-3">
-                            <label for="location" class="form-label">Location</label>
-                            <input type="text" class="form-control" id="location" name="location">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="submitEmployerBtn" class="btn btn-primary">Add Employer</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        // Example tab switching logic
-        document.getElementById('verified-tab').addEventListener('click', function() {
-            document.getElementById('verified-employers').classList.remove('d-none');
-            document.getElementById('pending-verifications').classList.add('d-none');
-        });
-    
-        document.getElementById('pending-tab').addEventListener('click', function() {
-            document.getElementById('verified-employers').classList.add('d-none');
-            document.getElementById('pending-verifications').classList.remove('d-none');
-        });
-    </script>
 {% endblock content %}

@@ -3,6 +3,9 @@ from users.models import User
 from address.models import Address
 from industry.models import Industry
 from django.core.exceptions import ValidationError
+from io import BytesIO
+from django.core.files import File
+from PIL import Image 
 import os
 from uuid import uuid4
 
@@ -17,6 +20,7 @@ def validate_file_size(value):
     limit = 5 * 1024 * 1024  # 5 MB
     if value.size > limit:
         raise ValidationError(f"File size must not exceed 5MB.")
+
 # Custom validator for avatar
 def validate_avatar(image):
     # Check file size (e.g., max 2MB)
@@ -59,7 +63,6 @@ def resume_file_upload_path(instance, filename):
     filename = f"{uuid4()}.{ext}"  # Generate a unique filename
     return os.path.join('resume', filename)
 
-
 def resume_avatar_upload_path(instance, filename):
     ext = filename.split('.')[-1]  # Get the file extension
     filename = f"{uuid4()}.{ext}"  # Generate a unique filename
@@ -74,7 +77,6 @@ class Resume(models.Model):
         default="icons8-male-user-96.png",
         validators=[validate_avatar]  
     )
-
     first_name = models.CharField(max_length=100, blank=True)
     middle_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)

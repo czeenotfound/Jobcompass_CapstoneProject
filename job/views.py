@@ -329,7 +329,7 @@ def create_job(request):
             Job_Experience, 
             form=JobExperienceForm, 
             formset=JobExperienceFormSet,
-            extra=2,  
+            extra=1,  
             can_delete=True
         )
 
