@@ -2,8 +2,36 @@
 
 {% block content %}
 
-<div class="container">
-    <h1 class="display-2">404 not found!</h1>
+<div class="container d-flex flex-column justify-content-center align-items-center mt-5 my-5" style="height: 75vh;">
+
+
+    <div class="text-center">
+        
+        <span class="fw-bold fs-4">OOPS! PAGE NOT FOUND</span>
+        <h1 id="pagenotfound" class="display-1 text-center fw-bold my-0">404</h1>
+        <h2 id="pagenotdetail" class="text-center fw-medium mb-5">We are sorry, but the page you requested was not found!</h2>
+        <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}" class="text-decoration-none">
+            <h1 class="fw-bold fs-4 btn btn-primary px-4 py-3" style="border-radius: 3rem;">Go to Homepage</h1>
+        </a>
+
+    </div>
+    <style>
+        #pagenotfound{
+            font-size: 15rem;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            #pagenotfound{
+                font-size: 10rem;
+            }
+
+            #pagenotdetail{
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+    
 </div>
 
 {% endblock content %}

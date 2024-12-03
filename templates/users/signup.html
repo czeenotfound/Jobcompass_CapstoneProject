@@ -85,7 +85,7 @@
                             </div>
                         </div>
                         <div id="requirements" class="text-muted mt-1 my-auto">
-                            <span id="length" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must be At least 8 characters</span>
+                            <span id="length" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must be At least 8 letters</span>
                             <br>
                             <span id="uppercase" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must Contain At least 1 uppercase letter</span>
                             <br>
@@ -122,6 +122,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+<script src="{% static 'JS/login.js' %}"></script>
 
 {% block scripts %}
 
@@ -144,36 +145,6 @@
         document.querySelector("form").addEventListener("submit", function (e) {
             var phoneNumber = iti.getNumber(); // Full phone number with country code
             document.querySelector("#phone").value = phoneNumber;
-        });
-
-        // Toggle password visibility for password and confirm password fields
-        const togglePassword = document.getElementById('toggle-password');
-        const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
-        const passwordInput = document.getElementById('password');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
-
-        // Toggle functionality for the password field
-        togglePassword.addEventListener('click', () => {
-            const icon = togglePassword.querySelector('i');
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.className = 'fa-solid fa-eye'; // Switch to eye icon
-            } else {
-                passwordInput.type = 'password';
-                icon.className = 'fa-solid fa-eye-slash'; // Switch to eye-slash icon
-            }
-        });
-
-        // Toggle functionality for the confirm password field
-        toggleConfirmPassword.addEventListener('click', () => {
-            const icon = toggleConfirmPassword.querySelector('i');
-            if (confirmPasswordInput.type === 'password') {
-                confirmPasswordInput.type = 'text';
-                icon.className = 'fa-solid fa-eye'; // Switch to eye icon
-            } else {
-                confirmPasswordInput.type = 'password';
-                icon.className = 'fa-solid fa-eye-slash'; // Switch to eye-slash icon
-            }
         });
     });
     
