@@ -77,7 +77,7 @@ def admin_dashboard(request):
         'total_applications': total_applications,
     }
     
-    return render(request, 'admin/admin-dashboard.html')
+    return render(request, 'admin/admin-dashboard.html', context)
 
 @login_required(login_url='admin-login')
 def admin_manage_jobs(request):

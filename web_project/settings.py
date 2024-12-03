@@ -29,12 +29,22 @@ import cloudinary.api
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-j@+x+5zwid@6ke!8i#%1h2#ng)c!fpk2loy4svvsxqbe#*cxp$'
+# SECRET_KEY = 'django-insecure-j@+x+5zwid@6ke!8i#%1h2#ng)c!fpk2loy4svvsxqbe#*cxp$'
+
+SECRET_KEY = os.environ.get('SECRET_KEY', default='django-insecure-j@+x+5zwid@6ke!8i#%1h2#ng)c!fpk2loy4svvsxqbe#*cxp$')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+# ALLOWED_HOSTS = ["*"]
 
-ALLOWED_HOSTS = ["*"]
+DEBUG = not os.environ.get("DATABASE_URL")  # False in production, True in development
+
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 
