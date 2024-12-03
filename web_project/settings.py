@@ -40,7 +40,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default='django-insecure-j@+x+5zwid@6k
 
 DEBUG = not os.environ.get("DATABASE_URL")  # False in production, True in development
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = []
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 if RENDER_EXTERNAL_HOSTNAME:
