@@ -63,6 +63,11 @@
                             </div>
                         </div>
                     {% endif %}
+                {% empty %}
+                    <div class="customAlert alert alert-danger text-center shadow" role="alert" style="padding: 5rem; margin-bottom: 10vh;">
+                        <img src="{% static 'images/undraw_no_data_re_kwbl.svg' %}" class="mb-4" width="150" height="150" alt="">
+                        <h3>No Records found.</h3>
+                    </div>
                 {% endfor %}
             </div>
             <!-- Upcoming Events -->
@@ -90,6 +95,11 @@
                                 <a href="{% url 'jobfair_register' jobfair.pk %}" class="customButton btn btn-outline-primary w-100">Register</a>
                             </div>
                         </div>
+                    </div>
+                {% empty %}
+                    <div class="customAlert alert alert-danger text-center shadow" role="alert" style="padding: 5rem; margin-bottom: 10vh;">
+                        <img src="{% static 'images/undraw_no_data_re_kwbl.svg' %}" class="mb-4" width="150" height="150" alt="">
+                        <h3>No Records found.</h3>
                     </div>
                 {% endfor %}
             </div>

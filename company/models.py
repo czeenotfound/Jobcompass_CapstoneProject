@@ -28,15 +28,25 @@ class Company(models.Model):
 
     about_us = models.TextField(null=True, blank=True)
     industry = models.ForeignKey(Industry, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='industries')
-    dateFounded = models.DateTimeField(null=True, blank=True)
+    dateFounded = models.DateField(null=True, blank=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True, related_name='company')
     employee_count = models.PositiveIntegerField(null=True, blank=True)
     
     tin_number = models.CharField(max_length=15, null=True, blank=True)
     
-    bir_file = CloudinaryField('file', resource_type='raw', folder='company-dti')
+    bir_file = CloudinaryField(
+        'file',
+        resource_type='raw',
+        folder='company-bir',
+        blank=True
+    )
 
-    dti_file = CloudinaryField('file', resource_type='raw', folder='company-dti')
+    dti_file = CloudinaryField(
+        'file',
+        resource_type='raw', 
+        folder='company-dti',
+        blank=True
+    )
 
     facebook = models.URLField(max_length=200, null=True, blank=True)
     twitter = models.URLField(max_length=200, null=True, blank=True)

@@ -7,8 +7,7 @@
             <h1 class="h2">Admin Dashboard</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
                 <div class="btn-group me-2">
-                    <button type="button" class="btn btn-sm btn-outline-secondary">Add Job</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary">Manage Users</button>
+                    <a href="{% url 'admin-verification' %}" type="button" class="btn btn-sm btn-outline-secondary">Verify Companies</a>
                 </div>
             </div>
         </div>
@@ -19,7 +18,7 @@
                 <div class="card text-white bg-primary mb-3">
                     <div class="card-body">
                         <h5 class="card-title">Total Applicants</h5>
-                        <p class="card-text fs-4">{{ total_applicants }}</p>
+                        <p class="card-text fs-1">{{ total_applicants }}</p>
                     </div>
                 </div>
             </div>
@@ -27,7 +26,7 @@
                 <div class="card text-white bg-success mb-3">
                     <div class="card-body">
                         <h5 class="card-title">Total Company</h5>
-                        <p class="card-text fs-4">{{ total_companies }}</p>
+                        <p class="card-text fs-1">{{ total_companies }}</p>
                     </div>
                 </div>
             </div>
@@ -35,15 +34,69 @@
                 <div class="card text-white bg-warning mb-3">
                     <div class="card-body">
                         <h5 class="card-title">Total Applications</h5>
-                        <p class="card-text fs-4">{{ total_applications }}</p>
+                        <p class="card-text fs-1">{{ total_applications }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <a href="{% url 'admin-employers' %}" type="button" class="btn btn-sm btn-outline-secondary">Manage Employers</a>
+                <a href="{% url 'admin-applicants' %}" type="button" class="btn btn-sm btn-outline-secondary">Manage Applicants</a>
+            </div>
+        </div>
+
+        <hr>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card text-dark bg-white mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Users Active</h5>
+                        <p class="card-text fs-1">{{ total_users_active }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card text-dark bg-white mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Users Deactive</h5>
+                        <p class="card-text fs-1">{{ total_users_inactive }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <a href="{% url 'admin-manage-jobs' %}" type="button" class="btn btn-sm btn-outline-secondary">Manage Jobs</a>
+                <a href="{% url 'admin-manage-jobfairs' %}" type="button" class="btn btn-sm btn-outline-secondary">Manage Job Fairs</a>
+            </div>
+        </div>
+
+        <hr>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card text-dark bg-white mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Jobs Open</h5>
+                        <p class="card-text fs-1">{{ jobs_open  }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card text-dark bg-white mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Jobs Closed</h5>
+                        <p class="card-text fs-1">{{ jobs_closed  }}</p>
                     </div>
                 </div>
             </div>
         </div>
     
         <!-- Chart Section -->
-        <canvas class="bg-white p-4 my-4 w-100" id="myChart" width="900" height="380"></canvas>
-    
+        <!-- <canvas class="bg-white p-4 my-4 w-100" id="myChart" width="900" height="380"></canvas> -->
+        
     </main>
 
+    
 {% endblock content %}

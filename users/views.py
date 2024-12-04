@@ -64,7 +64,7 @@ def register(request):
 
 def login_user(request):
     logout(request)
-    
+
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -73,6 +73,10 @@ def login_user(request):
         
         # Check if the user exists and is active
         if user is not None and user.is_active:
+            if not user.is_active:
+                messages.error(request, 'Your account has been deactivated. Please contact support for assistance.')
+                return redirect('login')
+            
             if user.is_applicant or user.is_employer:
                 login(request, user)
                 messages.success(request, 'Signed in successfully.')

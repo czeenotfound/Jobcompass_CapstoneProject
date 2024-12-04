@@ -40,11 +40,11 @@ class EducationForm(forms.ModelForm):
         widgets = {
             'degree': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Degree (e.g., Bachelor of Science in Nursing)',
+                'placeholder': 'Degree (e.g., High School Graduate, Bachelor of Arts in Psychology)',
             }),
             'institution': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Institution (e.g., University of XYZ)',
+                'placeholder': 'Institution (e.g., XYZ High School, ABC University)',
             }),
             'graduation_year': forms.NumberInput(attrs={
                 'class': 'form-control',
@@ -98,24 +98,17 @@ class ExperienceForm(forms.ModelForm):
 class ExperienceFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
-        
-        has_valid_form = False  # Track if there's at least one valid form
-        
         for form in self.forms:
-            # Skip empty forms (e.g., when extra forms are not filled)
-            if not form.cleaned_data or form.cleaned_data.get('DELETE', False):
+            # Skip forms marked for deletion
+            if form.cleaned_data.get('DELETE', False):
                 continue
-            
-            has_valid_form = True  
 
-            # Check required fields for each form
-            required_fields = ['title', 'company', 'start_date', 'end_date', 'description']
-            for field in required_fields:
-                if not form.cleaned_data.get(field):
-                    raise ValidationError("Please fill in all fields for each job experience entry.")
-        
-        if not has_valid_form:
-            raise ValidationError("Please add at least one experience.")
+            # Check that all fields in a form are filled if the form is not empty
+            if form.cleaned_data and not all(
+                form.cleaned_data.get(field) for field in ['title', 'company', 'start_date', 'end_date', 'description']
+            ):
+                raise ValidationError("Please fill in all fields for each job experience entry.")
+
         
 class CertificationForm(forms.ModelForm):
     class Meta:
@@ -131,8 +124,9 @@ class CertificationForm(forms.ModelForm):
 class CertificationFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
-        if not any(form.cleaned_data for form in self.forms):
-            raise ValidationError("Please add at least one certification.")
+        # No specific validation since certifications are optional
+        pass
+
 
 class ProjectForm(forms.ModelForm):
     class Meta:
@@ -157,8 +151,8 @@ class ProjectForm(forms.ModelForm):
 class ProjectFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
-        if not any(form.cleaned_data for form in self.forms):
-            raise ValidationError("Please add at least one project.")
+        # No specific validation since projects are optional
+        pass
 
 
 class SocialLinkForm(forms.ModelForm):
@@ -172,15 +166,14 @@ class SocialLinkForm(forms.ModelForm):
             }),
             'url': forms.URLInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Profile URL (e.g., https://linkedin.com/in/username)',
+                'placeholder': 'Social URL (e.g., https://linkedin.com/in/username)',
             }),
         }
 
 class SocialLinkFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
-        if not any(form.cleaned_data for form in self.forms):
-            raise ValidationError("Please add at least one social link.")
+        pass
 
 
 

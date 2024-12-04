@@ -143,11 +143,6 @@ body{
     background-color: rgba(13, 110, 253, 0.1);
 }
 
-.collapse.show {
-    background-color: var(--color-white);
-    border-left: 5px solid #0d6efd;
-}
-
 /* Custom Dropdown Styling */
 .custom-dropdown {
     position: relative;

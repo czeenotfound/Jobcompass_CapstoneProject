@@ -17,7 +17,7 @@
                         <img src="{{user.avatar.url}}" alt="Profile Image" class="profile-image bg-white">
                     </div>
                     <div class="col-md-12 col-lg-6">
-                        <h1 class="mb-3 text-white">{{employer.first_name|title}} {{employer.middle_name|title}} {{employer.last_name|title}}</h1>
+                        <h1 class="mb-3 text-white">{{employer.first_name|title}} {{employer.middle_name|title}} {{employer.last_name|title}} {{employer.suffix|title}}</h1>
                         <span class="skillbadge fw-bold">{{ employer.get_employer_status_display }}</span>
                         <p class="text-white mt-4">
                             <i class="fas fa-map-marker-alt me-2"></i>

@@ -7,8 +7,7 @@ def get_salary_range_choices():
     return [
         ("below_15k", "Below PHP 15,000"),
         ("15k_20k", "PHP 15,000 - PHP 20,000"),
-        ("20k_25k", "PHP 20,000 - PHP 25,000"),
-        ("25k_30k", "PHP 25,000 - PHP 30,000"),
+        ("20k_30k", "PHP 20,000 - PHP 30,000"),
         ("30k_40k", "PHP 30,000 - PHP 40,000"),
         ("40k_50k", "PHP 40,000 - PHP 50,000"),
         ("50k_75k", "PHP 50,000 - PHP 75,000"),
@@ -53,8 +52,7 @@ class Jobfilter(django_filters.FilterSet):
         salary_ranges = {
             "below_15k": (0, 15000),
             "15k_20k": (15000, 20000),
-            "20k_25k": (20000, 25000),
-            "25k_30k": (25000, 30000),
+            "20k_30k": (20000, 30000),
             "30k_40k": (30000, 40000),
             "40k_50k": (40000, 50000),
             "50k_75k": (50000, 75000),
@@ -62,29 +60,16 @@ class Jobfilter(django_filters.FilterSet):
             "100k_150k": (100000, 150000),
             "150k_200k": (150000, 200000),
             "200k_300k": (200000, 300000),
-            "300k_above": (300000, 1000000000),
+            "300k_above": (300000, 10**9),  # Use a very high integer for "above PHP 300,000"
         }
         if value in salary_ranges:
             min_salary, max_salary = salary_ranges[value]
-            return queryset.filter(salary_min__gte=min_salary, salary_max__lte=max_salary)
+            return queryset.filter(
+                Q(salary_min__gte=min_salary, salary_min__lte=max_salary) |
+                Q(salary_max__gte=min_salary, salary_max__lte=max_salary)
+            )
         return queryset
     
-
-def get_salary_range_choices():
-    return [
-        ("below_15k", "Below PHP 15,000"),
-        ("15k_20k", "PHP 15,000 - PHP 20,000"),
-        ("20k_25k", "PHP 20,000 - PHP 25,000"),
-        ("25k_30k", "PHP 25,000 - PHP 30,000"),
-        ("30k_40k", "PHP 30,000 - PHP 40,000"),
-        ("40k_50k", "PHP 40,000 - PHP 50,000"),
-        ("50k_75k", "PHP 50,000 - PHP 75,000"),
-        ("75k_100k", "PHP 75,000 - PHP 100,000"),
-        ("100k_150k", "PHP 100,000 - PHP 150,000"),
-        ("150k_200k", "PHP 150,000 - PHP 200,000"),
-        ("200k_300k", "PHP 200,000 - PHP 300,000"),
-        ("300k_above", "Above PHP 300,000"),
-    ]
 
 class JobFairfilter(django_filters.FilterSet):
     title = django_filters.CharFilter(lookup_expr='icontains')

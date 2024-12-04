@@ -4,45 +4,66 @@
 {% block content %}
     <div aria-label="breadcrumb" class="custombreadcrumb container bg-light p-4 mb-3 shadow-sm">
         <ol class="breadcrumb mb-0 d-flex justify-content-end">
-            <li class="breadcrumb-item"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
             <li class="breadcrumb-item active text-dark" aria-current="page">View Job</li>
         </ol>
     </div>
 <!-- Main Section -->
     <div class="container">
-        <h4 class="mt-4 mb-4 col-lg-2"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
+        <h4 class="mt-4 mb-4 col-lg-2"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
     </div>
 
     <div class="custom-container container bg-white applicantProfile-card">
         <div class="p-5 mb-5">
             <div class="row">
-                <h2>{{job.title}}</h2>
-                <p class="fs-4 text-muted mb-0">{{job.location_job_type|title}}</p>
-                <span class="mb-3 fs-5">Salary: ₱ {{job.salary_min}} - ₱ {{job.salary_max}}</span>
+                <div class="col-md-6">
+                    <h2>{{job.title}}</h2>
+                    <p class="fs-4 text-muted mb-0">{{job.location_job_type|title}}</p>
+                    <span class="mb-3 fs-5">Salary: ₱ {{job.salary_min}} - ₱ {{job.salary_max}}</span>
 
-                {% if user.is_authenticated and user.is_applicant %} 
-                <div class="mb-4">
-                    {% if job.has_applied %}
-                        {% if job.application_status == 'ACCEPTED' %}
-                            <a href="#" class="btn btn-success customButton disabled">Application Accepted</a>
-                        {% elif job.application_status == 'REJECTED' %}
-                            <a href="#" class="btn btn-danger customButton disabled">Application Rejected</a>
+                    {% if user.is_authenticated and user.is_applicant %} 
+                    <div class="mt-4 mb-4">
+                        {% if job.has_applied %}
+                            {% if job.application_status == 'ACCEPTED' %}
+                                <a href="#" class="btn btn-success customButton disabled">Application Accepted</a>
+                            {% elif job.application_status == 'REJECTED' %}
+                                <a href="#" class="btn btn-danger customButton disabled">Application Rejected</a>
+                            {% else %}
+                                <a href="{% url 'unapply-job' job.pk %}" class="btn btn-danger customButton px-4" onclick="return confirm('Are you sure you want to withdraw your application?')">Unapply</a>
+                            {% endif %}
                         {% else %}
-                            <a href="/" class="btn btn-danger customButton px-4" onclick="return confirm('Are you sure you want to withdraw your application?')">Unapply</a>
+                            <a href="{% url 'apply-job' job.pk %}" class="btn btn-primary customButton px-4">Apply</a>
                         {% endif %}
-                    {% else %}
-                        <a href="{% url 'apply-job' job.pk %}" class="btn btn-primary customButton px-4">Apply</a>
-                    {% endif %}
-                
-                    {% if job.is_saved %}
-                        <a href="{% url 'save-job' job.pk %}" class="btn btn-secondary disabled customButton px-4">Saved</a>
-                    {% else %}
-                        <a href="{% url 'save-job' job.pk %}" class="btn btn-outline-secondary customButton px-4">Save</a>
+                    
+                        {% if job.is_saved %}
+                            <a href="{% url 'save-job' job.pk %}" class="btn btn-secondary disabled customButton px-4">Saved</a>
+                        {% else %}
+                            <a href="{% url 'save-job' job.pk %}" class="btn btn-outline-secondary customButton px-4">Save</a>
+                        {% endif %}
+                    </div>
                     {% endif %}
                 </div>
-                {% endif %}
+                
+
+                <div class="col-md-6 mb-4">
+                    <h4>Job Location</h4>
+                    <div>
+                        <p> 
+                        {% if job.location.barangay and job.location.city and job.location.street %}
+                            <!-- Display Philippine address if available -->
+                            {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
+                        {% else %}
+                            <!-- Display international address if Philippine address is empty -->
+                            {{ job.location.street }}{% if job.location.street %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
+                        {% endif %}
+                        </p>
+                    </div>
+                </div>
             </div>
             
+
+            <hr>
+
             <div class="row">
                 <div class="col-sm-8">
                     {% if job.job_description %}

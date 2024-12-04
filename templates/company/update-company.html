@@ -61,12 +61,12 @@
                     </div>
                     <div class="col-6 mb-3">
                         <label for="dateFounded" class="form-label">Company Establish Date*</label>
-                        {% render_field form.dateFounded class="form-control" type="datetime-local"%}
+                        {% render_field form.dateFounded class="form-control" type="date"%}
                     </div>
 
                     <div class="col-6 mb-4">
                         <label for="employees" class="form-label">Number of Employees *</label>
-                        {% render_field form.employee_count class="form-control"%}
+                        {% render_field form.employee_count class="form-control" placeholder="e.g. 0000" %}
                     </div>
                     <!-- Website -->
                     <div class="col-6 mb-3">
@@ -83,7 +83,26 @@
                 <hr>
                 <!-- Location -->
                 <div class="mb-4 row">
-                    <h4 for="employerAddress" class="form-label mb-3">Address</h4>
+                    <h4 for="employerAddress" class="form-label mb-3">International Address</h4>
+                    <div class="col-sm-6 mb-3">
+                        <label for="country-text" class="form-label">Country</label>
+                        {% render_field address_form.country class="form-control form-control-md" id="country-text" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="countrycity-text" class="form-label">City</label>
+                        {% render_field address_form.countrycity class="form-control form-control-md" id="countrycity-text" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="countrypostal-text" class="form-label">Postal Code</label>
+                        {% render_field address_form.countrypostal class="form-control form-control-md" id="countrypostal-text" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="countrystreet-text" class="form-label">Street (Optional)</label>
+                        {% render_field address_form.countrystreet class="form-control form-control-md" id="countrystreet-text" %}
+                    </div>
+                    <hr>
+
+                    <h4 for="employerAddress" class="form-label mb-3">Philippines Address</h4>
                     <div class="col-sm-6 mb-3">
                         <label class="form-label">Region *</label>
                         <select name="region" class="form-select form-select-md mb-2" id="region"></select>
@@ -112,17 +131,20 @@
                 <hr>
 
                 <h4 for="employerAddress" class="form-label mb-3">Operational Information</h4>
+                <small class="text-danger fw-bold mb-3">
+                    "To verify your company and gain permission to post jobs or organize job fairs, please ensure you provide all required documents."
+                </small>
                 <div class="mb-3">
                     <label for="tinNumber" class="form-label">TIN Number *</label>
                     {% render_field form.tin_number class="form-control" placeholder="123-456-789-000"%}
                 </div>
                 <div class="mb-3">
                     <label for="birfile" class="form-label">BIR Certificate of Registration (Docx, PDF)*</label>
-                    {% render_field form.bir_file class="form-control"%}
+                    {% render_field form.bir_file class="form-control"}
                 </div>
                 <div class="mb-3">
                     <label for="dti_file" class="form-label">DTI Certificate of Registration *</label>
-                    {% render_field form.dti_file class="form-control"%}
+                    {% render_field form.dti_file class="form-control"}
                 </div>
 
                 <hr>
@@ -131,15 +153,15 @@
                 <h4 for="employerSocials" class="form-label mb-3">Socials (Optional)</h4>
                 <div class="mb-3">
                     <label for="facebook" class="form-label">Facebook</label>
-                    {% render_field form.facebook class="form-control" placeholder="Enter your Facebook URL" %}
+                    {% render_field form.facebook class="form-control" placeholder="URL (e.g., https://facebook.com)" %}
                 </div>
                 <div class="mb-3">
                     <label for="twitter" class="form-label">Twitter</label>
-                    {% render_field form.twitter class="form-control" placeholder="Enter your Twitter URL" %}
+                    {% render_field form.twitter class="form-control" placeholder="URL (e.g., https://twitter.com)" %}
                 </div>
                 <div class="mb-3">
                     <label for="github" class="form-label">GitHub</label>
-                    {% render_field form.github class="form-control" placeholder="Enter your GitHub URL" %}
+                    {% render_field form.github class="form-control" placeholder="URL (e.g., https://github.com)" %}
                 </div>
                 <!-- Submit Button -->
                 <div class="mt-4">

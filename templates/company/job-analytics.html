@@ -9,6 +9,12 @@
 
     <script src="{% static 'JS/datatables/dataTables.js' %}"></script>
 
+    <script src="{% static 'JS/exportDatatables/dataTables.buttons.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/jszip.min.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/pdfmake.min.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/vfs_fonts.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/buttons.print.min.js' %}"></script>
 {% endblock scripts %}
 
 {% block content %}
@@ -71,6 +77,19 @@
 
                 <!-- Main Section -->
                 <div class="custom-container bg-light p-3 shadow-sm">
+                    <div class="btn-group float-end">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Export
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><p class="mx-2 text-muted">Export</p></li>
+                            <li><button class="dropdown-item" id="btn-csv"><i class="fa-solid fa-file-csv"></i> Save as CSV</button></li>
+                            <li><button class="dropdown-item" id="btn-excel"><i class="fa-solid fa-file-excel"></i> Save as Excel</button></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><p class="mx-2 text-muted">Print</p></li>
+                            <li><button class="dropdown-item" id="btn-print"><i class="fa-solid fa-print"></i> Print</button></li>
+                        </ul>
+                    </div> 
                     <div class="mb-5">
                         <div class="tableBg">
                             <table id="jobAnalyticsTable" class="table w-100">
@@ -91,7 +110,13 @@
                                                 <h1 style="font-size: 1.5rem;">{{job.title}}</h1>
                                                 <div class="location-badge">
                                                     <i class="fas fa-location-dot"></i>
-                                                    {{job.location.barangay}},{{job.location.city}}
+                                                    {% if job.location.barangay and job.location.city and job.location.street %}
+                                                        <!-- Display Philippine address if available -->
+                                                        {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
+                                                    {% else %}
+                                                        <!-- Display international address if Philippine address is empty -->
+                                                        {{ job.location.street }}{% if job.location.street %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
+                                                    {% endif %}
                                                 </div>
                                             </td>
                                             <td>{{job.employment_job_type}}</td>
@@ -104,21 +129,23 @@
                                             <td>2024-09-10</td>
                                             <td>
                                                 <div class="action-buttons">
+                                                    
+                                                    <button class="btn btn-edit"><i class="fa-regular fa-pen-to-square"></i></button>
+                                                    <a href="{% url 'job-info' job.pk %}" class="btn btn-view"><i class="fa-solid fa-eye"></i></a>
+
                                                     {% if job.is_available %}
                                                         <!-- Deactivate Button -->
                                                         <a href="{% url 'deactivate-job' job.pk %}" class="btn btn-danger" 
                                                         onclick="return confirm('Are you sure you want to deactivate this job?')">
-                                                            Deactivate Job
+                                                            <i class="fa-solid fa-times"></i> Disable
                                                         </a>
                                                     {% else %}
                                                         <!-- Activate Button -->
                                                         <a href="{% url 'activate-job' job.pk %}" class="btn btn-success" 
                                                         onclick="return confirm('Are you sure you want to activate this job?')">
-                                                            Activate Job
+                                                            <i class="fa-solid fa-check"></i> Enable
                                                         </a>
                                                     {% endif %}
-                                                    <button class="btn btn-edit"><i class="fa-regular fa-pen-to-square"></i></button>
-                                                    <a href="job-applicants.html" class="btn btn-view"><i class="fa-solid fa-eye"></i></a>
                                                 </div>
                                             </td>
                                         </tr>

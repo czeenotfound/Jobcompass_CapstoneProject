@@ -82,12 +82,15 @@
                 <!-- Job Listings Column -->
                 <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
                     <h3 class="mb-1 mx-2">Jobs For You</h3>
+                    
                 </div> 
+                <p>{{ job_filtered_count }} results found</p>
                 <!-- Job Listings Column -->
                 <div class="col-md-5">
                     <!-- Job Cards -->
                     <div class="job-listings">
                         {% for job in job_filter.qs %}
+                        
                             <div class="card job-card mb-3" onclick="showJobDetails({{ forloop.counter }})">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start mb-4">
@@ -96,7 +99,15 @@
                                             <div>
                                                 <h5 class="mb-1 fw-bolder">{{job.title}}</h5>
                                                 <p class="text-muted mb-0">{{job.company}}</p>
-                                                <p class="text-muted mb-0" style="font-size: 12px;">{{job.location.barangay|title}}, {{job.location.city|title}}</p>
+                                                <p class="text-muted mb-0" style="font-size: 12px;">
+                                                    {% if job.location.barangay and job.location.city and job.location.street %}
+                                                        <!-- Display Philippine address if available -->
+                                                        {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
+                                                    {% else %}
+                                                        <!-- Display international address if Philippine address is empty -->
+                                                        {{ job.location.street }}{% if job.location.street %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
+                                                    {% endif %}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -151,7 +162,15 @@
                                             <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
                                                 <i class="fa-solid fa-location-dot text-mute"></i>
                                             </div>
-                                            <span>{{job.location.barangay|title}}, {{job.location.city|title}}</span>
+                                            <span> 
+                                                {% if job.location.barangay and job.location.city and job.location.street %}
+                                                    <!-- Display Philippine address if available -->
+                                                    {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
+                                                {% else %}
+                                                    <!-- Display international address if Philippine address is empty -->
+                                                    {{ job.location.street }}{% if job.location.street %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
+                                                {% endif %}
+                                            </span>
                                         </div>
                                         <div class="d-flex align-items-center mb-1">
                                             <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
@@ -180,7 +199,7 @@
                                                 {% elif job.application_status == 'REJECTED' %}
                                                     <a href="#" class="btn btn-danger customButton disabled">Application Rejected</a>
                                                 {% else %}
-                                                    <a href="/" class="btn btn-danger customButton px-4" onclick="return confirm('Are you sure you want to withdraw your application?')">Unapply</a>
+                                                    <a href="{% url 'unapply-job' job.pk %}" class="btn btn-danger customButton px-4" onclick="return confirm('Are you sure you want to withdraw your application?')">Unapply</a>
                                                 {% endif %}
                                             {% else %}
                                                 <a href="{% url 'apply-job' job.pk %}" class="btn btn-primary customButton px-4">Apply</a>
@@ -372,6 +391,7 @@
                     <!-- Left Column: Candidates -->
                     <div class=" col-md-8 p-4">
                         <h2 class="mb-4">Find Candidates</h2>
+                        <p>{{ resume_filtered_count }} results found</p>
                         <!-- Candidate Card Template -->
                         {% for resume in resume_filter.qs %}
                             <div class="card candidate-card mb-3 shadow-sm">
@@ -391,6 +411,25 @@
                                     </div>
                                     <div class="mt-3 row">
                                         <div class="col-12 mb-3 row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="fw-bolder" for="skills">Applicant Location</label>
+                                                <ul class="list-unstyled mb-0">
+                                                    <li>
+                                                        <span> {{resume.address.barangay}}, {{resume.address.city}}</span> 
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="fw-bolder" for="skills">Expected Salary</label>
+                                                <ul class="list-unstyled mb-0">
+                                                    <li>
+                                                        <span>₱ {{resume.expt_salary_min}} - ₱ {{resume.expt_salary_max}}</span> 
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            <hr>
+
                                             <div class="col-md-6 mb-3">
                                                 <label class="fw-bolder" for="skills">Experience</label>
                                                 <ul class="list-unstyled mb-0">

@@ -65,13 +65,13 @@
                     <p class="fs-4">Follow Us</p>
                     <ul class="list-unstyled">
                         <li class="my-3">
-                            <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-facebook footer-link"></i></a>
+                            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}" class="text-decoration-none text-muted"><i class="fa-brands fa-facebook footer-link"></i></a>
                         </li>
                         <li class="my-3">
-                            <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-x-twitter footer-link"></i></a>
+                            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}" class="text-decoration-none text-muted"><i class="fa-brands fa-x-twitter footer-link"></i></a>
                         </li>
                         <li class="my-3">
-                            <a href="#" class="text-decoration-none text-muted"><i class="fa-brands fa-instagram footer-link"></i></a>
+                            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}" class="text-decoration-none text-muted"><i class="fa-brands fa-instagram footer-link"></i></a>
                         </li>
                     </ul>
                 </div>

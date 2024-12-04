@@ -1,4 +1,20 @@
 {% extends 'admin/admin.html' %}
+{% load static %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/buttons.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.bootstrap5.css' %}">
+
+    <script src="{% static 'JS/datatables/dataTables.js' %}"></script>
+
+    <script src="{% static 'JS/exportDatatables/dataTables.buttons.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/jszip.min.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/pdfmake.min.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/vfs_fonts.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/buttons.print.min.js' %}"></script>
+{% endblock scripts %}
 
 {% block content %}
     <main class="col-md-9 ms-sm-auto col-lg-9 col-xl-10 py-3 px-md-4">
@@ -8,31 +24,74 @@
             </section>
         </div>
 
-        <div class="p-4">
-            <h3 class="fw-bold text-dark mb-4">Manage Applicants</h3>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h3 class="h6 fw-semibold mb-2">Total Job Seekers</h3>
-                            <p class="display-6 fw-bold" id="totalJobSeekers">17</p>
-                        </div>
-                    </div>
+        <div class="mainTableContent">
+            <div class="custom-container bg-white p-3 shadow-sm">
+                <div class="card-header p-4">
+                    <div class="btn-group float-end">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Export
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><p class="mx-2 text-muted">Export</p></li>
+                            <li><button class="dropdown-item" id="btn-csv"><i class="fa-solid fa-file-csv"></i> Save as CSV</button></li>
+                            <li><button class="dropdown-item" id="btn-excel"><i class="fa-solid fa-file-excel"></i> Save as Excel</button></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><p class="mx-2 text-muted">Print</p></li>
+                            <li><button class="dropdown-item" id="btn-print"><i class="fa-solid fa-print"></i> Print</button></li>
+                        </ul>
+                    </div> 
                 </div>
-                <div class="col-md-4">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h3 class="h6 fw-semibold mb-2">Total Employers</h3>
-                            <p class="display-6 fw-bold" id="totalEmployers">4</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h3 class="h6 fw-semibold mb-2">Total Job Postings</h3>
-                            <p class="display-6 fw-bold" id="totalJobPostings">21</p>
-                        </div>
+                <div class="mb-5">
+                    <div class="tableBg">
+                        <table id="manageApplicantTable" class="table bg-light">
+                            <thead>
+                                <tr>
+                                    <th>Applicant Details</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for applicant in applicants %}
+                                    <tr>
+                                        <td class="fw-semibold">
+                                            <h1 style="font-size: 1.5rem;">{{ applicant.get_full_name|title }}</h1>
+                                            <div class="location-badge">
+                                                <i class="fas fa-location-dot"></i>
+                                                {% if applicant.address.barangay and applicant.address.city and applicant.address.street %}
+                                                    <!-- Display Philippine location if available -->
+                                                    {{ applicant.address.street }}{% if applicant.address.barangay %}, {{ applicant.address.barangay }}{% endif %}{% if applicant.address.city %}, {{ applicant.address.city }}{% endif %}
+                                                {% else %}
+                                                    <!-- Display international location if Philippine location is empty -->
+                                                    {{ applicant.address.countrystreet }}{% if applicant.address.countrystreet %}, {% endif %}{{ applicant.address.countrycity }}{% if applicant.address.countrycity %}, {% endif %}{{ applicant.address.country }}
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        {% if applicant.is_active %}
+                                            <td><span class="status-badge status-open">Activated</span></td>
+                                        {% else %}
+                                            <td><span class="status-badge status-closed">Deactivated</span></td>
+                                        {% endif %}
+                                        <td>
+                                            <div class="action-buttons">
+                                                <form action="{% url 'toggle-user-status' applicant.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    {% if applicant.is_active %}
+                                                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to deactivate this account?')">
+                                                            <i class="fa-solid fa-times"></i> Deactivate
+                                                        </button>
+                                                    {% else %}
+                                                        <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to activate this account?')">
+                                                            <i class="fa-solid fa-check"></i> Activate
+                                                        </button>
+                                                    {% endif %}
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

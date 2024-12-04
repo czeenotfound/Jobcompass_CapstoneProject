@@ -20,7 +20,14 @@
                     <span class="skillbadge fw-bold">{{user.company.industry}}</span>
                     <p class="text-white mt-4">
                         <i class="fas fa-map-marker-alt me-2"></i>
-                        {{user.company.address.street}}, {{user.company.address.barangay}}, {{user.company.address.city}}
+                          
+                        {% if user.company.address.barangay and user.company.address.city and user.company.address.street %}
+                            <!-- Display Philippine address if available -->
+                            {{ user.company.address.street }}{% if user.company.address.barangay %}, {{ user.company.address.barangay }}{% endif %}{% if user.company.address.city %}, {{ user.company.address.city }}{% endif %}
+                        {% else %}
+                            <!-- Display international address if Philippine address is empty -->
+                            {{ user.company.address.street }}{% if user.company.address.street %}, {% endif %}{{ user.company.address.countrycity }}{% if user.company.address.countrycity %}, {% endif %}{{ user.company.address.country }}
+                        {% endif %}
                     </p>
                     <span class="text-white">Founded: {{user.company.dateFounded|date:'F d, Y' }}</span>
                     <br>

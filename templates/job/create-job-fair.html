@@ -67,20 +67,30 @@
                     <h5 class="mb-3">Job Fair Date</h5>
                     <div class="col-sm-6 mb-3">
                         <label for="jobfairstartDate class="form-label">Start Date</label>
-                        {% render_field form.start_date class="form-control" type="datetime-local"  %}
+                        {% render_field form.start_date class="form-control" type="date"  %}
                     </div>
                     <div class="col-sm-6 mb-3">
                         <label for="jobfairendDate class="form-label">End Date</label>
-                        {% render_field form.end_date class="form-control" type="datetime-local"  %}
+                        {% render_field form.end_date class="form-control" type="date"  %}
                     </div>
 
                     <div class="col-sm-6 mb-3">
+                        <label for="jobfairstartDate class="form-label">Start Time</label>
+                        {% render_field form.start_time class="form-control" type="time"  %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="jobfairendDate class="form-label">End Time</label>
+                        {% render_field form.end_time class="form-control" type="time"  %}
+                    </div>
+
+                    <h5 class="mb-3">Application Date</h5>
+                    <div class="col-sm-6 mb-3">
                         <label for="jobfairApplicationStarts class="form-label">Application Start</label>
-                        {% render_field form.application_starts class="form-control" type="datetime-local"  %}
+                        {% render_field form.application_starts class="form-control" type="date"  %}
                     </div>
                     <div class="col-sm-6 mb-3">
                         <label for="jobfairApplicationDeadline class="form-label">Application Deadline</label>
-                        {% render_field form.application_deadline class="form-control" type="datetime-local"  %}
+                        {% render_field form.application_deadline class="form-control" type="date"  %}
                     </div>
                 </div>
 
@@ -99,8 +109,29 @@
                 </div>
 
                 <hr>
+
                 <div class="mb-4 row">
-                    <h5 for="jobfairLocation" class="form-label">Location</h5>
+                    <h4 for="employerAddress" class="form-label mb-3">International Location Venue</h4>
+                    <div class="col-sm-6 mb-3">
+                        <label for="country-text" class="form-label">Country</label>
+                        <input type="text" class="form-control" name="country" id="country-text" placeholder="Enter Country">
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="countrycity-text" class="form-label">City / Municipality *</label>
+                        <input type="text" class="form-control" name="countrycity" id="country-text" placeholder="Enter City">
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="countrypostal-text" class="form-label">Postal Code</label>
+                        <input type="text" class="form-control" name="countrypostal" id="country-text" placeholder="Enter Country">
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="countrystreet-text" class="form-label">Street (Optional)</label>
+                        <input type="text" class="form-control" name="countrystreet" id="country-text" placeholder="Enter Country">
+                    </div>
+
+                    <hr>
+
+                    <h4 for="employerAddress" class="form-label mb-3">Location Venue</h4>
                     <div class="col-sm-6 mb-3">
                         <label class="form-label">Region *</label>
                         <select name="region" class="form-select form-select-md" id="region"></select>
@@ -121,7 +152,7 @@
                         <select name="barangay" class="form-select form-select-md" id="barangay"></select>
                         <input type="hidden" class="form-select form-select-md" name="barangay" id="barangay-text">
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="mb-3">
                         <label for="street-text" class="form-label">Venue</label>
                         <input type="text" class="form-control form-control-md" name="street" id="street-text">
                     </div>

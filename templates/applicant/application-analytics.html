@@ -9,6 +9,13 @@
 
     <script src="{% static 'JS/datatables/dataTables.js' %}"></script>
 
+    <script src="{% static 'JS/exportDatatables/dataTables.buttons.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/jszip.min.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/pdfmake.min.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/vfs_fonts.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/buttons.print.min.js' %}"></script>
+    
 {% endblock scripts %}
 
 {% block content %}
@@ -60,8 +67,6 @@
                     </div>
                 </div>
                 
-
-                
                 <div class="custom-container bg-light p-3 shadow-sm">
                     <div class="tableBg">
                         <table id="applicationAnalyticsTable" class="table w-100">
@@ -80,15 +85,21 @@
                                             <h1 style="font-size: 1.5rem;">{{ application.job.title }}</h1>
                                             <div class="location-badge">
                                                 <i class="fas fa-location-dot"></i>
-                                                {{ application.job.location.barangay }}, {{ application.job.location.city }}
+                                                {% if application.job.location.barangay and application.job.location.city and application.job.location.street %}
+                                                    <!-- Display Philippine address if available -->
+                                                    {{ application.job.location.street }}{% if application.job.location.barangay %}, {{ application.job.location.barangay }}{% endif %}{% if application.job.location.city %}, {{ application.job.location.city }}{% endif %}
+                                                {% else %}
+                                                    <!-- Display international address if Philippine address is empty -->
+                                                    {{ application.job.location.countrystreet }}{% if application.job.location.countrystreet %}, {% endif %}{{ application.job.location.countrycity }}{% if application.job.location.countrycity %}, {% endif %}{{ application.job.location.country }}
+                                                {% endif %}
                                             </div>
                                         </td>
                                         <td>{{ application.job.employment_job_type }}</td>
                                         <td>{{ application.job.posted_date_time|date:'F d, Y h:m A' }}</td>
                                         <td>
                                             <div class="action-buttons">
-                                                <a href="job-applicants.html" class="btn btn-view"><i class="fa-solid fa-eye"></i></a>
-                                                <a href="/" class="deleteButton btn btn-outline-danger" 
+                                                <a href="{% url 'view_job_application' application.id %}" class="btn btn-view"><i class="fa-solid fa-eye"></i></a>
+                                                <a href="|" class="deleteButton btn btn-outline-danger" 
                                                 onclick="return confirm('Are you sure you want to unsave this job?')">
                                                 <i class="fa-solid fa-trash"></i>
                                                 </a>

@@ -20,10 +20,19 @@
                     <h1>{{jobfair.title}}</h1>
                     <p class="fs-3 text-muted mb-0">{{jobfair.location_job_type|title}}</p>
                     <p>{{jobfair.fair_event_held}}</p>
-                    <p class="fs-5">Venue: {{jobfair.location.street}}, {{jobfair.location.city}}</p>
-
-                    <p class="mt-4 mb-3">Start Date: {{jobfair.start_date|date:'F m, Y h A'}} - {{jobfair.end_date|date:'F m, Y h A'}}</p>
-                    <p class="mb-3">Application Date: {{jobfair.start_date|date:'F m, Y h A'}} - {{jobfair.end_date|date:'F m, Y h A'}}</p>
+                    <p class="fs-5">Venue:  {% if jobfair.location.barangay and jobfair.location.city and jobfair.location.street %}
+                        <!-- Display Philippine address if available -->
+                        {{ jobfair.location.street }}{% if jobfair.location.barangay %}, {{ jobfair.location.barangay }}{% endif %}{% if jobfair.location.city %}, {{ jobfair.location.city }}{% endif %}
+                    {% else %}
+                        <!-- Display international address if Philippine address is empty -->
+                        {{ jobfair.location.countrystreet }}{% if jobfair.location.countrystreet %}, {% endif %}{{ jobfair.location.countrycity }}{% if jobfair.location.countrycity %}, {% endif %}{{ jobfair.location.country }}
+                    {% endif %}
+                    </p>
+                    
+                    <p class="fs-5 mb-3">Application Date: {{jobfair.application_starts}} - {{jobfair.application_deadline}}</p>
+                    <p class="fs-5 mt-4 mb-3">Start Date: {{jobfair.start_date}} - {{jobfair.end_date}}</p>
+                    <p class="fs-5 mt-4 mb-3">Time: {{jobfair.start_time|date:'h:i A'}} - {{jobfair.end_time|date:'h:i A'}}</p>
+                   
                     
                     {% if user.is_authenticated %}
                         {% if jobfair.is_active %}

@@ -28,8 +28,8 @@ class Job(models.Model):
     ideal_candidate = models.TextField(blank=True)
     industry = models.ForeignKey(Industry, on_delete=models.DO_NOTHING, null=True, blank=True)
     
-    location = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)  # Job address
-    
+    location = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
+
     employment_type_choices = (
         ('Full-Time', 'Full-Time'),
         ('Part-Time', 'Part-Time'),
@@ -232,16 +232,19 @@ class JobFair(models.Model):
     description = models.TextField(blank=True)
     fair_event_held = models.CharField(max_length=20, choices=event_held_choices, blank=True)
     # Additional Fields
-    start_date = models.DateTimeField(null=True, blank=True)
-    end_date = models.DateTimeField(null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+
+    start_time = models.TimeField(null=True, blank=True) 
+    end_time = models.TimeField(null=True, blank=True)  
     
     contact_email = models.EmailField(null=True, blank=True)
     contact_phone = models.CharField(max_length=15, blank=True)
     
     max_attendees = models.IntegerField(null=True, blank=True)
 
-    application_starts =models.DateTimeField(null=True, blank=True)
-    application_deadline = models.DateTimeField(null=True, blank=True)
+    application_starts =models.DateField(null=True, blank=True)
+    application_deadline = models.DateField(null=True, blank=True)
     
     image = CloudinaryField(
         'images', 

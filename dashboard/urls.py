@@ -13,6 +13,7 @@ urlpatterns = [
 
     path('resume/<int:pk>/', views.view_resume_profile, name='view-resume-profile'),
 
+    path('settings/<int:pk>/', views.user_settings, name='settings'),
 
     path('inbox/', views.inbox, name="inbox"),
 ]

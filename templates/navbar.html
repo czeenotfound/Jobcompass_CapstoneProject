@@ -104,7 +104,7 @@
                                 <li><a class="dropdown-item custom-dropdown-item" href="{% url 'jobfair-registration' %}">Job Fair Registration</a></li>
                                 <li><a class="dropdown-item custom-dropdown-item" href="{% url 'job-savedjobs' %}">Saved Jobs</a></li>
                                 <li><a class="dropdown-item custom-dropdown-item" href="{% url 'application-analytics' %}">Application Analytics</a></li>
-                                <li><a class="dropdown-item custom-dropdown-item" href="#">Settings</a></li>
+                                <li><a class="dropdown-item custom-dropdown-item" href="{% url 'settings' user.pk %}">Settings</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
@@ -189,7 +189,7 @@
                                 <li><span class="dropdown-item custom-dropdown-item disabled text-dark fw-bold mb-2">{{user.get_full_name|title }}</span></li>
                                 <li><a class="dropdown-item custom-dropdown-item" href="{% url 'employer-profile' user.pk %}">Account Profile</a></li>
                                
-                                <li><a class="dropdown-item custom-dropdown-item" href="#">Settings</a></li>
+                                <li><a class="dropdown-item custom-dropdown-item" href="{% url 'settings' user.pk %}">Settings</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>

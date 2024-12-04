@@ -38,7 +38,7 @@
                 
                 <h4 for="applicantResume" class="form-label mb-3">Document Resume</h4>
                 <div class="mb-3 bg-light p-3">
-                    <label for="resumePDF" class="form-label fw-bold">Upload Resume (pdf) *</label>
+                    <label for="resumePDF" class="form-label fw-bold">Upload Resume (.pdf, .docx) *</label>
                     {% render_field form.upload_resume class="form-control" id="resumePDF" %}
                 </div>
 
@@ -145,10 +145,10 @@
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <label class="mb-0">
-                            Education 
-                            <small class="text-danger ms-2">(Optional)</small>
+                            Education
+                            <small class="text-danger ms-2">(Minimum 1 education required)</small>
                             <br>
-                            <small class="text-danger fw-bold">"Only 1 education can be added or updated at a time. You can add education skill during your next update."</small>
+                            <small class="text-danger fw-bold">"Only 1 education can be added or updated at a time. You can add another education during your next update."</small>
                         </label>
                     </div>
                     <div id="education-container">
@@ -192,6 +192,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <label class="mb-0">
                             Experience 
+                            <small class="text-danger ms-2">(Optional)</small>
                             <br>
                             <small class="text-danger fw-bold">"Only 1 experience can be added or updated at a time. You can add another experience during your next update."</small>
                         </label>

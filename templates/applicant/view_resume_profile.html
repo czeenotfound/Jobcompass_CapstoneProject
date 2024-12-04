@@ -45,7 +45,7 @@
                     <div class="row mt-5">
                         <div class="col-md-6 mb-4">
                             <h4>Experience</h4>
-                            {% for experience in resume.user.resume.experiences.all %}
+                            {% for experience in user.resume.experiences.all %}
                                 <p class="card-text">
                                     <strong>{{experience.title}}</strong> <br>
                                     {{experience.company}} <br>
@@ -54,6 +54,8 @@
                                         <li>{{experience.description}}</li>
                                     </ul>
                                 </p>
+                            {% empty %}
+                                <p class="card-text">No Experience details available.</p>
                             {% endfor %}
                         </div>
 
@@ -117,24 +119,18 @@
                     </div>
                     
 
-                    <h4>Experience</h4>
-                    {% for socials in resume.user.resume.sociallinks.all %}
-                        <p class="card-text">
-                            <strong>{{socials.platform}}</strong> <br>
-                            {{socials.company}} <br>
-                            {{socials.start_date}} - {{socials.end_date}} <br>
-                            <ul>
-                                <li>{{socials.description}}</li>
-                            </ul>
-                        </p>
-                    {% endfor %}
                     <div class="stats-card">
                         <h5>Social Links</h5>
-                        <div class="social-links">
-                            <a href="#"><i class="fab fa-linkedin fa-2x"></i></a>
-                            <a href="#"><i class="fab fa-twitter fa-2x"></i></a>
-                            <a href="#"><i class="fab fa-github fa-2x"></i></a>
-                        </div>
+                        {% for social in user.resume.social_links.all %}
+                            <p class="card-text">
+                                <strong>{{ social.platform }}</strong>
+                                <br> 
+                                <small>{{ social.url }}</small>
+                                <br>
+                            </p>
+                        {% empty %}
+                            <p class="card-text">No Socials details available.</p>
+                        {% endfor %}
                     </div>
                 </div>
             </div>

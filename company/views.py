@@ -91,6 +91,18 @@ def job_applicants(request, pk):
     else:
         messages.warning(request, 'Permission Denied')
         return redirect('dashboard')
+
+# job applicants 
+@login_required(login_url='login')
+def jobfair_registers(request, pk):
+    if request.user.is_employer:
+        jobfair = JobFair.objects.get(pk=pk)
+        applicants = jobfair.jobfairregistration_set.all().order_by('-submit_date')
+        context = {'jobfair':jobfair, 'applicants':applicants}
+        return render(request, 'company/jobfair-registers.html', context)
+    else:
+        messages.warning(request, 'Permission Denied')
+        return redirect('dashboard')
     
 
 @login_required

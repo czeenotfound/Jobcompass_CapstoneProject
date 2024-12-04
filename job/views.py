@@ -30,6 +30,15 @@ def job_info(request, pk):
                     user=request.user,
                     job=OuterRef('pk')
                 )
+            ),
+             application_status=Coalesce(
+                Subquery(
+                    ApplicationStatus.objects.filter(
+                        application__job=OuterRef('pk'),
+                        application__user=request.user
+                    ).values('status')[:1]  
+                ),
+                Value('NOT_APPLIED') 
             )
         ),
         pk=pk
@@ -103,23 +112,6 @@ def job_application(request):
 def view_job_application(request, pk):
     # Fetch the application by its primary key
     application = get_object_or_404(Application, pk=pk)
-    job = get_object_or_404(
-        Job.objects.annotate(
-            has_applied=Exists(
-                Application.objects.filter(
-                    user=request.user,
-                    job=OuterRef('pk')
-                )
-            ),
-            is_saved=Exists(
-                SaveJob.objects.filter(
-                    user=request.user,
-                    job=OuterRef('pk')
-                )
-            )
-        ),
-        pk=pk
-    )
     # Optional: Ensure only authorized users (employer or applicant) can access it
     if request.user != application.job.company.user and request.user != application.user:
         return redirect('dashboard')  # Redirect unauthorized users
@@ -127,7 +119,6 @@ def view_job_application(request, pk):
     # Pass the application details to the template
     context = {
         'application': application,
-        'job': job
     }
     return render(request, 'applicant/view-job-application.html', context)
 
@@ -356,6 +347,10 @@ def create_job(request):
 
                     # Create or update the Address
                     location, created = Address.objects.get_or_create(
+                        country=request.POST.get('country'),
+                        countrycity=request.POST.get('countrycity'),
+                        countrypostal=request.POST.get('countrypostal'),
+                        countrystreet=request.POST.get('countrystreet'),
                         region=request.POST.get('region'),
                         province=request.POST.get('province'),
                         city=request.POST.get('city'),
@@ -744,6 +739,10 @@ def create_job_fair(request):
 
                 # Create or update the Address
                 location, created = Address.objects.get_or_create(
+                    country=request.POST.get('country'),
+                    countrycity=request.POST.get('countrycity'),
+                    countrypostal=request.POST.get('countrypostal'),
+                    countrystreet=request.POST.get('countrystreet'),
                     region=request.POST.get('region'),
                     province=request.POST.get('province'),
                     city=request.POST.get('city'),

@@ -68,9 +68,6 @@
                             <br>
                             <small class="text-danger fw-bold">"Only 3 responsibilities can be added or updated at a time. You can add another responsibility during your next update."</small>
                         </label>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="add-responsibility-btn">
-                            <i class="bi bi-plus-circle me-1"></i>Add Responsibility
-                        </button>
                     </div>
                     <div id="responsibilities-container">
                         {{ responsibility_formset.management_form }}
@@ -172,30 +169,50 @@
                 <hr>
                 
                 <div class="row">
+                    <h4 for="employerAddress" class="form-label mb-3">International Location Venue</h4>
+                    <div class="col-sm-6 mb-3">
+                        <label for="country-text" class="form-label">Country</label>
+                        {% render_field address_form.country class="form-control form-control-md" id="country-text" placeholder="Enter Country"%}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="countrycity-text" class="form-label">City</label>
+                        {% render_field address_form.countrycity class="form-control form-control-md" id="countrycity-text" placeholder="Enter City/Municipality"%}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="countrypostal-text" class="form-label">Postal Code</label>
+                        {% render_field address_form.countrypostal class="form-control form-control-md" id="countrypostal-text" placeholder="Enter Postal Code"%}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="countrystreet-text" class="form-label">Street (Optional)</label>
+                        {% render_field address_form.countrystreet class="form-control form-control-md" id="countrystreet-text" placeholder="Enter Street"%}
+                    </div>
+
+                    <hr>
+
                     <h4 for="employerAddress" class="form-label mb-3">Job Location</h4>
                     <div class="col-sm-6 mb-3">
                         <label class="form-label">Region *</label>
-                        <select name="region" class="form-control form-control-md" id="region"></select>
-                        {% render_field address_form.region class="form-control form-control-md" name="region_text" id="region-text" %}
+                        <select name="region" class="form-control form-control-md mb-2" id="region"></select>
+                        {% render_field address_form.region class="form-control form-control-md" name="region_text" id="region-text" placeholder="Enter Region" %}
                     </div>
                     <div class="col-sm-6 mb-3">
                         <label class="form-label">Province *</label>
-                        <select name="province" class="form-control form-control-md" id="province"></select>
-                        {% render_field address_form.province class="form-control form-control-md" name="province_text" id="province-text" %}
+                        <select name="province" class="form-control form-control-md mb-2" id="province"></select>
+                        {% render_field address_form.province class="form-control form-control-md" name="province_text" id="province-text" placeholder="Enter Province"  %}
                     </div>
                     <div class="col-sm-6 mb-3">
                         <label class="form-label">City / Municipality *</label>
-                        <select name="city" class="form-control form-control-md" id="city"></select>
-                        {% render_field address_form.city class="form-control form-control-md" name="city_text" id="city-text" %}
+                        <select name="city" class="form-control form-control-md mb-2" id="city"></select>
+                        {% render_field address_form.city class="form-control form-control-md" name="city_text" id="city-text" placeholder="Enter City/Municipality" %}
                     </div>
                     <div class="col-sm-6 mb-3">
                         <label class="form-label">Barangay *</label>
-                        <select name="barangay" class="form-control form-control-md" id="barangay"></select>
-                        {% render_field address_form.barangay class="form-control form-control-md" name="barangay_text" id="barangay-text" %}
+                        <select name="barangay" class="form-control form-control-md mb-2" id="barangay"></select>
+                        {% render_field address_form.barangay class="form-control form-control-md" name="barangay_text" id="barangay-text" placeholder="Enter Barangay" %}
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="street-text" class="form-label">Venue</label>
-                        {% render_field address_form.street class="form-control form-control-md" id="street-text" %}
+                        <label for="street-text" class="form-label">Street (Optional)</label>
+                        {% render_field address_form.street class="form-control form-control-md" id="street-text" placeholder="Enter Street" %}
                     </div>
                 </div>
                 
@@ -212,79 +229,4 @@
             
         </div>
     </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-    // Skills dynamic addition
-    const skillsContainer = document.getElementById('skills-container');
-    const addSkillBtn = document.getElementById('add-skill-btn');
-    const skillsTotalFormsInput = document.getElementById('id_skills-TOTAL_FORMS');
-
-    // Responsibilities dynamic addition
-    const responsibilitiesContainer = document.getElementById('responsibilities-container');
-    const addResponsibilityBtn = document.getElementById('add-responsibility-btn');
-    const responsibilitiesTotalFormsInput = document.getElementById('id_responsibilities-TOTAL_FORMS');
-    
-    // Function to add a new form row
-    function addFormRow(container, totalFormsInput, prefix, maxForms = 10) {
-        // Check if we've reached max forms
-        if (parseInt(totalFormsInput.value) >= maxForms) {
-            alert(`Maximum of ${maxForms} ${prefix} allowed`);
-            return;
-        }
-
-        // Get the last form to clone
-        const forms = container.querySelectorAll(`.${prefix}-form`);
-        const lastForm = forms[forms.length - 1];
-        
-        // Clone the last form
-        const newForm = lastForm.cloneNode(true);
-        
-        // Reset input values
-        const inputs = newForm.querySelectorAll('input');
-        inputs.forEach(input => {
-            // Clear text inputs
-            if (input.type === 'text') {
-                input.value = '';
-            }
-            // Uncheck delete checkbox if present
-            if (input.type === 'checkbox') {
-                input.checked = false;
-            }
-        });
-
-        // Update form indices
-        const currentTotal = parseInt(totalFormsInput.value);
-        newForm.innerHTML = newForm.innerHTML.replace(
-            new RegExp(`${prefix}-${currentTotal - 1}`, 'g'), 
-            `${prefix}-${currentTotal}`
-        );
-
-        // Add delete button functionality for new rows
-        const deleteCheckbox = newForm.querySelector('input[type="checkbox"]');
-        if (deleteCheckbox) {
-            const deleteLabel = newForm.querySelector('.form-check-label');
-            deleteLabel.addEventListener('click', () => {
-                deleteCheckbox.checked = !deleteCheckbox.checked;
-            });
-        }
-
-        // Increment total forms
-        totalFormsInput.value = currentTotal + 1;
-
-        // Add new form to container
-        container.appendChild(newForm);
-    }
-
-    // Event listeners for adding rows
-    addSkillBtn.addEventListener('click', () => {
-        addFormRow(skillsContainer, skillsTotalFormsInput, 'skill');
-    });
-
-    addResponsibilityBtn.addEventListener('click', () => {
-        addFormRow(responsibilitiesContainer, responsibilitiesTotalFormsInput, 'responsibility');
-    });
-
-});
-</script>
 {% endblock content %}

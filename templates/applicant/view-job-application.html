@@ -24,24 +24,6 @@
                     <span class="mb-3 fs-5">Salary: ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }}</span>
                     {% if user.is_authenticated and user.is_applicant %} 
                         <div class="mb-4 mt-3">
-                            {% if job.has_applied %}
-                                {% if job.application_status == 'ACCEPTED' %}
-                                    <a href="#" class="btn btn-success customButton disabled mb-2">Application Accepted</a>
-                                {% elif job.application_status == 'REJECTED' %}
-                                    <a href="#" class="btn btn-danger customButton disabled mb-2">Application Rejected</a>
-                                {% else %}
-                                    <a href="/" class="btn btn-danger customButton px-4 mb-2" onclick="return confirm('Are you sure you want to withdraw your application?')">Unapply</a>
-                                {% endif %}
-                            {% else %}
-                                <a href="{% url 'apply-job' job.pk %}" class="btn btn-primary customButton mb-2 px-4">Apply</a>
-                            {% endif %}
-                        
-                            {% if job.is_saved %}
-                                <a href="{% url 'save-job' job.pk %}" class="btn btn-secondary disabled customButton mb-2 px-4">Saved</a>
-                            {% else %}
-                                <a href="{% url 'save-job' job.pk %}" class="btn btn-outline-secondary customButton mb-2 px-4">Save</a>
-                            {% endif %}
-
                             <a href="{% url 'job-info' application.job.id %}" class="btn btn-outline-primary customButton mb-2 px-3">
                                 <i class="fa-solid fa-eye"></i> View Job Details
                             </a>
@@ -63,9 +45,9 @@
             <div class="row">
                 <div class="col-sm-6">
                     <div class="mt-4 mb-4">
-                        <h4>Applicant Information</h4>
+                        <h4>Your Information</h4>
                         <div class="mt-4">
-                            <p><strong>Name:</strong> {{ application.user.get_full_name }}</p>
+                            <p><strong>Name:</strong> {{ application.user.get_full_name|title }}</p>
                             <p><strong>Email:</strong> {{ application.user.email }}</p>
                             <p><strong>Phone:</strong> {{ application.user.phone}}</p>
                         </div>

@@ -1,0 +1,106 @@
+{% extends 'users/base.html' %}
+{% load humanize %}
+{% load static %}
+{% load widget_tweaks %}
+
+
+{% block content %}
+    <div aria-label="breadcrumb" class="custombreadcrumb container bg-light p-4 mb-4 shadow-sm">
+        <ol class="breadcrumb mb-0 d-flex justify-content-end">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+            <li class="breadcrumb-item">Settings</a></li>
+        </ol>
+    </div>
+    
+    {% if request.user.is_applicant %}
+        <div class="container mb-5">
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <div class="row">
+                <h4 class="mt-4 mb-4 col-lg-2"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
+                
+                <div class="col-lg-10 card p-5 mb-5" method="POST" >
+                    <div class="col-md-12 col-lg-5 mb-3">
+                        Name: <h1 class="mb-3 text-dark">{{user.get_full_name|title}}</h1>
+                    </div>
+                    
+                    <hr>
+
+                    <form method="POST" class="mt-4 row">
+                        {% csrf_token %}
+                        <h4 class="col-md-6">Change Password</h4>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {% render_field form.old_password class="form-control" placeholder="Enter your current password" %}
+                            </div>
+                            <div class="mb-3">
+                                {% render_field form.new_password1 class="form-control" placeholder="Enter your new password" %}
+                            </div>
+                            <div class="mb-3">
+                                {% render_field form.new_password2 class="form-control" placeholder="Confirm your new password" %}
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 d-flex justify-content-end gap-2">
+                            <button type="submit" class="customButton btn btn-danger py-2 px-2">
+                                Change Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+
+    {% elif request.user.is_employer %}
+    <div class="container mb-5">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <div class="row">
+            <h4 class="mt-4 mb-4 col-lg-2"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
+            
+            <div class="col-lg-10 card p-5 mb-5" method="POST" >
+                <div class="col-md-12 col-lg-5 mb-3">
+                    Name: <h1 class="mb-3 text-dark">{{user.get_full_name|title}}</h1>
+                </div>
+                
+                <hr>
+
+                <form method="POST" class="mt-4 row">
+                    {% csrf_token %}
+                    <h4 class="col-md-6">Change Password</h4>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {% render_field form.old_password class="form-control" placeholder="Enter your current password" %}
+                        </div>
+                        <div class="mb-3">
+                            {% render_field form.new_password1 class="form-control" placeholder="Enter your new password" %}
+                        </div>
+                        <div class="mb-3">
+                            {% render_field form.new_password2 class="form-control" placeholder="Confirm your new password" %}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 d-flex justify-content-end gap-2">
+                        <button type="submit" class="customButton btn btn-danger py-2 px-2">
+                            Change Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+
+{% endblock content %}

@@ -1,6 +1,7 @@
 {% extends 'users/base.html' %}
-{% load humanize %}
+
 {% load static %}
+{% load humanize %}
 
 {% block scripts %}
     <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.dataTables.css' %}">
@@ -8,6 +9,13 @@
     <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.bootstrap5.css' %}">
 
     <script src="{% static 'JS/datatables/dataTables.js' %}"></script>
+
+    <script src="{% static 'JS/exportDatatables/dataTables.buttons.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/jszip.min.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/pdfmake.min.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/vfs_fonts.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/buttons.print.min.js' %}"></script>
 {% endblock scripts %}
 
 {% block content %}
@@ -55,7 +63,13 @@
                                                 <h1 style="font-size: 1.5rem;">{{ register.jobfair.title }}</h1>
                                                 <div class="location-badge">
                                                     <i class="fas fa-location-dot"></i>
-                                                    {{ register.jobfair.location.barangay }}, {{ register.jobfair.location.city }}
+                                                    {% if register.jobfair.location.barangay and  register.jobfair.location.city and  register.jobfair.location.street %}
+                                                        <!-- Display Philippine address if available -->
+                                                        {{ register.jobfair.location.street }}{% if  register.jobfair.location.barangay %}, {{  register.jobfair.location.barangay }}{% endif %}{% if  register.jobfair.location.city %}, {{  register.jobfair.location.city }}{% endif %}
+                                                    {% else %}
+                                                        <!-- Display international address if Philippine address is empty -->
+                                                        {{ register.jobfair.location.countrystreet }}{% if  register.jobfair.location.countrystreet %}, {% endif %}{{  register.jobfair.location.countrycity }}{% if  register.jobfair.location.countrycity %}, {% endif %}{{  register.jobfair.location.country }}
+                                                    {% endif %}
                                                 </div>
                                             </td>
                                             <td>{{ register.jobfair.fair_event_held}}</td>

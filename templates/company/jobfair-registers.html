@@ -46,39 +46,27 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Example row for an application -->
-                                {% for applicant in applicants %}
+                                {% if applicants %}
+                                    {% for applicant in applicants %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ applicant.user.get_full_name }}</td>
+                                            <td>{{ applicant.user.email }}</td>
+                                            <td>{{ applicant.submit_date|date:'F j, Y, g:i A' }}</td>
+                                            <td class="action-buttons">
+                                                <a href="$" class="btn btn-edit" title="Update Status"><i class="fa-regular fa-pen-to-square"></i></a>
+                                                <a href="$" class="btn btn-view" title="View Profile">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
                                     <tr>
-                                        <td class="fw-semibold">
-                                            <h1 style="font-size: 1.5rem;"> {{applicant.user.resume.last_name|title}}, {{applicant.user.resume.first_name|title}} {{applicant.user.resume.middle_name|title}}</h1>
-                                            <div class="location-badge">
-                                                <i class="fa-solid fa-at"></i>
-                                                {{applicant.user.email}}
-                                            </div>
-                                            <div class="location-badge">
-                                                <i class="fa-solid fa-phone"></i>
-                                                {{applicant.user.phone}}
-                                            </div>
-                                        </td>
-                                        <td>{{applicant.applicationstatus.status}}</td>
-                                        <td>{{applicant.applicationstatus.status_date|date:'F m, Y h:m A'}}</td>
-                                        
-                                        <td>
-                                            <!-- Check if resume exists and display it -->
-                                            {% if applicant.user.resume.upload_resume %}
-                                                <a href="{{ applicant.user.resume.upload_resume.url }}" target="_blank">View Resume</a>
-                                            {% else %}
-                                                <p>No resume uploaded</p>
-                                            {% endif %}
-                                        </td>
-                                        <td class="action-buttons">
-                                            <a href="{% url 'update-application-status' applicant.pk %}" class="btn btn-edit" title="Update Status"><i class="fa-regular fa-pen-to-square"></i></a>
-                                            <a href="{% url 'view-resume-profile' applicant.pk %}" class="btn btn-view" title="View Profile">
-                                                <i class="fa-solid fa-eye"></i>
-                                            </a>
-                                        </td>
+                                        <td colspan="4" class="text-center">No registrations yet.</td>
                                     </tr>
-                                {% endfor %}
+                                {% endif %}
+                                
                                 <!-- Repeat similar rows for each applicant -->
                             </tbody>
                         </table>

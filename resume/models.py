@@ -61,7 +61,8 @@ class Resume(models.Model):
         'file', 
         resource_type='raw', 
         folder='resume',
-        validators=[validate_resume_file]
+        validators=[validate_resume_file],
+        blank=True
     )
 
     def __str__(self):

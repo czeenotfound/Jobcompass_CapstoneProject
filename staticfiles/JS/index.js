@@ -1,5 +1,7 @@
+var jobPostings;
+
 $(document).ready(function() {
-    $('#jobPostingsTable').DataTable({
+    jobPostings = $('#jobPostingsTable').DataTable({
         pageLength: 5, // Initial page length
         order: [[4, 'desc']],   // Sort by date by default
         language: {
@@ -16,37 +18,61 @@ $(document).ready(function() {
         lengthMenu: [ [5, 10, 25, 50, -1], [5, 10, 25, 50, "All"] ], // Define the options for the length menu
         columnDefs: [
             { orderable: false, targets: 5 } // Disable sorting for actions column
+        ],
+        buttons: [
+            {
+                extend: 'csv',
+                text: 'Export CSV',
+                title: 'Csv Employer Manage Jobs',
+                className: 'btn btn-primary btn-sm',
+                  exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                }
+            },
+            {
+                extend: 'excel',
+                text: 'Export Excel',
+                title: 'Excel Employer Manage Jobs',
+                className: 'btn btn-success btn-sm',
+                exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                } 
+            },
+            {
+                extend: 'print',
+                class: 'profile-buttons-print',
+                title: 'Print Employer Manage Jobs',
+                exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                }
+            }
         ]
     });
 });
 
-
-$(document).ready(function() {
-    $('#companyverifiedTable').DataTable({
-        pageLength: 5, // Initial page length
-        order: [[4, 'desc']],   // Sort by date by default
-        language: {
-            search: "",
-            searchPlaceholder: 'Search jobs...',
-            lengthMenu: "Show _MENU_entries",
-            paginate: {
-                first: '<i class="fa fa-angle-double-left"></i>',
-                last: '<i class="fa fa-angle-double-right"></i>',
-                next: '<i class="fa fa-angle-right"></i>',
-                previous: '<i class="fa fa-angle-left"></i>'
-            }
-        },
-        lengthMenu: [ [5, 10, 25, 50, -1], [5, 10, 25, 50, "All"] ], // Define the options for the length menu
-        columnDefs: [
-            { orderable: false, targets: 5 } // Disable sorting for actions column
-        ]
-    });
+$('#btn-excel').on('click', function(){
+    jobPostings.button('.buttons-excel').trigger();
   });
-
-
+$('#btn-csv').on('click', function(){
+    jobPostings.button('.buttons-csv').trigger();
+});
+$('#btn-print').on('click', function(){
+    jobPostings.button('.buttons-print').trigger();
+});
+  
+var jobApplication;
 
 $(document).ready(function() {
-    $('#jobApplicationStatusTable').DataTable({
+    jobApplication = $('#jobApplicationStatusTable').DataTable({
         pageLength: 5, // Initial page length
         order: [[2,'desc']],   // Sort by date by default
         language: {
@@ -63,13 +89,61 @@ $(document).ready(function() {
         lengthMenu: [ [5, 10, 25, 50, -1], [5, 10, 25, 50, "All"] ], // Define the options for the length menu
         columnDefs: [
             { orderable: false, targets: 4 } // Disable sorting for actions column
+        ],
+        buttons: [
+            {
+                extend: 'csv',
+                text: 'Export CSV',
+                title: 'Csv Employer Manage Jobs',
+                className: 'btn btn-primary btn-sm',
+                  exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                }
+            },
+            {
+                extend: 'excel',
+                text: 'Export Excel',
+                title: 'Excel Employer Manage Jobs',
+                className: 'btn btn-success btn-sm',
+                exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                } 
+            },
+            {
+                extend: 'print',
+                class: 'profile-buttons-print',
+                title: 'Print Employer Manage Jobs',
+                exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                }
+            }
         ]
     });
 });
 
+$('#btn-excel').on('click', function(){
+    jobApplication.button('.buttons-excel').trigger();
+  });
+$('#btn-csv').on('click', function(){
+    jobApplication.button('.buttons-csv').trigger();
+});
+$('#btn-print').on('click', function(){
+    jobApplication.button('.buttons-print').trigger();
+});
+
+var jobfairPostings;
 
 $(document).ready(function() {
-    $('#jobfairPostingsTable').DataTable({
+    jobfairPostings = $('#jobfairPostingsTable').DataTable({
         pageLength: 5, // Initial page length
         order: [[4, 'desc']],   // Sort by date by default
         language: {
@@ -86,6 +160,259 @@ $(document).ready(function() {
         lengthMenu: [ [5, 10, 25, 50, -1], [5, 10, 25, 50, "All"] ], // Define the options for the length menu
         columnDefs: [
             { orderable: false, targets: 5 } // Disable sorting for actions column
+        ],
+        buttons: [
+            {
+                extend: 'csv',
+                text: 'Export CSV',
+                title: 'Csv Employer Manage Job Fair',
+                className: 'btn btn-primary btn-sm',
+                  exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                }
+            },
+            {
+                extend: 'excel',
+                text: 'Export Excel',
+                title: 'Excel Employer Manage Job Fair',
+                className: 'btn btn-success btn-sm',
+                exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                } 
+            },
+            {
+                extend: 'print',
+                class: 'profile-buttons-print',
+                title: 'Print Employer Manage Job Fair',
+                exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                }
+            }
+        ]
+    });
+});
+
+$('#btn-excel').on('click', function(){
+    jobfairPostings.button('.buttons-excel').trigger();
+  });
+$('#btn-csv').on('click', function(){
+    jobfairPostings.button('.buttons-csv').trigger();
+});
+$('#btn-print').on('click', function(){
+    jobfairPostings.button('.buttons-print').trigger();
+});
+
+var applicationAnalytics;
+
+$(document).ready(function() {
+    applicationAnalytics = $('#applicationAnalyticsTable').DataTable({
+        pageLength: 3, // Initial page length
+        order: [[2, 'desc']],   // Sort by date by default
+        language: {
+            search: "",
+            searchPlaceholder: 'Search jobs...',
+            lengthMenu: "Show _MENU_entries",
+            paginate: {
+                first: '<i class="fa fa-angle-double-left"></i>',
+                last: '<i class="fa fa-angle-double-right"></i>',
+                next: '<i class="fa fa-angle-right"></i>',
+                previous: '<i class="fa fa-angle-left"></i>'
+            }
+        },
+        lengthMenu: [ [3, 5, 10, 25, 50, -1], [3, 5, 10, 25, 50, "All"] ], // Define the options for the length menu
+        columnDefs: [
+            { orderable: false, targets: 3 } // Disable sorting for actions column
+        ],
+        buttons: [
+            {
+                extend: 'csv',
+                text: 'Export CSV',
+                title: 'Csv Employer Manage Jobs',
+                className: 'btn btn-primary btn-sm',
+                  exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                } 
+            },
+            {
+                extend: 'excel',
+                text: 'Export Excel',
+                title: 'Excel Employer Manage Jobs',
+                className: 'btn btn-success btn-sm',
+                exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                } 
+            },
+            {
+                extend: 'print',
+                class: 'profile-buttons-print',
+                title: 'Print Employer Manage Jobs',
+                exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                }
+            }
+        ]
+    });
+});
+
+
+$('#btn-excel').on('click', function(){
+    applicationAnalytics.button('.buttons-excel').trigger();
+  });
+$('#btn-csv').on('click', function(){
+    applicationAnalytics.button('.buttons-csv').trigger();
+});
+$('#btn-print').on('click', function(){
+    applicationAnalytics.button('.buttons-print').trigger();
+});
+
+
+var jobAnalytics;
+
+$(document).ready(function() {
+    jobAnalytics = $('#jobAnalyticsTable').DataTable({
+        pageLength: 3, // Initial page length
+        order: [[2, 'desc']],   // Sort by date by default
+        language: {
+            search: "",
+            searchPlaceholder: 'Search jobs...',
+            lengthMenu: "Show _MENU_entries",
+            paginate: {
+                first: '<i class="fa fa-angle-double-left"></i>',
+                last: '<i class="fa fa-angle-double-right"></i>',
+                next: '<i class="fa fa-angle-right"></i>',
+                previous: '<i class="fa fa-angle-left"></i>'
+            }
+        },
+        lengthMenu: [ [3, 5, 10, 25, 50, -1], [3, 5, 10, 25, 50, "All"] ], // Define the options for the length menu
+        columnDefs: [
+            { orderable: false, targets: 3 } // Disable sorting for actions column
+        ],
+        buttons: [
+            {
+                extend: 'csv',
+                text: 'Export CSV',
+                title: 'Csv Employer Manage Applications',
+                className: 'btn btn-primary btn-sm',
+                  exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                }
+            },
+            {
+                extend: 'excel',
+                text: 'Export Excel',
+                title: 'Excel Employer Manage Applications',
+                className: 'btn btn-success btn-sm',
+                exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                } 
+            },
+            {
+                extend: 'print',
+                class: 'profile-buttons-print',
+                title: 'Print Employer Manage Applications',
+                exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                }
+            }
+        ]
+
+    });
+});
+
+$('#btn-excel').on('click', function(){
+    jobAnalytics.button('.buttons-excel').trigger();
+  });
+$('#btn-csv').on('click', function(){
+    jobAnalytics.button('.buttons-csv').trigger();
+});
+$('#btn-print').on('click', function(){
+    jobAnalytics.button('.buttons-print').trigger();
+});
+
+var jobFairRegis;
+
+$(document).ready(function() {
+    jobFairRegis = $('#jobFairTable').DataTable({
+        pageLength: 5, // Initial page length
+        order: [[2, 'desc']],   // Sort by date by default
+        language: {
+            search: "",
+            searchPlaceholder: 'Search job fairs...',
+            lengthMenu: "Show _MENU_entries",
+            paginate: {
+                first: '<i class="fa fa-angle-double-left"></i>',
+                last: '<i class="fa fa-angle-double-right"></i>',
+                next: '<i class="fa fa-angle-right"></i>',
+                previous: '<i class="fa fa-angle-left"></i>'
+            }
+        },
+        lengthMenu: [ [5, 10, 25, 50, -1], [5, 10, 25, 50, "All"] ], // Define the options for the length menu
+        columnDefs: [
+            { orderable: false, targets: 3 } // Disable sorting for actions column
+        ],
+        buttons: [
+            {
+                extend: 'csv',
+                text: 'Export CSV',
+                title: 'Csv Employer Manage Jobs',
+                className: 'btn btn-primary btn-sm',
+                  exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                }
+            },
+            {
+                extend: 'excel',
+                text: 'Export Excel',
+                title: 'Excel Employer Manage Jobs',
+                className: 'btn btn-success btn-sm',
+                exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                } 
+            },
+            {
+                extend: 'print',
+                class: 'profile-buttons-print',
+                title: 'Print Employer Manage Jobs',
+                exportOptions: {
+                    columns: [0, 1, 2, 4] // Exclude the last column
+                },
+                init: function (api, node, config){
+                    $(node).hide();
+                }
+            }
         ]
     });
 });
@@ -112,73 +439,6 @@ $(document).ready(function() {
     });
 });
 
-$(document).ready(function() {
-    $('#applicationAnalyticsTable').DataTable({
-        pageLength: 3, // Initial page length
-        order: [[2, 'desc']],   // Sort by date by default
-        language: {
-            search: "",
-            searchPlaceholder: 'Search jobs...',
-            lengthMenu: "Show _MENU_entries",
-            paginate: {
-                first: '<i class="fa fa-angle-double-left"></i>',
-                last: '<i class="fa fa-angle-double-right"></i>',
-                next: '<i class="fa fa-angle-right"></i>',
-                previous: '<i class="fa fa-angle-left"></i>'
-            }
-        },
-        lengthMenu: [ [3, 5, 10, 25, 50, -1], [3, 5, 10, 25, 50, "All"] ], // Define the options for the length menu
-        columnDefs: [
-            { orderable: false, targets: 3 } // Disable sorting for actions column
-        ]
-    });
-});
-
-$(document).ready(function() {
-    $('#jobAnalyticsTable').DataTable({
-        pageLength: 3, // Initial page length
-        order: [[2, 'desc']],   // Sort by date by default
-        language: {
-            search: "",
-            searchPlaceholder: 'Search jobs...',
-            lengthMenu: "Show _MENU_entries",
-            paginate: {
-                first: '<i class="fa fa-angle-double-left"></i>',
-                last: '<i class="fa fa-angle-double-right"></i>',
-                next: '<i class="fa fa-angle-right"></i>',
-                previous: '<i class="fa fa-angle-left"></i>'
-            }
-        },
-        lengthMenu: [ [3, 5, 10, 25, 50, -1], [3, 5, 10, 25, 50, "All"] ], // Define the options for the length menu
-        columnDefs: [
-            { orderable: false, targets: 3 } // Disable sorting for actions column
-        ]
-    });
-});
-
-$(document).ready(function() {
-    $('#jobFairTable').DataTable({
-        pageLength: 5, // Initial page length
-        order: [[2, 'desc']],   // Sort by date by default
-        language: {
-            search: "",
-            searchPlaceholder: 'Search job fairs...',
-            lengthMenu: "Show _MENU_entries",
-            paginate: {
-                first: '<i class="fa fa-angle-double-left"></i>',
-                last: '<i class="fa fa-angle-double-right"></i>',
-                next: '<i class="fa fa-angle-right"></i>',
-                previous: '<i class="fa fa-angle-left"></i>'
-            }
-        },
-        lengthMenu: [ [5, 10, 25, 50, -1], [5, 10, 25, 50, "All"] ], // Define the options for the length menu
-        columnDefs: [
-            { orderable: false, targets: 3 } // Disable sorting for actions column
-        ]
-    });
-});
-
-
 // ============== Scroll to Top ================ //
 function scrollToTop() {
     window.scrollTo({
@@ -198,25 +458,7 @@ function scrollToTop() {
   
 // ============== End of Scroll to Top ================ //
 
-
-const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-
-// GO TO FIND JOBS Homepage
-document.getElementById("findjobs-link").addEventListener("click", function(event) {
-    event.preventDefault(); // Prevent the default anchor click behavior
-    const findJobsSection = document.getElementById("findjobs");
-    
-    // Adjust the scroll position with a smooth scroll effect
-    window.scrollTo({
-        top: findJobsSection.offsetTop - 150, // Adjust based on the navbar height
-        behavior: 'smooth'
-    });
-});
-
 // END OF GO TO FIND JOBS Homepage
-
-
 
 document.getElementById("filter-btn").addEventListener("click", function() {
     const filterOptions = document.getElementById("filter-options");
@@ -307,28 +549,4 @@ function validateStep(step) {
         }
     }
     return true;
-}
-
-// Function to clone and add a skill input field
-function addSkill() {
-    let container = document.getElementById('skills-container');
-    let newSkill = document.querySelector('.skill-item').cloneNode(true);
-    newSkill.querySelector('input').value = ''; // Clear input value
-    container.appendChild(newSkill);
-}
-
-// Function to clone and add a responsibility input field
-function addResponsibility() {
-    let container = document.getElementById('responsibilities-container');
-    let newResponsibility = document.querySelector('.responsibility-item').cloneNode(true);
-    newResponsibility.querySelector('input').value = ''; // Clear input value
-    container.appendChild(newResponsibility);
-}
-
-// Function to clone and add an experience input field
-function addExperience() {
-    let container = document.getElementById('experiences-container');
-    let newExperience = document.querySelector('.experience-item').cloneNode(true);
-    newExperience.querySelector('input').value = ''; // Clear input value
-    container.appendChild(newExperience);
 }

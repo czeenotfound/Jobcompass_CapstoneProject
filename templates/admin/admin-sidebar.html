@@ -68,29 +68,13 @@
                             <div class="text-container">Verification</div>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'admin-reports' %}active{% endif %}" href="{% url 'admin-reports' %}">
-                            <div class="icon-container text-center">
-                                <i class="fas fa-chart-bar"></i>
-                            </div>
-                            <div class="text-container">Reports</div>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link d-flex align-items-center  {% if request.resolver_match.url_name == 'admin-settings' %}active{% endif %}" href="{% url 'admin-settings' %}">
-                            <div class="icon-container text-center">
-                                <i class="fas fa-cog"></i>
-                            </div>
-                            <div class="text-container">Settings</div>
-                        </a>
-                    </li>
 
                     <hr class="nav-item d-md-none">
 
                     <li class="nav-item d-md-none">
-                        <a class="nav-link d-flex align-items-center" href="{% url 'admin-profile' %}">
+                        <a class="nav-link d-flex align-items-center" href="{% url 'admin-profile' user.pk %}">
                             <div class="icon-container text-center">
-                                <img src="{{user.avatar.url}}" alt="mdo" width="32" height="32" class="rounded-circle">
+                                <img src="{{user.avatar.url}}" alt="user" width="32" height="32" class="rounded-circle">
                             </div>
                             <div class="text-container">
                                 Profile

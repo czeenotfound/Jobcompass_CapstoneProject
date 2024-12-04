@@ -1,4 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.contrib import messages
+
 from job.models import Job, SaveJob, Application, ApplicationStatus, Conversation, Message
 from company.models import Company, Employer
 from resume.models import Resume
@@ -9,6 +13,7 @@ from job.filter import Jobfilter
 from resume.filter import Resumefilter
 from django.contrib.auth.decorators import login_required
 from job.filter import get_salary_range_choices
+
 
 # # Create your views here.
 @login_required(login_url='login')
@@ -40,6 +45,8 @@ def dashboard(request):
         .select_related('company', 'industry', 'location') \
         .order_by('-posted_date_time'))
 
+    job_filtered_count = job_filter.qs.count()
+
     resume_filter = Resumefilter(request.GET, queryset=Resume.objects.filter(user__has_resume=True) \
         .select_related('user', 'address') \
         .prefetch_related(
@@ -66,9 +73,14 @@ def dashboard(request):
         # Employer profile does not exist
         employer = None
         is_profile_complete = False
-    
+        # Get the count of filtered results
+
+    resume_filtered_count = resume_filter.qs.count()
+
     context = {
         'job_filter': job_filter,
+        'job_filtered_count': job_filtered_count,
+        'resume_filtered_count': resume_filtered_count,
         'resume_filter': resume_filter,
         'salary_range_choices': get_salary_range_choices(),  # Pass to template
         'is_profile_complete': is_profile_complete
@@ -187,3 +199,28 @@ def inbox(request):
         'first_conversation': first_conversation,
     }
     return render(request, 'dashboard/inbox.html', context)
+
+
+
+@login_required(login_url='login')
+def user_settings(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.user)  # Keeps the user logged in after the password change
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('logout')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(user=request.user)
+    
+    context = {
+        'user': user,
+        'form': form,
+    }
+    
+    return render(request, 'dashboard/settings.html', context)

@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.bootstrap5.css' %}">
 
     <script src="{% static 'JS/datatables/dataTables.js' %}"></script>
+
+    <script src="{% static 'JS/exportDatatables/dataTables.buttons.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/jszip.min.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/pdfmake.min.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/vfs_fonts.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'JS/exportDatatables/buttons.print.min.js' %}"></script>
 {% endblock scripts %}
 
 
@@ -18,70 +25,123 @@
                 <h1 class="hero-heading">Verification Management</h1>
             </section>
         </div>
+        <!-- Metrics Section -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Pending Companies</h5>
+                        <p class="card-text fs-4">{{ pending_count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Verified Companies</h5>
+                        <p class="card-text fs-4">{{ verified_count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-danger mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Rejected Companies</h5>
+                        <p class="card-text fs-4">{{ rejected_count }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
         
-        <div class="custom-container bg-light p-3 shadow-sm">
-            <div class="mb-5">
-                <div class="tableBg">
-                    <table id="companyverifiedTable" class="table table-responsive w-100">
-                        <thead>
-                            <tr>
-                                <th>Company Name</th>
-                                <th>Company Email</th>
-                                <th>Status</th>
-                                <th>Document</th>
-                                <th>Post Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for company in companies %}
+        <div class="mainTableContent">
+            <div class="custom-container bg-white p-3 shadow-sm">
+                <div class="card-header p-4">
+                    <div class="btn-group float-end">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Export
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><p class="mx-2 text-muted">Export</p></li>
+                            <li><button class="dropdown-item" id="btn-pdf"><i class="fa-solid fa-file-pdf"></i> Save as PDF</button></li>
+                            <li><button class="dropdown-item" id="btn-csv"><i class="fa-solid fa-file-csv"></i> Save as CSV</button></li>
+                            <li><button class="dropdown-item" id="btn-excel"><i class="fa-solid fa-file-excel"></i> Save as Excel</button></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><p class="mx-2 text-muted">Print</p></li>
+                            <li><button class="dropdown-item" id="btn-print"><i class="fa-solid fa-print"></i> Print</button></li>
+                        </ul>
+                    </div> 
+                </div>
+                <div class="mb-5">
+                    <div class="tableBg">
+                        <table id="companyverifiedTable" class="table bg-light">
+                            <thead>
                                 <tr>
-                                    <td class="fw-semibold">
-                                        <h1 style="font-size: 1.5rem;">{{ company.company_name }}</h1>
-                                        <div class="location-badge">
-                                            <i class="fas fa-location-dot"></i>
-                                            {{company.address.street}},{{company.address.city}}
-                                        </div>
-                                    </td>
-                                    <td>{{company.email}}</td>
-                                    {% if company.verification_status == 'Pending' %}
-                                    <td>
-                                        <span class="status-badge status-pending">{{ company.verification_status }}</span>
-                                    </td>   
-                                    {% elif company.verification_status == 'Verified' %}
-                                    <td>
-                                        <span class="status-badge status-open">{{ company.verification_status }}</span>
-                                    </td>    
-                                    {% else %}
-                                    <td>
-                                        <span class="status-badge status-close">{{ company.verification_status }}</span>
-                                    </td>
-                                    {% endif %}
-                                    <td>
-                                        {% if company.bir_file or dti_file %}
-                                            <a href="{{ company.bir_file.url }}" target="_blank">View BIR</a>
-                                            <a href="{{ company.dti_file.url }}" target="_blank">View DTI</a>
-                                        {% else %}
-                                            <p>No resume uploaded</p>
-                                        {% endif %}</td>
-                                    </td>
-                                    <td>{{company.dateFounded|date:'F d, Y'}}</td>
-                                    <td>
-                                        <form method="post" class="action-buttons" style="display: inline;">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="company_id" value="{{ company.id }}">
-                                            <select name="verification_status" class="form-select form-select-sm d-inline-block w-auto">
-                                                <option value="Pending" {% if company.verification_status == "Pending" %}selected{% endif %}>Pending</option>
-                                                <option value="Verified" {% if company.verification_status == "Verified" %}selected{% endif %}>Verified</option>
-                                                <option value="Rejected" {% if company.verification_status == "Rejected" %}selected{% endif %}>Rejected</option>
-                                            </select>
-                                            <button type="submit" class="btn btn-sm btn-primary">Update</button>
-                                        </form>
-                                    </td>
+                                    <th>Company Details</th>
+                                    <th>Status</th>
+                                    <th>Post Date</th>
+                                    <th>Actions</th>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {% for company in companies %}
+                                    <tr>
+                                        <td class="fw-semibold">
+                                            <h1 style="font-size: 1.5rem;">{{ company.company_name }}</h1>
+                                            <p>{{company.email}}</p>
+                                            <div class="location-badge">
+                                                <i class="fas fa-location-dot"></i>
+                                                {% if company.address.barangay and company.address.city and company.address.street %}
+                                                    <!-- Display Philippine address if available -->
+                                                    {{ company.address.street }}{% if company.address.barangay %}, {{ company.address.barangay }}{% endif %}{% if company.address.city %}, {{ company.address.city }}{% endif %}
+                                                {% else %}
+                                                    <!-- Display international address if Philippine address is empty -->
+                                                    {{ company.address.street }}{% if company.address.street %}, {% endif %}{{ company.address.countrycity }}{% if company.address.countrycity %}, {% endif %}{{ company.address.country }}
+                                                {% endif %}
+                                            </div>
+                                            <hr>
+                                            <div class="mt-3">
+                                                <label for="companyfiles">Company Credentials</label>
+                                                <p>{{ company.tin_number}}</p>
+                                                <br>
+                                                {% if company.bir_file or dti_file %}
+                                                    <a href="{{ company.bir_file.url }}" target="_blank">View BIR</a>
+                                                    <a href="{{ company.dti_file.url }}" target="_blank">View DTI</a>
+                                                {% else %}
+                                                    <p>No resume uploaded</p>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        {% if company.verification_status == 'Pending' %}
+                                        <td>
+                                            <span class="status-badge status-pending text-dark">{{ company.verification_status }}</span>
+                                        </td>   
+                                        {% elif company.verification_status == 'Verified' %}
+                                        <td>
+                                            <span class="status-badge status-open">{{ company.verification_status }}</span>
+                                        </td>    
+                                        {% else %}
+                                        <td>
+                                            <span class="status-badge status-close">{{ company.verification_status }}</span>
+                                        </td>
+                                        {% endif %}
+                                        <td>{{company.dateFounded|date:'F d, Y'}}</td>
+                                        <td>
+                                            <form method="post" class="action-buttons" style="display: inline;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="company_id" value="{{ company.id }}">
+                                                <select name="verification_status" class="form-select form-select-sm d-inline-block w-auto">
+                                                    <option value="Pending" {% if company.verification_status == "Pending" %}selected{% endif %}>Pending</option>
+                                                    <option value="Verified" {% if company.verification_status == "Verified" %}selected{% endif %}>Verified</option>
+                                                    <option value="Rejected" {% if company.verification_status == "Rejected" %}selected{% endif %}>Rejected</option>
+                                                </select>
+                                                <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
