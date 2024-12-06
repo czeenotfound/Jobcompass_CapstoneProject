@@ -87,6 +87,7 @@
                                                 <h5 class="mb-1 fw-bolder">{{conversation.application.job.title}}</h5>
                                                 <p class="text-muted mb-0">{{conversation.application.job.company}}</p>
                                                 <span class="text-muted mb-0">{{conversation.application.job.location_job_type|title}}</span>
+                                                <p class="text-muted mb-0">₱ {{conversation.application.job.salary_min}} - ₱ {{conversation.application.job.salary_max}} ({{conversation.application.job.salary_mode}})</p>
                                             </div>
                                         </div>
                                     </div>
@@ -128,23 +129,11 @@
                                 </div>
                             </div>
                         </div>
-                        
                     {% empty %}
                         <div class="customAlert alert alert-danger text-center shadow" role="alert" style="padding: 5rem; margin-bottom: 10vh;">
                             <img src="{% static 'images/undraw_no_data_re_kwbl.svg' %}" class="mb-4" width="150" height="150" alt="">
-                            <h3>No results found.</h3>
-                            {% if request.GET.title %} for "{{ request.GET.title }}"{% endif %}
-                            {% if request.GET.location %} in "{{ request.GET.location }}"{% endif %}
-                            {% if request.GET.industry %} under "{{ request.GET.industry }}" industry{% endif %}
-                            {% if request.GET.employment_job_type %} with job type "{{ request.GET.employment_job_type }}"{% endif %}
-                            {% if request.GET.salary_range %}
-                                {% for key, label in salary_range_choices %}
-                                    {% if key == request.GET.salary_range %}
-                                        with a salary range "{{ label }}".
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                            <p class="mt-2">Please adjust your filters and try again.</p>
+                            <h4>No Conversation found</h4>
+                            <p class="mt-2">Apply Job Now.</p>
                         </div>
                     {% endfor %}
                 </div>
@@ -194,9 +183,10 @@
                                 </div>
                             </div>
                         {% empty %}
-                            <div class="customAlert alert alert-danger text-center p-4 shadow" role="alert">
+                            <div class="customAlert alert alert-danger text-center shadow" role="alert" style="padding: 5rem; margin-bottom: 10vh;">
+                                <img src="{% static 'images/undraw_no_data_re_kwbl.svg' %}" class="mb-4" width="150" height="150" alt="">
                                 <h4>No Conversation found</h4>
-                                <p class="mt-2">Apply Job Now <a href="{% url 'dashboard' %}"></a>.</p>
+                                <p class="mt-2">Update Application Now.</p>
                             </div>
                         {% endfor %}
                     </div>
@@ -224,11 +214,11 @@
                                 <div class="card-body p-4">
                                     <div class="d-flex justify-content-between align-items-start mb-4">
                                         <div class="d-flex align-items-center">
-                                            <img src="{{conversation.application.job.company.avatar.url}}" alt="CompanyLogo" class="company-logo me-3">
+                                            <img src="{{conversation.application.user.resume.avatar.url}}" alt="CompanyLogo" class="company-logo me-3">
                                             <div>
-                                                <h5 class="mb-1 fw-bolder">{{conversation.application.job.title}}</h5>
-                                                <p class="text-muted mb-0">{{conversation.application.job.company}}</p>
-                                                <span class="text-muted mb-0">{{conversation.application.job.location_job_type|title}}</span>
+                                                <h5 class="mb-1 fw-bolder">{{conversation.application.user.resume.last_name|title}}, {{conversation.application.user.resume.first_name|title}}</h5>
+                                                <p class="text-muted mb-0">{{conversation.application.user.resume.industry}}</p>
+                                                <span class="text-muted mb-0">{{conversation.application.user.resume.employment_job_type}}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -270,23 +260,10 @@
                                 </div>
                             </div>
                         </div>
-                        
                     {% empty %}
-                        <div class="customAlert alert alert-danger text-center shadow" role="alert" style="padding: 5rem; margin-bottom: 10vh;">
-                            <img src="{% static 'images/undraw_no_data_re_kwbl.svg' %}" class="mb-4" width="150" height="150" alt="">
-                            <h3>No results found.</h3>
-                            {% if request.GET.title %} for "{{ request.GET.title }}"{% endif %}
-                            {% if request.GET.location %} in "{{ request.GET.location }}"{% endif %}
-                            {% if request.GET.industry %} under "{{ request.GET.industry }}" industry{% endif %}
-                            {% if request.GET.employment_job_type %} with job type "{{ request.GET.employment_job_type }}"{% endif %}
-                            {% if request.GET.salary_range %}
-                                {% for key, label in salary_range_choices %}
-                                    {% if key == request.GET.salary_range %}
-                                        with a salary range "{{ label }}".
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                            <p class="mt-2">Please adjust your filters and try again.</p>
+                        <div class="customAlert alert alert-danger text-center p-4 shadow" role="alert">
+                            <h4>No Conversation found</h4>
+                            <p class="mt-2">Update Application Now.</p>
                         </div>
                     {% endfor %}
                 </div>
