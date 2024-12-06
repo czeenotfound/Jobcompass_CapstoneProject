@@ -164,8 +164,8 @@
                                         <div class="d-flex align-items-center">
                                             <img src="{{conversation.application.job.company.avatar.url}}" alt="CompanyLogo" class="company-logo me-3">
                                             <div>
-                                                <h6 class="mb-1 fw-bolder">{{conversation.application.job.user.get_full_name|title}}</h6>
-                                                <p class="text-muted mb-0">{{conversation.application.job.company}}</p>
+                                                <h6 class="mb-1 fw-bolder">{{conversation.application.user.resume.last_name|title}},{{conversation.application.user.resume.first_name|title}}</h6>
+                                                <span class="text-muted mb-0">{{conversation.application.user.resume.employment_job_type}}</span>
                                                 {% if conversation.messages.all %}
                                                     <!-- Sneak peek of the latest message -->
                                                     <div class="mt-2 text-muted">
