@@ -8,8 +8,11 @@ urlpatterns = [
 
     path('manage-jobs/', views.manage_jobs, name='manage-jobs'),
     path('manage-job-fairs/', views.manage_job_fair, name='manage-job-fairs'),
+
     path('jobfair-registers/<int:pk>', views.jobfair_registers, name='jobfair-registers'),
+
     path('job-analytics/', views.job_analytics, name='job-analytics'),
+    
     path('job-applicants/<int:pk>', views.job_applicants, name='job-applicants'),
     
     

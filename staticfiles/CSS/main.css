@@ -1652,6 +1652,43 @@ c
     background-color: #F8FAFC;
 }
 
+
+#jobfairregistersStatusTable {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    border: none;
+    margin-bottom: 0;
+    border-radius: 2rem;
+}
+
+#jobfairregistersStatusTable thead th {
+    background: var(--color-light);
+    border: none;
+    font-weight: bolder;
+    text-align: start;
+    font-size: 0.95rem;
+    padding: 1.5rem 2.5rem;
+    letter-spacing: 0.5px;
+    white-space: nowrap; /* Prevent header text wrapping */
+    
+}
+
+#jobfairregistersStatusTable tbody td {
+    padding: 2.2rem 2.5rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #F1F5F9;
+    color: #334155;
+    white-space: nowrap; /* Prevent cell text wrapping */
+}
+
+#jobfairregistersStatusTable tbody tr:hover {
+    background-color: #F8FAFC;
+}
+
+
+
+
 #jobfairPostingsTable {
     border-collapse: separate;
     border-spacing: 0;

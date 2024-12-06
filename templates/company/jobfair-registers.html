@@ -1,4 +1,5 @@
 {% extends 'users/base.html' %}
+
 {% load humanize %}
 {% load static %}
 
@@ -16,32 +17,30 @@
         <div aria-label="breadcrumb" class="custombreadcrumb bg-light p-4 mb-3 shadow-sm">
             <ol class="breadcrumb mb-0 d-flex justify-content-end">
                 <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'manage-jobs' %}" class="text-decoration-none text-dark text-muted">Manage Jobs</a></li>
-                <li class="breadcrumb-item active text-dark" aria-current="page">View Application</li>
+                <li class="breadcrumb-item"><a href="{% url 'manage-job-fairs' %}" class="text-decoration-none text-dark text-muted">Manage Job fair</a></li>
+                <li class="breadcrumb-item active text-dark" aria-current="page">View Registration</li>
             </ol>
         </div>
         <!-- Welcome  -->
         <div class="d-flex align-items-center">
             <section class="employerbanner w-100  h-100 p-5 bg-light mb-4">
-                <h1 class="hero-heading">Applications for {{job.title}}</h1>
+                <h1 class="hero-heading">Registrations for {{jobfair.title}}</h1>
                 <br>
-                <a href="{% url 'create-job' %}" class="btn btn-light customButton btn-md mt-3"><i class="fa-solid fa-plus"></i> Post a Job</a>
+                <a href="{% url 'create-job-fair' %}" class="btn btn-light customButton btn-md mt-3"><i class="fa-solid fa-plus"></i> Post Job Fair</a>
             </section>
         </div>
     
         <!-- Main Section -->
         <div class="mainTableContent">
-            <!-- Table to display applications -->
             <div class="custom-container bg-light p-3 shadow-sm">
                 <div class="mb-5">
                     <div class="tableBg">
-                        <table id="jobApplicationStatusTable" class="table w-100">
+                        <table id="jobfairregistersStatusTable" class="table w-100">
                             <thead>
                                 <tr>
+                                    <th class="text-start p-4">No.</th>
                                     <th class="text-start p-4">Applicant Details</th>
-                                    <th class="text-start p-4">Status</th>
-                                    <th class="text-start p-4">Application Date</th>
-                                    <th class="text-start p-4">Resume (PDF)</th>
+                                    <th class="text-start p-4">Registration Date</th>
                                     <th class="text-start p-4">Actions</th>
                                 </tr>
                             </thead>
@@ -50,12 +49,15 @@
                                     {% for applicant in applicants %}
                                         <tr>
                                             <td>{{ forloop.counter }}</td>
-                                            <td>{{ applicant.user.get_full_name }}</td>
-                                            <td>{{ applicant.user.email }}</td>
+                                            <td>
+                                                <h1 style="font-size: 1.5rem;">{{ applicant.user.resume.last_name|title }}, {{ applicant.user.resume.first_name|title }}</h1>
+                                                <div class="location-badge">
+                                                    {{ applicant.user.email }}
+                                                </div>
+                                            </td>
                                             <td>{{ applicant.submit_date|date:'F j, Y, g:i A' }}</td>
                                             <td class="action-buttons">
-                                                <a href="$" class="btn btn-edit" title="Update Status"><i class="fa-regular fa-pen-to-square"></i></a>
-                                                <a href="$" class="btn btn-view" title="View Profile">
+                                                <a href="{% url 'view-resume-profile' applicant.pk %}" class="btn btn-view" title="View Profile">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </a>
                                             </td>

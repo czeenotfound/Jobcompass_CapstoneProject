@@ -94,7 +94,7 @@ $(document).ready(function() {
             {
                 extend: 'csv',
                 text: 'Export CSV',
-                title: 'Csv Employer Manage Jobs',
+                title: 'Csv Applicant Job Applications',
                 className: 'btn btn-primary btn-sm',
                   exportOptions: {
                     columns: [0, 1, 2, 4] // Exclude the last column
@@ -106,7 +106,7 @@ $(document).ready(function() {
             {
                 extend: 'excel',
                 text: 'Export Excel',
-                title: 'Excel Employer Manage Jobs',
+                title: 'Excel Applicant Job Applications',
                 className: 'btn btn-success btn-sm',
                 exportOptions: {
                     columns: [0, 1, 2, 4] // Exclude the last column
@@ -118,7 +118,7 @@ $(document).ready(function() {
             {
                 extend: 'print',
                 class: 'profile-buttons-print',
-                title: 'Print Employer Manage Jobs',
+                title: 'Print Applicant Job Applications',
                 exportOptions: {
                     columns: [0, 1, 2, 4] // Exclude the last column
                 },
@@ -139,6 +139,30 @@ $('#btn-csv').on('click', function(){
 $('#btn-print').on('click', function(){
     jobApplication.button('.buttons-print').trigger();
 });
+
+
+$(document).ready(function() {
+    jobRegistration = $('#jobfairregistersStatusTable').DataTable({
+        pageLength: 5, // Initial page length
+        order: [[2,'asc']],   // Sort by date by default
+        language: {
+            search: "",
+            searchPlaceholder: 'Search applicant job fair...',
+            lengthMenu: "Show _MENU_entries",
+            paginate: {
+                first: '<i class="fa fa-angle-double-left"></i>',
+                last: '<i class="fa fa-angle-double-right"></i>',
+                next: '<i class="fa fa-angle-right"></i>',
+                previous: '<i class="fa fa-angle-left"></i>'
+            }
+        },
+        lengthMenu: [ [5, 10, 25, 50, -1], [5, 10, 25, 50, "All"] ], // Define the options for the length menu
+        columnDefs: [
+            { orderable: false, targets: 3 } // Disable sorting for actions column
+        ]
+    });
+});
+
 
 var jobfairPostings;
 
