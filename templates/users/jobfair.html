@@ -49,8 +49,15 @@
                                             </a>
                                             <p class="text-muted mb-3">
                                                 <i class="fas fa-calendar-alt me-2"></i> {{jobfair.start_date|date:'F d, Y'}}
-                                                <i class="fas fa-clock ms-3 me-2"></i> {{ jobfair.start_date|date:'h:i A'  }} - {{ jobfair.end_date|date:'h:i A'  }}
-                                                <i class="fas fa-map-marker-alt ms-3 me-2"></i> {{ jobfair.location.street }}, {{ jobfair.location.city }}
+                                                <i class="fas fa-clock ms-3 me-2"></i> {{ jobfair.start_time }} - {{ jobfair.end_time }}
+                                                <i class="fas fa-map-marker-alt ms-3 me-2"></i> 
+                                                {% if jobfair.location.barangay and jobfair.location.city and jobfair.location.street %}
+                                                    <!-- Display Philippine address if available -->
+                                                    {{ jobfair.location.street }}{% if jobfair.location.barangay %}, {{ jobfair.location.barangay }}{% endif %}{% if jobfair.location.city %}, {{ jobfair.location.city }}{% endif %}
+                                                {% else %}
+                                                    <!-- Display international address if Philippine address is empty -->
+                                                    {{ jobfair.location.countrystreet }}{% if jobfair.location.countrystreet %}, {% endif %}{{ jobfair.location.countrycity }}{% if jobfair.location.countrycity %}, {% endif %}{{ jobfair.location.country }}
+                                                {% endif %}
                                             </p>
                                             <p class="mb-3">{{ jobfair.description|slice:":150" }}...</p>
                                         </div>
@@ -86,9 +93,18 @@
                                 <p class="text-muted mb-3">
                                     <i class="fas fa-calendar-alt me-2"></i> {{ jobfair.start_date|date:'F d, Y' }} - {{ jobfair.end_date|date:'F d, Y'}}
                                     <br>
-                                    <i class="fas fa-clock me-2"></i> {{ jobfair.start_date|date:'h:i A'  }} - {{ jobfair.end_date|date:'h:i A'  }}
+                                    <i class="fas fa-clock me-2"></i> {{ jobfair.start_time|date:'h:i A'  }} - {{ jobfair.end_time|date:'h:i A'  }}
                                     <br>
-                                    <i class="fas fa-map-marker-alt me-2"></i> {{ jobfair.location.street }}, {{ jobfair.location.city }}
+                                    <i class="fa-solid fa-users-between-lines"></i> {{ jobfair.max_attendees }}
+                                    <br>
+                                    <i class="fas fa-map-marker-alt me-2"></i>
+                                    {% if jobfair.location.barangay and jobfair.location.city and jobfair.location.street %}
+                                        <!-- Display Philippine address if available -->
+                                        {{ jobfair.location.street }}{% if jobfair.location.barangay %}, {{ jobfair.location.barangay }}{% endif %}{% if jobfair.location.city %}, {{ jobfair.location.city }}{% endif %}
+                                    {% else %}
+                                        <!-- Display international address if Philippine address is empty -->
+                                        {{ jobfair.location.countrystreet }}{% if jobfair.location.countrystreet %}, {% endif %}{{ jobfair.location.countrycity }}{% if jobfair.location.countrycity %}, {% endif %}{{ jobfair.location.country }}
+                                    {% endif %}
                                 </p>
                                 <p class="card-text">{{ jobfair.description|slice:":100" }}...</p>
                             </div>
