@@ -553,7 +553,6 @@ def apply(request, pk):
         messages.info(request, 'Please login to continue')
         return redirect('login')
 
-@login_required(login_url='login')
 def unapply(request, pk):
     if not request.user.is_authenticated:
         messages.warning(request, 'Login/Register required to proceed.')
@@ -658,7 +657,6 @@ def job_fair(request):
     return render(request, 'job/applicant-jobfairs.html', context)
 
 
-@login_required(login_url='login')
 def all_job_fair(request):
     if not request.user.is_authenticated:
         messages.warning(request, 'Login/Register required to proceed.')
