@@ -35,16 +35,16 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default='django-insecure-j@+x+5zwid@6k
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-# ALLOWED_HOSTS = ["*"]
+DEBUG = True
+ALLOWED_HOSTS = ["*"]
 
-DEBUG = not os.environ.get("DATABASE_URL")  # False in production, True in development
+# DEBUG = not os.environ.get("DATABASE_URL")  # False in production, True in development
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
-RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+# RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+# if RENDER_EXTERNAL_HOSTNAME:
+#     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 
