@@ -86,7 +86,9 @@
                             </div>
                         </div>
                         <div id="requirements" class="text-muted mt-1 my-auto">
-                            <span id="length" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must be At least 8 letters</span>
+                            <span id="letters" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must be At least 8 letters</span>
+                            <br>
+                            <span class="feedback"></span>
                             <br>
                             <span id="uppercase" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must Contain At least 1 uppercase letter</span>
                             <br>
@@ -155,11 +157,15 @@
         const password = document.getElementById("password").value;
 
         // Password requirements
-        const length = /.{8,}/;
+        const lettersOnly = /[a-zA-Z]/g; // Matches alphabetic characters
         const uppercase = /[A-Z]/;
         const lowercase = /[a-z]/;
         const digit = /[0-9]/;
         const special = /[~!@#$%^&*()_+{}":;'[\]]/;
+
+        // Count alphabetic characters
+        const letters = password.match(lettersOnly) || [];
+        const hasEnoughLetters = letters.length >= 8;
 
         // Helper function to update validation status
         function updateStatus(id, condition) {
@@ -168,11 +174,20 @@
             if (condition) {
                 element.className = "valid";
                 icon.className = "fa-regular fa-circle-check"; // Green check icon
+                element.querySelector(".feedback").innerText = "";
             } else {
                 element.className = "invalid";
                 icon.className = "fa-solid fa-circle-xmark"; // Red cross icon
+                element.querySelector(".feedback").innerText = additionalMessage;
             }
         }
+
+         // Validate each requirement
+        updateStatus(
+            "letters",
+            hasEnoughLetters,
+            `Password must include at least 8 letters. Currently, it has ${letters.length}.`
+        );
 
         // Validate each requirement
         updateStatus("length", length.test(password));
