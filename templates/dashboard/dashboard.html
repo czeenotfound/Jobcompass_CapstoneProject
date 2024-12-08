@@ -102,10 +102,8 @@
                                                 <p class="text-muted mb-0">{{job.company}}</p>
                                                 <p class="text-muted mb-0" style="font-size: 12px;">
                                                     {% if job.location.barangay and job.location.city and job.location.street %}
-                                                        <!-- Display Philippine address if available -->
                                                         {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
                                                     {% else %}
-                                                        <!-- Display international address if Philippine address is empty -->
                                                         {{ job.location.street }}{% if job.location.street %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
                                                     {% endif %}
                                                 </p>
@@ -165,11 +163,9 @@
                                             </div>
                                             <span> 
                                                 {% if job.location.barangay and job.location.city and job.location.street %}
-                                                    <!-- Display Philippine address if available -->
                                                     {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
                                                 {% else %}
-                                                    <!-- Display international address if Philippine address is empty -->
-                                                    {{ job.location.street }}{% if job.location.street %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
+                                                    {{ job.location.countrystreet }}{% if job.location.countrystreet %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
                                                 {% endif %}
                                             </span>
                                         </div>
