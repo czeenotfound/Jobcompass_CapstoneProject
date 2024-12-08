@@ -87,7 +87,6 @@
                         </div>
                         <div id="requirements" class="text-muted mt-1 my-auto">
                             <span id="letters" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must be At least 8 letters</span>
-                            <span class="feedback"></span>
                             <br>
                             <span id="uppercase" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must Contain At least 1 uppercase letter</span>
                             <br>
@@ -173,11 +172,9 @@
             if (condition) {
                 element.className = "valid";
                 icon.className = "fa-regular fa-circle-check"; // Green check icon
-                element.querySelector(".feedback").innerText = "";
             } else {
                 element.className = "invalid";
                 icon.className = "fa-solid fa-circle-xmark"; // Red cross icon
-                element.querySelector(".feedback").innerText = additionalMessage;
             }
         }
 
@@ -189,7 +186,6 @@
         );
 
         // Validate each requirement
-        updateStatus("length", length.test(password));
         updateStatus("uppercase", uppercase.test(password));
         updateStatus("lowercase", lowercase.test(password));
         updateStatus("digit", digit.test(password));
