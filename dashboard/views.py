@@ -56,7 +56,8 @@ def dashboard(request):
             'certifications',
             'projects',
             'social_links'
-        )) 
+        ).order_by('?')  # Randomize the queryset
+    ) 
     
     try:
         employer = Employer.objects.get(user=request.user)
