@@ -123,6 +123,20 @@ def admin_manage_jobfairs(request):
     
     return render(request, 'admin/admin-manage-jobfairs.html', context)
 
+
+@login_required(login_url='admin-login')
+def toggle_featured_status(request, pk):
+    if not request.user.is_superuser:
+        return redirect('admin-login')
+    
+    jobfair = get_object_or_404(JobFair, pk=pk)
+    jobfair.is_featured = not jobfair.is_featured  # Toggle the is_featured status
+    jobfair.save()
+
+    messages.success(request, f"Job Fair '{jobfair.title}' featured status updated.")
+    
+    return redirect('admin-manage-jobfairs')
+
 @login_required(login_url='admin-login')
 def admin_employers(request):
     if not request.user.is_authenticated or not request.user.is_staff:
@@ -171,6 +185,7 @@ def admin_verification(request):
         company_id = request.POST.get('company_id')
         new_status = request.POST.get('verification_status')
         company = get_object_or_404(Company, id=company_id)
+        
         if new_status in ['Pending', 'Verified', 'Rejected']:
             company.verification_status = new_status
             company.is_verified = (new_status == 'Verified')
@@ -178,8 +193,10 @@ def admin_verification(request):
             messages.success(request, f"{company.company_name}'s status updated to {new_status}.")
         else:
             messages.error(request, "Invalid status update.")
+    
+        return redirect('admin-verification')
 
-    context={
+    context = {
         'companies': companies,
         'pending_count': pending_count,
         'verified_count': verified_count,
@@ -208,3 +225,56 @@ def toggle_user_status(request, user_id):
     status = "activated" if user.is_active else "deactivated"
     messages.success(request, f"User {user.get_full_name()} has been {status}.")
     return redirect('admin-dashboard')  # Adjust redirect as needed
+
+
+@login_required(login_url='login')
+def admin_activate_job(request, pk):
+    job = get_object_or_404(Job, pk=pk)
+    
+    job.is_available = True
+    job.save()
+
+    messages.success(request, f"Job '{job.title}' has been activated.")
+
+    return redirect('admin-manage-jobs')  
+
+@login_required(login_url='login')
+def admin_deactivate_job(request, pk):
+    job = get_object_or_404(Job, pk=pk)
+    
+    job.is_available = False
+    job.save()
+
+    messages.success(request, f"Job '{job.title}' has been deactivated.")
+
+    return redirect('admin-manage-jobs') 
+
+def admin_activate_job_fair(request, pk):
+    if request.user.is_superuser:
+        jobfair = get_object_or_404(JobFair, pk=pk)
+        
+        jobfair.is_active = True
+        jobfair.save()
+
+        messages.success(request, f"Job Fair '{jobfair.title}' has been activated.")
+
+        return redirect('admin-manage-jobfairs')  
+    else:
+        messages.info(request,'Permission Denied!')
+        return redirect('admin-dashboard')
+    
+    
+
+def admin_deactivate_job_fair(request, pk):
+    if request.user.is_superuser:
+        jobfair = get_object_or_404(JobFair, pk=pk)
+        
+        jobfair.is_active = False
+        jobfair.save()
+
+        messages.success(request, f"Job Fair '{jobfair.title}' has been deactivated.")
+
+        return redirect('admin-manage-jobfairs') 
+    else:
+        messages.info(request,'Permission Denied!')
+        return redirect('admin-dashboard')

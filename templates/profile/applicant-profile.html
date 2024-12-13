@@ -22,13 +22,15 @@
                         <img src="{{user.avatar.url}}" alt="Profile Image" class="profile-image bg-light">
                     </div>
                     <div class="col-md-12 col-lg-5 mb-3">
-                        <h1 class="mb-3 text-white">{{user.resume.first_name|title}} {{user.resume.middle_name|title}} {{user.resume.last_name|title}}  {{user.resume.suffix|title}}</h1>
-                        <p class="text-white mt-4">
+                        <h1 class="mb-2 text-white">{{user.resume.first_name|title}} {{user.resume.middle_name|title}} {{user.resume.last_name|title}}  {{user.resume.suffix|title}}</h1>
+                        <p class="text-white mt-0">
                             <i class="fas fa-map-marker-alt me-2"></i>
                             {{user.resume.address.barangay}}, {{user.resume.address.city}}
                         </p>
                         <span class="skillbadge fw-bold">Status: {{user.resume.employment_job_type}}</span>
                     </div>
+
+
                     <div class="col-md-12 col-lg-4 d-flex justify-content-center gap-3">
                         <a href="{% url 'create-resume' %}" class="btn btn-outline-light customButton px-3">
                             <i class="fas fa-edit me-2"></i>Edit Profile
@@ -76,6 +78,8 @@
                                 {% endfor %}
                             </div>
 
+                            
+
                             <div class="col-md-6 mb-4">
                                 <h4>Education</h4>
                                 {% for education in user.resume.education.all %}
@@ -98,7 +102,7 @@
                                         <li>{{ certificate.name }}</li>
                                     </ul>
                                 {% empty %}
-                                    <p class="card-text">No education details available.</p>
+                                    <p class="card-text">No certification details available.</p>
                                 {% endfor %}
                             </div>
 
@@ -116,7 +120,7 @@
                                         
                                     </p>
                                 {% empty %}
-                                    <p class="card-text">No education details available.</p>
+                                    <p class="card-text">No project details available.</p>
                                 {% endfor %}
                             </div>
                         </div>

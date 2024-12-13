@@ -47,7 +47,7 @@
                         <table id="managejobFairpostingsTable" class="table bg-light">
                             <thead>
                                 <tr>
-                                    <th>Job Details</th>
+                                    <th>Job Fair Details</th>
                                     <th>Status</th>
                                     <th>Post Date</th>
                                     <th>Actions</th>
@@ -84,17 +84,24 @@
                                             <div class="action-buttons">
                                                 {% if jobfair.is_active %}
                                                     <!-- Deactivate Button -->
-                                                    <a href="{% url 'deactivate-job-fair' jobfair.pk %}" title="deactivate job fair" class="btn btn-danger" 
-                                                    onclick="return confirm('Are you sure you want to deactivate this job?')">
+                                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmModal" 
+                                                        data-action-url="{% url 'admin-deactivate-job-fair' jobfair.pk %}">
                                                         <i class="fa-solid fa-times"></i> Disable
-                                                    </a>
+                                                    </button>
                                                 {% else %}
                                                     <!-- Activate Button -->
-                                                    <a href="{% url 'activate-job-fair' jobfair.pk %}" title="activate job fair" class="btn btn-success" 
-                                                    onclick="return confirm('Are you sure you want to activate this job?')">
+                                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmModal" 
+                                                        data-action-url="{% url 'admin-activate-job-fair' jobfair.pk %}">
                                                         <i class="fa-solid fa-check"></i> Enable
-                                                    </a>
+                                                    </button>
                                                 {% endif %}
+                                                <a href="{% url 'toggle-featured-status' jobfair.pk %}" class="btn {% if jobfair.is_featured %}btn-secondary{% else %}btn-warning{% endif %}">
+                                                    {% if jobfair.is_featured %}
+                                                        Unfeature
+                                                    {% else %}
+                                                        Feature
+                                                    {% endif %}
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
@@ -106,4 +113,38 @@
             </div>
         </div>
     </main>
+    
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to perform this action?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a id="confirmActionButton" href="#" class="btn btn-primary">Confirm</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmActionButton = document.getElementById('confirmActionButton');
+
+    confirmModal.addEventListener('show.bs.modal', function (event) {
+        // Get the button that triggered the modal
+        const button = event.relatedTarget;
+
+        // Extract the URL from the button's data-action-url attribute
+        const actionUrl = button.getAttribute('data-action-url');
+
+        // Set the URL in the confirmation button
+        confirmActionButton.href = actionUrl;
+    });
+</script>
 {% endblock content %}

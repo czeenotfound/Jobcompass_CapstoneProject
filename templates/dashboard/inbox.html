@@ -30,7 +30,7 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div class="d-flex align-items-center">
-                                            <img src="{{conversation.application.job.company.avatar.url}}" alt="CompanyLogo" class="company-logo me-3">
+                                            <img src="{{conversation.application.job.company.avatar.url}}" alt="CompanyLogo" class="img-fluid rounded-circle company-logo me-3">
                                             <div>
                                                 <h6 class="mb-1 fw-bolder">{{conversation.application.job.title}}</h6>
                                                 <p class="text-muted mb-0">{{conversation.application.job.company}}</p>
@@ -82,7 +82,7 @@
                                 <div class="card-body p-4">
                                     <div class="d-flex justify-content-between align-items-start mb-4">
                                         <div class="d-flex align-items-center">
-                                            <img src="{{conversation.application.job.company.avatar.url}}" alt="CompanyLogo" class="company-logo me-3">
+                                            <img src="{{conversation.application.job.company.avatar.url}}" alt="CompanyLogo" class="img-fluid rounded-circle company-logo me-3">
                                             <div>
                                                 <h5 class="mb-1 fw-bolder">{{conversation.application.job.title}}</h5>
                                                 <p class="text-muted mb-0">{{conversation.application.job.company}}</p>
@@ -102,7 +102,7 @@
                                                     {% if message.sender == request.user %}
                                                         You
                                                     {% else %}
-                                                        {{ message.sender.get_full_name }}
+                                                        {{ message.sender.get_full_name|title }}
                                                     {% endif %}
                                                     • {{ message.timestamp|date:"h:i" }}
                                                 </small>
@@ -162,7 +162,7 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div class="d-flex align-items-center">
-                                            <img src="{{conversation.application.user.resume.avatar.url}}" alt="CompanyLogo" class="company-logo me-3">
+                                            <img src="{{conversation.application.user.resume.avatar.url}}" alt="CompanyLogo" class="img-fluid rounded-circle company-logo me-3">
                                             <div>
                                                 <h6 class="mb-1 fw-bolder">{{conversation.application.user.resume.last_name|title}},{{conversation.application.user.resume.first_name|title}}</h6>
                                                 <span class="text-muted mb-0">{{conversation.application.user.resume.employment_job_type}}</span>
@@ -196,7 +196,7 @@
                     {% for conversation in conversations %}
                         <div id="inbox-{{ forloop.counter }}" class="inbox-details {% if forloop.first %} active {% endif %}">
                             <div class="card inbox-card-details">
-                                <span class="featured-badge p-3">
+                                <div class="featured-badge p-3 d-flex flex-column align-items-end">
                                     {% if conversation.application.applicationstatus.status == 'SUBMITTED' %}
                                         <span class="status-badge status-submitted">Submitted</span>
                                     {% elif  conversation.application.applicationstatus.status == 'UNDER_REVIEW' %}
@@ -210,15 +210,16 @@
                                     {% elif  conversation.application.applicationstatus.status == 'REJECTED' %}
                                         <span class="status-badge status-rejected">Rejected</span>
                                     {% endif %}
-                                </span>
+                                    <a href="{% url 'job-applicants' conversation.application.job.pk %}" class="text-decoration-none px-3"> Update Status</a>
+                                </div>
                                 <div class="card-body p-4">
                                     <div class="d-flex justify-content-between align-items-start mb-4">
                                         <div class="d-flex align-items-center">
-                                            <img src="{{conversation.application.user.resume.avatar.url}}" alt="CompanyLogo" class="company-logo me-3">
+                                            <img src="{{conversation.application.user.resume.avatar.url}}" alt="CompanyLogo" class="img-fluid rounded-circle company-logo me-3">
                                             <div>
                                                 <h5 class="mb-1 fw-bolder">{{conversation.application.user.resume.last_name|title}}, {{conversation.application.user.resume.first_name|title}}</h5>
                                                 <p class="text-muted mb-0">{{conversation.application.user.resume.industry}}</p>
-                                                <span class="text-muted mb-0">{{conversation.application.user.resume.employment_job_type}}</span>
+                                                <p class="text-muted mb-0">{{conversation.application.user.resume.employment_job_type}}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -233,7 +234,7 @@
                                                     {% if message.sender == request.user %}
                                                         You
                                                     {% else %}
-                                                        {{ message.sender.get_full_name }}
+                                                        {{ message.sender.resume.first_name|title }} {{ message.sender.resume.last_name|title }}
                                                     {% endif %}
                                                     • {{ message.timestamp|date:"h:i" }}
                                                 </small>

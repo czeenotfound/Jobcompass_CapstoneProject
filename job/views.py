@@ -345,20 +345,31 @@ def create_job(request):
                         messages.warning(request, 'Your company does not have an associated industry.')
                         return redirect('create-job')
 
-                    # Create or update the Address
-                    location, created = Address.objects.get_or_create(
-                        country=request.POST.get('country'),
-                        countrycity=request.POST.get('countrycity'),
-                        countrypostal=request.POST.get('countrypostal'),
-                        countrystreet=request.POST.get('countrystreet'),
-                        region=request.POST.get('region'),
-                        province=request.POST.get('province'),
-                        city=request.POST.get('city'),
-                        barangay=request.POST.get('barangay'),
-                        street=request.POST.get('street', '')
-                    )
-                    
-                    var.location = location
+                    # Check if the employer wants to use the company location
+                    use_company_location = request.POST.get('use_company_location') == 'true'
+
+                    if use_company_location:
+                        # Use the company's address as the job location
+                        company_location = request.user.company.address
+                        if company_location:
+                            var.location = company_location
+                        else:
+                            messages.warning(request, 'Your company does not have a valid address.')
+                            return redirect('create-job')
+                    else:
+                        # Create or update a custom Address
+                        location, created = Address.objects.get_or_create(
+                            country=request.POST.get('country'),
+                            countrycity=request.POST.get('countrycity'),
+                            countrypostal=request.POST.get('countrypostal'),
+                            countrystreet=request.POST.get('countrystreet'),
+                            region=request.POST.get('region'),
+                            province=request.POST.get('province'),
+                            city=request.POST.get('city'),
+                            barangay=request.POST.get('barangay'),
+                            street=request.POST.get('street', '')
+                        )
+                        var.location = location
                     var.save()
 
                     # Save formsets
@@ -735,20 +746,25 @@ def create_job_fair(request):
                 var.user = request.user
                 var.company = request.user.company
 
-                # Create or update the Address
-                location, created = Address.objects.get_or_create(
-                    country=request.POST.get('country'),
-                    countrycity=request.POST.get('countrycity'),
-                    countrypostal=request.POST.get('countrypostal'),
-                    countrystreet=request.POST.get('countrystreet'),
-                    region=request.POST.get('region'),
-                    province=request.POST.get('province'),
-                    city=request.POST.get('city'),
-                    barangay=request.POST.get('barangay'),
-                    street=request.POST.get('street', '')
-                )
-                
-                var.location = location
+                # Determine if the selected job fair type is "Virtual"
+                job_fair_type = form.cleaned_data.get('fair_event_held')
+                if job_fair_type == "Virtual":
+                    # Use the company's address
+                    var.location = company.address
+                else:
+                    # Create or update the Address based on form input
+                    location, created = Address.objects.get_or_create(
+                        country=request.POST.get('country'),
+                        countrycity=request.POST.get('countrycity'),
+                        countrypostal=request.POST.get('countrypostal'),
+                        countrystreet=request.POST.get('countrystreet'),
+                        region=request.POST.get('region'),
+                        province=request.POST.get('province'),
+                        city=request.POST.get('city'),
+                        barangay=request.POST.get('barangay'),
+                        street=request.POST.get('street', '')
+                    )
+                    var.location = location
 
                 var.save()
                 messages.info(request, 'New Job Fair has been created')
@@ -763,6 +779,7 @@ def create_job_fair(request):
     else:
         messages.info(request,'Permission Denied!')
         return redirect('dashboard')
+    
 
 @login_required(login_url='login')
 def update_job_fair(request, pk):

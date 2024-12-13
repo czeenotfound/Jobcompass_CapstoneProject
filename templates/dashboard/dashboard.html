@@ -83,20 +83,20 @@
                 <!-- Job Listings Column -->
                 <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
                     <h3 class="mb-1 mx-2">Jobs For You</h3>
-                    
+                    <p>{{ job_filtered_count }} results found</p>
                 </div> 
-                <p>{{ job_filtered_count }} results found</p>
+               
                 <!-- Job Listings Column -->
                 <div class="col-md-5">
                     <!-- Job Cards -->
                     <div class="job-listings">
                         {% for job in job_filter.qs %}
-                        
+                         
                             <div class="card job-card mb-3" onclick="showJobDetails({{ forloop.counter }})">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start mb-4">
                                         <div class="d-flex align-items-center">
-                                            <img src="{{job.company.avatar.url}}" alt="CompanyLogo" class="company-logo me-3">
+                                            <img src="{{job.company.avatar.url}}" alt="CompanyLogo" class="img-fluid rounded-circle company-logo me-3">
                                             <div>
                                                 <h5 class="mb-1 fw-bolder">{{job.title}}</h5>
                                                 <p class="text-muted mb-0">{{job.company}}</p>
@@ -104,7 +104,7 @@
                                                     {% if job.location.barangay and job.location.city and job.location.street %}
                                                         {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
                                                     {% else %}
-                                                        {{ job.location.street }}{% if job.location.street %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
+                                                        {{ job.location.countrystreet }}{% if job.location.countrystreet %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
                                                     {% endif %}
                                                 </p>
                                             </div>
@@ -123,9 +123,6 @@
                                             </li>
                                         </ul>
                                     </div>
-                                    
-                                    
-
                                 </div>
                                 <div class="card-footer bg-white" style="border-top: none;"  title="{{ job.posted_date_time|date:'F d, Y H:i:s' }}">
                                     <span>Posted {{job.posted_date_time|naturaltime}}</span>
@@ -147,7 +144,7 @@
                                 <div class="card-body p-4">
                                     <div class="d-flex justify-content-between align-items-start mb-4">
                                         <div class="d-flex align-items-center">
-                                            <img src="{{job.company.avatar.url}}" alt="CompanyLogo" class="company-logo me-3">
+                                            <img src="{{job.company.avatar.url}}" alt="CompanyLogo" class="img-fluid rounded-circle company-logo me-3">
                                             <div>
                                                 <a href="{% url 'job-info' job.pk %}" class="joblink fs-2 text-decoration-none mb-1 fw-bolder">{{job.title}}</a>
                                                 <p class="text-muted mb-0">{{job.company}}</p>
@@ -196,7 +193,9 @@
                                                 {% elif job.application_status == 'REJECTED' %}
                                                     <a href="#" class="btn btn-danger customButton disabled">Application Rejected</a>
                                                 {% else %}
-                                                    <a href="{% url 'unapply-job' job.pk %}" class="btn btn-danger customButton px-4" onclick="return confirm('Are you sure you want to withdraw your application?')">Unapply</a>
+                                                    <button type="button" class="btn btn-danger customButton px-4" data-bs-toggle="modal" data-bs-target="#confirmModal" 
+                                                        data-action-url="{% url 'unapply-job' job.pk %}">Unapply
+                                                    </button>
                                                 {% endif %}
                                             {% else %}
                                                 <a href="{% url 'apply-job' job.pk %}" class="btn btn-primary customButton px-4">Apply</a>
@@ -563,9 +562,41 @@
                     </div>
                 </div>
         {% endif %}
-        
-        
     </div>
     {% endif %}
+
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to perform this action?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a id="confirmActionButton" href="#" class="btn btn-primary">Confirm</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmActionButton = document.getElementById('confirmActionButton');
+
+    confirmModal.addEventListener('show.bs.modal', function (event) {
+        // Get the button that triggered the modal
+        const button = event.relatedTarget;
+
+        // Extract the URL from the button's data-action-url attribute
+        const actionUrl = button.getAttribute('data-action-url');
+
+        // Set the URL in the confirmation button
+        confirmActionButton.href = actionUrl;
+    });
+</script>
 
 {% endblock content %}

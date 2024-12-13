@@ -30,7 +30,9 @@
                             {% elif job.application_status == 'REJECTED' %}
                                 <a href="#" class="btn btn-danger customButton disabled">Application Rejected</a>
                             {% else %}
-                                <a href="{% url 'unapply-job' job.pk %}" class="btn btn-danger customButton px-4" onclick="return confirm('Are you sure you want to withdraw your application?')">Unapply</a>
+                                <button type="button" class="btn btn-danger customButton px-4" data-bs-toggle="modal" data-bs-target="#confirmModal" 
+                                    data-action-url="{% url 'unapply-job' job.pk %}">Unapply
+                                </button>
                             {% endif %}
                         {% else %}
                             <a href="{% url 'apply-job' job.pk %}" class="btn btn-primary customButton px-4">Apply</a>
@@ -55,7 +57,7 @@
                             {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
                         {% else %}
                             <!-- Display international address if Philippine address is empty -->
-                            {{ job.location.street }}{% if job.location.street %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
+                            {{ job.location.countrystreet }}{% if job.location.countrystreet %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
                         {% endif %}
                         </p>
                     </div>
@@ -152,11 +154,42 @@
                             <span>{{user.email}}</span>
                         </div>
                     </div>
-                    
                 </div>
             </div>
-                
         </div>
     </div>
-        
+
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to perform this action?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a id="confirmActionButton" href="#" class="btn btn-primary">Confirm</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmActionButton = document.getElementById('confirmActionButton');
+
+    confirmModal.addEventListener('show.bs.modal', function (event) {
+        // Get the button that triggered the modal
+        const button = event.relatedTarget;
+
+        // Extract the URL from the button's data-action-url attribute
+        const actionUrl = button.getAttribute('data-action-url');
+
+        // Set the URL in the confirmation button
+        confirmActionButton.href = actionUrl;
+    });
+</script>
 {% endblock content %}

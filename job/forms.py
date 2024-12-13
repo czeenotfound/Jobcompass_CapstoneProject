@@ -51,4 +51,4 @@ class CreateJobFairForm(forms.ModelForm):
 class UpdateJobFairForm(forms.ModelForm):
     class Meta:
         model = JobFair
-        exclude = ('user', 'company', 'industry', 'is_featured', 'is_active')
+        exclude = ('user', 'company', 'industry')

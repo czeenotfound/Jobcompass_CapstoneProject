@@ -341,13 +341,13 @@ body{
 }
 
 .status-open {
-  background: #DCF5E7;
-  color: #0D9F4F;
+  background: #00ff6e;
+  color: #353535;
 }
 
 .status-closed {
-  background: #FEE2E2;
-  color: #DC2626;
+  background: #ff0000;
+  color: #ffffff;
 }
 
 .status-pending {
@@ -2033,28 +2033,6 @@ background-color: #0056b3; /* Thumb color on hover */
 
 #jobPostingsTable tbody tr:hover {
   background-color: #F8FAFC;
-}
-
-.status-badge {
-  padding: 0.4rem 1rem;
-  border-radius: 50px;
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.status-open {
-  background: #DCF5E7;
-  color: #0D9F4F;
-}
-
-.status-closed {
-  background: #FEE2E2;
-  color: #DC2626;
-}
-
-.status-pending {
-  background: #daff07;
-  color: #ffffff;
 }
 
 .action-buttons .btn {

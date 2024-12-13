@@ -17,7 +17,7 @@ $(document).ready(function() {
         },
         lengthMenu: [ [5, 10, 25, 50, -1], [5, 10, 25, 50, "All"] ], // Define the options for the length menu
         columnDefs: [
-            { orderable: false, targets: 5 } // Disable sorting for actions column
+            { orderable: false, targets: [1,2,3,5] } // Disable sorting for actions column
         ],
         buttons: [
             {
@@ -74,7 +74,7 @@ var jobApplication;
 $(document).ready(function() {
     jobApplication = $('#jobApplicationStatusTable').DataTable({
         pageLength: 5, // Initial page length
-        order: [[2,'desc']],   // Sort by date by default
+        order: [[2,'asc']],   // Sort by date by default
         language: {
             search: "",
             searchPlaceholder: 'Search jobs...',
@@ -216,7 +216,7 @@ var applicationAnalytics;
 $(document).ready(function() {
     applicationAnalytics = $('#applicationAnalyticsTable').DataTable({
         pageLength: 3, // Initial page length
-        order: [[2, 'desc']],   // Sort by date by default
+        order: [[2, 'asc']],   // Sort by date by default
         language: {
             search: "",
             searchPlaceholder: 'Search jobs...',
@@ -289,7 +289,7 @@ var jobAnalytics;
 $(document).ready(function() {
     jobAnalytics = $('#jobAnalyticsTable').DataTable({
         pageLength: 3, // Initial page length
-        order: [[2, 'desc']],   // Sort by date by default
+        order: [[4, 'desc']],   // Sort by date by default
         language: {
             search: "",
             searchPlaceholder: 'Search jobs...',
@@ -303,7 +303,7 @@ $(document).ready(function() {
         },
         lengthMenu: [ [3, 5, 10, 25, 50, -1], [3, 5, 10, 25, 50, "All"] ], // Define the options for the length menu
         columnDefs: [
-            { orderable: false, targets: 3 } // Disable sorting for actions column
+            { orderable: false, targets: [1,2,3,5] } // Disable sorting for actions column
         ],
         buttons: [
             {
@@ -361,7 +361,7 @@ var jobFairRegis;
 $(document).ready(function() {
     jobFairRegis = $('#jobFairTable').DataTable({
         pageLength: 5, // Initial page length
-        order: [[2, 'desc']],   // Sort by date by default
+        order: [[2, 'asc']],   // Sort by date by default
         language: {
             search: "",
             searchPlaceholder: 'Search job fairs...',
@@ -420,7 +420,7 @@ $(document).ready(function() {
 $(document).ready(function() {
     $('#jobSavedTable').DataTable({
         pageLength: 5, // Initial page length
-        order: [[2, 'desc']],   // Sort by date by default
+        order: [[2, 'asc']],   // Sort by date by default
         language: {
             search: "",
             searchPlaceholder: 'Search saved job...',

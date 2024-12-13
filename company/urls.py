@@ -15,9 +15,6 @@ urlpatterns = [
     
     path('job-applicants/<int:pk>', views.job_applicants, name='job-applicants'),
     
-    
-    path('update-status/<int:pk>', views.update_application_status, name='update-application-status'),
-
     path('start-conversation/<int:application_id>/', views.start_conversation, name='start_conversation'),
     path('conversation/<int:pk>/', views.view_conversation, name='view_conversation'),
 

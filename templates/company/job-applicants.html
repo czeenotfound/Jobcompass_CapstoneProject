@@ -1,5 +1,7 @@
 {% extends 'users/base.html' %}
 {% load humanize %}
+{% load widget_tweaks %}
+
 {% load static %}
 
 {% block scripts %}
@@ -72,7 +74,43 @@
                                             {% endif %}
                                         </td>
                                         <td class="action-buttons">
-                                            <a href="{% url 'update-application-status' applicant.pk %}" class="btn btn-edit" title="Update Status"><i class="fa-regular fa-pen-to-square"></i></a>
+                                            <form method="POST" class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="application_id" value="{{ applicant.pk }}">
+                                                
+                                                <div class="btn-group" role="group" aria-label="Status Update">
+                                                    {% for value, display in applicant.applicationstatus.STATUS_CHOICES %}
+                                                        <button type="submit" name="status" value="{{ value }}" 
+                                                                class="btn btn-sm 
+                                                                       {% if applicant.applicationstatus.status == value %}
+                                                                           {% if value == 'SUBMITTED' %}btn-info
+                                                                           {% elif value == 'UNDER_REVIEW' %}btn-warning
+                                                                           {% elif value == 'INTERVIEW' %}btn-primary
+                                                                           {% elif value == 'OFFERED' %}btn-success
+                                                                           {% elif value == 'REJECTED' %}btn-danger
+                                                                           {% elif value == 'ACCEPTED' %}btn-success
+                                                                           {% endif %}
+                                                                       {% else %}
+                                                                           btn-outline-secondary
+                                                                       {% endif %}" 
+                                                                title="{{ display }}">
+                                                            {% if value == 'SUBMITTED' %}
+                                                                <i class="fa-solid fa-file-circle-plus"></i>
+                                                            {% elif value == 'UNDER_REVIEW' %}
+                                                                <i class="fa-solid fa-eye"></i>
+                                                            {% elif value == 'INTERVIEW' %}
+                                                                <i class="fa-solid fa-calendar-check"></i>
+                                                            {% elif value == 'OFFERED' %}
+                                                                <i class="fa-solid fa-handshake"></i>
+                                                            {% elif value == 'REJECTED' %}
+                                                                <i class="fa-solid fa-times-circle"></i>
+                                                            {% elif value == 'ACCEPTED' %}
+                                                                <i class="fa-solid fa-thumbs-up"></i>
+                                                            {% endif %}
+                                                        </button>
+                                                    {% endfor %}
+                                                </div>
+                                            </form>
                                             <a href="{% url 'view-resume-profile' applicant.pk %}" class="btn btn-view" title="View Profile">
                                                 <i class="fa-solid fa-eye"></i>
                                             </a>

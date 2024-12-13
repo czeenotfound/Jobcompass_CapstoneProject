@@ -65,13 +65,15 @@
                         <label for="email" class="form-label">Email Address</label>
                         <div class="bubbleform d-flex gap-3 align-items-center">
                             <i class="fa-regular fa-envelope"></i>
-                            {% render_field form.email class="form-control border-0 p-0" placeholder="name@sample.com"%}
+                            {% render_field form.email class="form-control border-0 p-0" placeholder="name@sample.com" required=True %}
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <label for="phone" class="form-label">Phone Number</label>
                         <div class="bubbleform mb-3">
-                            {% render_field  form.phone class="form-control border-0 py-0 px-0 ps-5" id="phone" placeholder="Enter your phone number" %}
+                            {% render_field  form.phone class="form-control border-0 py-0 px-0 ps-5" id="phone" placeholder="Enter your phone number" required=True %}
+                                       
+                            <input type="text" id="country_code" name="country_code">
                         </div>
                     </div>
                     
@@ -79,7 +81,7 @@
                         <label for="password" class="form-label">Create Password</label>
                         <div class="bubbleform mb-3 position-relative">
                             <div class="position-relative">
-                                {% render_field form.password1 id="password" class="form-control border-0 p-0" oninput="validatePassword()" placeholder="Create Password" %}
+                                {% render_field form.password1 id="password" class="form-control border-0 p-0" oninput="validatePassword()" placeholder="Create Password" required=True %}
                                 <span id="toggle-password" class="position-absolute end-0 top-50 translate-middle-y pe-3">
                                     <i class="fa-solid fa-eye-slash cursor-pointer"></i>
                                 </span>
@@ -98,7 +100,7 @@
                         </div>
                         <label for="confirmPassword" class="form-label">Confirm Password</label>
                         <div class="bubbleform mb-3 position-relative">
-                            {% render_field form.password2 id="confirmPassword" class="form-control border-0 p-0" placeholder="Confirm Password" %}
+                            {% render_field form.password2 id="confirmPassword" class="form-control border-0 p-0" placeholder="Confirm Password" required=True %}
                             <span id="toggle-confirm-password" class="position-absolute end-0 top-50 translate-middle-y pe-3">
                                 <i class="fa-solid fa-eye-slash cursor-pointer"></i>
                             </span>
@@ -116,8 +118,7 @@
 
                 <p class="mt-3 text-center">Already have an account? <a class="text-decoration-none" href="{% url 'login' %}">Log In</a></p>
             </form>
-            <!-- Hidden field to store the selected country code -->
-            <input type="hidden" id="country_code" name="country_code">
+            
         </div>
     </div>
 </div>
@@ -132,12 +133,12 @@
     document.addEventListener('DOMContentLoaded', function () {
         var input = document.querySelector("#phone");
         var iti = window.intlTelInput(input, {
-            preferredCountries: ["ph", "us", "sg"],  // Preferred countries
+            preferredCountries: ["ph", "us", "sg"], // Preferred countries
             utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // Utils script for formatting
         });
 
-        // Add an event listener to capture the selected country code
-        input.addEventListener('input', function () {
+        // Add an event listener for country changes
+        input.addEventListener('countrychange', function () {
             var countryCode = iti.getSelectedCountryData().dialCode; // Get the country dial code
             document.querySelector('#country_code').value = countryCode; // Set hidden field value
         });

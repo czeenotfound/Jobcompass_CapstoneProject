@@ -21,13 +21,38 @@
                     <h1>{{jobfair.title}}</h1>
                     <p class="fs-3 text-muted mb-0">{{jobfair.location_job_type|title}}</p>
                     <p>{{jobfair.fair_event_held}}</p>
-                    <p class="fs-5">Venue:  {% if jobfair.location.barangay and jobfair.location.city and jobfair.location.street %}
-                        <!-- Display Philippine address if available -->
-                        {{ jobfair.location.street }}{% if jobfair.location.barangay %}, {{ jobfair.location.barangay }}{% endif %}{% if jobfair.location.city %}, {{ jobfair.location.city }}{% endif %}
-                    {% else %}
-                        <!-- Display international address if Philippine address is empty -->
-                        {{ jobfair.location.countrystreet }}{% if jobfair.location.countrystreet %}, {% endif %}{{ jobfair.location.countrycity }}{% if jobfair.location.countrycity %}, {% endif %}{{ jobfair.location.country }}
-                    {% endif %}
+
+                    <p class="fs-5">
+                        {% if jobfair.fair_event_held == 'Onsite' %}
+                            <!-- Display Onsite Location -->
+                            <span class="fw-bold">Onsite:</span>
+                            {% if jobfair.location.barangay and jobfair.location.city and jobfair.location.street %}
+                                {{ jobfair.location.street }}{% if jobfair.location.barangay %}, {{ jobfair.location.barangay }}{% endif %}{% if jobfair.location.city %}, {{ jobfair.location.city }}{% endif %}
+                            {% else %}
+                                {{ jobfair.location.countrystreet }}{% if jobfair.location.countrystreet %}, {% endif %}{{ jobfair.location.countrycity }}{% if jobfair.location.countrycity %}, {% endif %}{{ jobfair.location.country }}
+                            {% endif %}
+                        {% elif jobfair.fair_event_held == 'Virtual' %}
+                            <!-- Display Virtual Link -->
+                            <span class="fw-bold">Virtual:</span>
+                            <a href="{{ jobfair.url_location }}" target="_blank" class="text-decoration-none">
+                                {{ jobfair.url_location }}
+                            </a>
+                        {% elif jobfair.fair_event_held == 'Hybrid' %}
+                            <span class="fw-bold">Onsite:</span>
+                            {% if jobfair.location.barangay and jobfair.location.city and jobfair.location.street %}
+                                {{ jobfair.location.street }}{% if jobfair.location.barangay %}, {{ jobfair.location.barangay }}{% endif %}{% if jobfair.location.city %}, {{ jobfair.location.city }}{% endif %}
+                            {% else %}
+                                {{ jobfair.location.countrystreet }}{% if jobfair.location.countrystreet %}, {% endif %}{{ jobfair.location.countrycity }}{% if jobfair.location.countrycity %}, {% endif %}{{ jobfair.location.country }}
+                            {% endif %}
+
+                            <span class="fw-bold">Virtual:</span>
+                            <a href="{{ jobfair.url_location }}" target="_blank" class="text-decoration-none">
+                                {{ jobfair.url_location }}
+                            </a>
+                        {% else %}
+                            <!-- Default message if status is undefined -->
+                            <span class="text-muted">Location details unavailable</span>
+                        {% endif %}
                     </p>
                     
                     <p class="fs-5 mb-3">Application Date: {{jobfair.application_starts}} - {{jobfair.application_deadline}}</p>

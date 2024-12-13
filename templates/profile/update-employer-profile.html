@@ -28,7 +28,13 @@
                     </div>
                     <div class="col-9 mb-3 bg-light p-3">
                         <label for="userAvatar" class="form-label fw-bold">User Avatar</label>
-                        {% render_field avatar_phone_form.avatar class="form-control" id="userAvatar" %}
+                        <input type="file" name="{{ avatar_phone_form.avatar.name }}" id="userAvatar" class="form-control">
+                    
+                        {% if avatar_phone_form.avatar.errors %}
+                            <div class="text-danger">
+                                {{ avatar_phone_form.avatar.errors }}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
                
@@ -66,11 +72,30 @@
                 <hr>
 
                 <div class="row">
-                    <h4 for="employerAddress" class="form-label mb-3">Address</h4>
+                    <h4 for="employerAddress" class="form-label mb-3">International Address</h4>
+                    <div class="col-sm-6 mb-3">
+                        <label for="country-text" class="form-label">Country</label>
+                        {% render_field address_form.country class="form-control form-control-md" id="country-text" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="countrycity-text" class="form-label">City</label>
+                        {% render_field address_form.countrycity class="form-control form-control-md" id="countrycity-text" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="countrypostal-text" class="form-label">Postal Code</label>
+                        {% render_field address_form.countrypostal class="form-control form-control-md" id="countrypostal-text" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="countrystreet-text" class="form-label">Street (Optional)</label>
+                        {% render_field address_form.countrystreet class="form-control form-control-md" id="countrystreet-text" %}
+                    </div>
+                    <hr>
+
+                    <h4 for="employerAddress" class="form-label mb-3">Philippines Address</h4>
                     <div class="col-sm-6 mb-3">
                         <label class="form-label">Region *</label>
                         <select name="region" class="form-select form-select-md mb-2" id="region"></select>
-                        {% render_field address_form.region class="form-control form-control-md" name="region_text" id="region-text" %}
+                        {% render_field address_form.region class="form-control form-control-md" name="region_text" id="region-text"%}
                     </div>
                     <div class="col-sm-6 mb-3">
                         <label class="form-label">Province *</label>

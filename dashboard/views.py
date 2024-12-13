@@ -114,8 +114,15 @@ def view_resume_profile(request, pk):
     # Fetch the resume object by its primary key (pk)
     resume = get_object_or_404(Resume, pk=pk)
 
+    try:
+        resume = Resume.objects.get(pk=pk) 
+        resume_file = resume.upload_resume
+    except Resume.DoesNotExist:
+        resume_file = None
+    
     context = {
-        'resume': resume
+        'resume': resume,
+        'resume_file': resume_file
     }
     return render(request, 'applicant/view_resume_profile.html', context)
 

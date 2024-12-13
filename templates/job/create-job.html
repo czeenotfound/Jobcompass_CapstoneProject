@@ -168,60 +168,107 @@
                 </div>
 
                 <hr>
-                
+                <h4>Job Location</h4>
+                <br>
+
                 <div class="mb-3 row">
-                    <h4 for="employerAddress" class="form-label mb-3">International Job Location </h4>
-                    <div class="col-sm-6 mb-3">
-                        <label for="country-text" class="form-label">Country</label>
-                        <input type="text" class="form-control" name="country" id="country-text" placeholder="Enter Country">
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label for="countrycity-text" class="form-label">City / Municipality *</label>
-                        <input type="text" class="form-control" name="countrycity" id="country-text" placeholder="Enter City/Municipality">
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label for="countrypostal-text" class="form-label">Postal Code</label>
-                        <input type="text" class="form-control" name="countrypostal" id="country-text" placeholder="Enter Postal Code">
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label for="countrystreet-text" class="form-label">Street (Optional)</label>
-                        <input type="text" class="form-control" name="countrystreet" id="country-text" placeholder="Enter Street">
-                    </div>
+                    <div class="btn-group col-sm-12" role="group" aria-label="Use Address">
+                        <input type="radio" class="btn-check" name="use_company_location" id="use_company_address" value="true" checked>
+                        <label class="btn btn-outline-primary customButton p-3" for="use_company_address">Use Company Address</label>
 
-                    <hr>
-
+                        <input type="radio" class="btn-check" name="use_company_location" id="use_custom_address" value="false">
+                        <label class="btn btn-outline-secondary customButton p-3" for="use_custom_address">Use Custom Address</label>
+                    </div>
+                </div>
+                
+                <div id="company-address-fields" class="card bg-light p-5">
+                    <h4><i class="fa-solid fa-location-dot me-2"></i> Company Address</h4>
+                    <br>
                     <h4 for="joblocation" class="form-label mb-3">Job Location</h4>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">Region *</label>
-                        <select name="region" class="form-control form-control-md" id="region"></select>
-                        <input type="hidden" class="form-control form-control-md" name="region" id="region-text"  required>
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">Province *</label>
-                        <select name="province" class="form-control form-control-md" id="province"></select>
-                        <input type="hidden" class="form-control form-control-md" name="province" id="province-text" required>
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">City / Municipality *</label>
-                        <select name="city" class="form-control form-control-md" id="city"></select>
-                        <input type="hidden" class="form-control form-control-md" name="city" id="city-text" required>
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">Barangay *</label>
-                        <select name="barangay" class="form-control form-control-md" id="barangay"></select>
-                        <input type="hidden" class="form-control form-control-md" name="barangay" id="barangay-text" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="street-text" class="form-label">Street (Optional)</label>
-                        <input type="text" class="form-control form-control-md" name="street" placeholder="Enter Street"  id="street-text">
+                    <span class="fw-bold">Local Address</span>
+                    <p id="company-address">
+                        {{ user.company.address.street }}, {{ user.company.address.barangay }}, {{ user.company.address.city }}, 
+                        {{ user.company.address.province }}, {{ user.company.address.region }}
+                    </p>
+                    
+                    {% if user.company.address.countrystreet or user.company.address.countrycity or user.company.address.country %}
+                        <span class="fw-bold">International Address</span>
+                        <p id="company-address">
+                            {{ user.company.address.countrystreet|title }}, {{ user.company.address.countrycity|title }}, {{ user.company.address.country|title }}
+                        </p>
+                    {% else %}
+                        <p class="text-muted">No international address available.</p>
+                    {% endif %}
+                </div>
+
+                <div id="custom-address-fields" style="display: none;" class="card bg-light p-5">
+                    <h4><i class="fa-solid fa-location-dot me-2"></i> Custom Address</h4>
+                    <br>
+                    <div class="mb-3 row">
+                        <h4 for="employerAddress" class="form-label mb-3">International Job Location </h4>
+                        <div class="col-sm-6 mb-3">
+                            <label for="country-text" class="form-label">Country</label>
+                            <input type="text" class="form-control" name="country" id="country-text" placeholder="Enter Country">
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <label for="countrycity-text" class="form-label">City / Municipality</label>
+                            <input type="text" class="form-control" name="countrycity" id="country-text" placeholder="Enter City/Municipality">
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <label for="countrypostal-text" class="form-label">Postal Code</label>
+                            <input type="text" class="form-control" name="countrypostal" id="country-text" placeholder="Enter Postal Code">
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <label for="countrystreet-text" class="form-label">Street (Optional)</label>
+                            <input type="text" class="form-control" name="countrystreet" id="country-text" placeholder="Enter Street">
+                        </div>
+
+                        <hr>
+
+                        <h4 for="joblocation" class="form-label mb-3">Job Location</h4>
+                        <div class="col-sm-6 mb-3">
+                            <label class="form-label">Region *</label>
+                            <select name="region" class="form-control form-control-md" id="region"></select>
+                            <input type="hidden" class="form-control form-control-md" name="region" id="region-text"  required>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <label class="form-label">Province *</label>
+                            <select name="province" class="form-control form-control-md" id="province"></select>
+                            <input type="hidden" class="form-control form-control-md" name="province" id="province-text" required>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <label class="form-label">City / Municipality *</label>
+                            <select name="city" class="form-control form-control-md" id="city"></select>
+                            <input type="hidden" class="form-control form-control-md" name="city" id="city-text" required>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <label class="form-label">Barangay *</label>
+                            <select name="barangay" class="form-control form-control-md" id="barangay"></select>
+                            <input type="hidden" class="form-control form-control-md" name="barangay" id="barangay-text" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="street-text" class="form-label">Street (Optional)</label>
+                            <input type="text" class="form-control form-control-md" name="street" placeholder="Enter Street"  id="street-text">
+                        </div>
                     </div>
                 </div>
 
                 <hr>
 
+                <h4>Job Visibility</h4>
+                <br>
                 <div class="mb-3">
-                    <label for="jobTitle" class="form-label">Job Available</label>
-                    {% render_field form.is_available class="form-check-input" %}
+                    <div class="btn-group d-flex" role="group" aria-label="Job Availability">
+                        <input type="radio" class="btn-check" name="is_available" id="job_available_true" value="true" {% if form.is_available.value == True %}checked{% endif %}>
+                        <label class="btn btn-outline-success customButton p-3" for="job_available_true">
+                            <i class="fa-solid fa-check me-2"></i> Publish Now
+                        </label>
+                
+                        <input type="radio" class="btn-check" name="is_available" id="job_available_false" value="false" {% if form.is_available.value == False %}checked{% endif %}>
+                        <label class="btn btn-outline-secondary customButton p-3" for="job_available_false">
+                            <i class="fa-regular fa-floppy-disk me-2"></i> Save as Draft
+                        </label>
+                    </div>
                 </div>
             
                 <div class="mt-4 d-flex justify-content-end gap-2">
@@ -238,77 +285,28 @@
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-    // Skills dynamic addition
-    const skillsContainer = document.getElementById('skills-container');
-    const addSkillBtn = document.getElementById('add-skill-btn');
-    const skillsTotalFormsInput = document.getElementById('id_skills-TOTAL_FORMS');
+    const companyAddressFields = document.getElementById('company-address-fields');
+    const customAddressFields = document.getElementById('custom-address-fields');
 
-    // Responsibilities dynamic addition
-    const responsibilitiesContainer = document.getElementById('responsibilities-container');
-    const addResponsibilityBtn = document.getElementById('add-responsibility-btn');
-    const responsibilitiesTotalFormsInput = document.getElementById('id_responsibilities-TOTAL_FORMS');
+    const companyAddressRadio = document.getElementById('use_company_address');
+    const customAddressRadio = document.getElementById('use_custom_address');
 
-    // Function to add a new form row
-    function addFormRow(container, totalFormsInput, prefix, maxForms = 10) {
-        // Check if we've reached max forms
-        if (parseInt(totalFormsInput.value) >= maxForms) {
-            alert(`Maximum of ${maxForms} ${prefix} allowed`);
-            return;
+    function toggleAddressFields() {
+        if (companyAddressRadio.checked) {
+            companyAddressFields.style.display = 'block';
+            customAddressFields.style.display = 'none';
+        } else if (customAddressRadio.checked) {
+            companyAddressFields.style.display = 'none';
+            customAddressFields.style.display = 'block';
         }
-
-        // Get the last form to clone
-        const forms = container.querySelectorAll(`.${prefix}-form`);
-        const lastForm = forms[forms.length - 1];
-        
-        // Clone the last form
-        const newForm = lastForm.cloneNode(true);
-        
-        // Reset input values
-        const inputs = newForm.querySelectorAll('input');
-        inputs.forEach(input => {
-            // Clear text inputs
-            if (input.type === 'text') {
-                input.value = '';
-            }
-            // Uncheck delete checkbox if present
-            if (input.type === 'checkbox') {
-                input.checked = false;
-            }
-        });
-
-        // Update form indices
-        const currentTotal = parseInt(totalFormsInput.value);
-        newForm.innerHTML = newForm.innerHTML.replace(
-            new RegExp(`${prefix}-${currentTotal - 1}`, 'g'), 
-            `${prefix}-${currentTotal}`
-        );
-
-        // Add delete button functionality for new rows
-        const deleteCheckbox = newForm.querySelector('input[type="checkbox"]');
-        if (deleteCheckbox) {
-            const deleteLabel = newForm.querySelector('.form-check-label');
-            deleteLabel.addEventListener('click', () => {
-                deleteCheckbox.checked = !deleteCheckbox.checked;
-            });
-        }
-
-        // Increment total forms
-        totalFormsInput.value = currentTotal + 1;
-
-        // Add new form to container
-        container.appendChild(newForm);
     }
 
-    // Event listeners for adding rows
-    addSkillBtn.addEventListener('click', () => {
-        addFormRow(skillsContainer, skillsTotalFormsInput, 'skill');
-    });
+    // Add event listeners to the radio buttons
+    companyAddressRadio.addEventListener('change', toggleAddressFields);
+    customAddressRadio.addEventListener('change', toggleAddressFields);
 
-    addResponsibilityBtn.addEventListener('click', () => {
-        addFormRow(responsibilitiesContainer, responsibilitiesTotalFormsInput, 'responsibility');
-    });
+    // Initialize the display based on the default selected radio button
+    toggleAddressFields();
 
-});
 </script>
 {% endblock content %}

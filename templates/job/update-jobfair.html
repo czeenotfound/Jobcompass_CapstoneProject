@@ -1,6 +1,7 @@
 {% extends 'users/base.html' %}
 {% block title %}Job Compass | Update Job Fair{% endblock %}
 {% load widget_tweaks %}
+{% load static %}
 
 {% block content %}
     <div aria-label="breadcrumb" class="custombreadcrumb container bg-light p-4 mb-4 shadow-sm">
@@ -13,11 +14,26 @@
     <div class="container">
         <div class="row">
             <h4 class="mt-4 mb-4 col-lg-2"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
-            <form class="col-lg-10 card p-5 mb-5" method="POST">
+            <form class="col-lg-10 card p-5 mb-5" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <h1 class="mb-4">Update Job Fair</h1>
                 <hr>
                 <h4 for="employerSocials" class="form-label mb-3">Job Fair Information</h4>
+                
+                <div class="text-center">
+                    <label for="jobfairimage" class="form-label fw-bold">Job Fair Cover Image</label>
+                    <div class="d-flex align-items-center justify-content-center">
+                        {% if form.image.value %}
+                            <div class="mb-2 row">
+                                <img src="{{ form.image.value.url }}" alt="Current Avatar" class="img-fluid" style="max-width: 450px; max-height: 450px;">
+                            </div>
+                        {% endif %}
+                    </div>
+                    <input type="file" id="image" name="image" class="form-control" accept="image/*">
+                </div>
+
+                <hr>
+
 
                 <div class="mb-3">
                     <label for="jobfairtitle" class="form-label">Job Fair Title</label>
@@ -28,22 +44,7 @@
                     <label for="jobfairtitle" class="form-label">Company's Industry</label>
                     <input type="text" disabled class="form-control" name="" id="" placeholder="{{user.company.industry}}">
                 </div>
-                <div class="row">
-                    <div class="col-sm-6 mb-3">
-                        <label for="fair_event_held" class="form-label">Job Fair Type</label>
-                        {% render_field form.fair_event_held class="form-select" %}
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label for="jobfairattendees" class="form-label">Attendees</label>
-                        {% render_field form.max_attendees class="form-control" %}
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label for="jobfairUrlVirtual" class="form-label">URL Virtual (For Virtual Job Fair)</label>
-                    {% render_field form.url_location class="form-control" placeholder="https://www.website.com" %}
-                </div>
-
+               
                 <div class="mb-3">
                     <label for="jobfairdescription" class="form-label">Description</label>
                     {% render_field form.description class="form-control" rows="4" %}
@@ -96,70 +97,113 @@
                 </div>
 
                 <hr>
-                
                 <div class="row">
-                     <label for="jobfairimage" class="form-label fw-bold">Job Fair Cover Image</label>
-                    <div class="col-6 d-flex align-items-center justify-content-center">
-                        {% if form.image.value %}
-                            <div class="mb-2 row">
-                                <img src="{{ form.image.value.url }}" alt="Current Avatar" class="img-fluid" style="max-width: 450px; max-height: 450px;">
-                            </div>
-                        {% endif %}
+                    <div class="col-sm-6 mb-3">
+                        <label for="fair_event_held" class="form-label">Job Fair Type</label>
+                        <div class="btn-group d-flex" role="group" aria-label="Job Fair Type">
+                            {% for choice, display in form.fair_event_held.field.choices %}
+                                {% if choice %}
+                                    <input type="radio" class="btn-check" name="fair_event_held" id="jobfair_{{ choice }}" value="{{ choice }}" 
+                                        {% if form.fair_event_held.value == choice %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary customButton p-3" for="jobfair_{{ choice }}">
+                                        {{ display }}
+                                    </label>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                     </div>
-                    <div class="col-6 mb-3 bg-light p-3">
-                        <label for="userAvatar" class="form-label fw-bold">User Avatar</label>
-                        {% render_field form.image class="form-control" id="userAvatar" %}
+                    <div class="col-sm-6 mb-3">
+                        <label for="jobfairattendees" class="form-label">Attendees</label>
+                        {% render_field form.max_attendees class="form-control" %}
                     </div>
                 </div>
-                <hr>
-                <div class="row">
-                    <h4 for="employerAddress" class="form-label mb-3">International Location Venue</h4>
-                    <div class="col-sm-6 mb-3">
-                        <label for="country-text" class="form-label">Country</label>
-                        {% render_field address_form.country class="form-control form-control-md" id="country-text" %}
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label for="countrycity-text" class="form-label">City</label>
-                        {% render_field address_form.countrycity class="form-control form-control-md" id="countrycity-text" %}
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label for="countrypostal-text" class="form-label">Postal Code</label>
-                        {% render_field address_form.countrypostal class="form-control form-control-md" id="countrypostal-text" %}
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label for="countrystreet-text" class="form-label">Street (Optional)</label>
-                        {% render_field address_form.countrystreet class="form-control form-control-md" id="countrystreet-text" %}
-                    </div>
+
+                <!-- URL (Virtual) -->
+                <div id="virtual-link-section" style="display: none;" class="py-3">
 
                     <hr>
-                    
-                    <h4 for="employerAddress" class="form-label mb-3">Location Venue</h4>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">Region *</label>
-                        <select name="region" class="form-control form-control-md mb-2"" id="region"></select>
-                        {% render_field address_form.region class="form-control form-control-md" name="region_text" id="region-text" placeholder="Enter Region" %}
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">Province *</label>
-                        <select name="province" class="form-control form-control-md mb-2"" id="province"></select>
-                        {% render_field address_form.province class="form-control form-control-md" name="province_text" id="province-text" placeholder="Enter Province" %}
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">City / Municipality *</label>
-                        <select name="city" class="form-control form-control-md mb-2"" id="city"></select>
-                        {% render_field address_form.city class="form-control form-control-md" name="city_text" id="city-text" placeholder="Enter City" %}
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">Barangay *</label>
-                        <select name="barangay" class="form-control form-control-md mb-2"" id="barangay"></select>
-                        {% render_field address_form.barangay class="form-control form-control-md" name="barangay_text" id="barangay-text" placeholder="Enter Barangay" %}
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="street-text" class="form-label">Venue</label>
-                        {% render_field address_form.street class="form-control form-control-md" id="street-text" placeholder="(e.g. hotel venue, street)"  %}
+                    <h3 class="form-label mb-3">Virtual Job Fair</h3>
+                    <div class="card bg-light p-3 mb-3">
+                        <label for="jobfairUrlVirtual" class="form-label">URL Virtual Link (For Virtual Job Fair)</label>
+                        {% render_field form.url_location class="form-control" placeholder="https://www.website.com" %}
                     </div>
                 </div>
+
+                <!-- Location (Onsite) -->
+                <div id="onsite-venue-section" style="display: none;" class="py-3">
+                    
+                    <hr>
+                    <h3 class="form-label mb-3">Onsite Job Fair Venue</h3>
+                    <br>
+                    <div class="card bg-light p-5">
+                        <div class="mb-3 row">
+                            <h4 for="employerAddress" class="form-label mb-3">International Location Venue</h4>
+                            <div class="col-sm-6 mb-3">
+                                <label for="country-text" class="form-label">Country</label>
+                                {% render_field address_form.country class="form-control form-control-md" id="country-text" %}
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label for="countrycity-text" class="form-label">City</label>
+                                {% render_field address_form.countrycity class="form-control form-control-md" id="countrycity-text" %}
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label for="countrypostal-text" class="form-label">Postal Code</label>
+                                {% render_field address_form.countrypostal class="form-control form-control-md" id="countrypostal-text" %}
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label for="countrystreet-text" class="form-label">Street (Optional)</label>
+                                {% render_field address_form.countrystreet class="form-control form-control-md" id="countrystreet-text" %}
+                            </div>
+        
+                            <hr>
+                            
+                            <h4 for="employerAddress" class="form-label mb-3">Location Venue</h4>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label">Region *</label>
+                                <select name="region" class="form-control form-control-md mb-2"" id="region"></select>
+                                {% render_field address_form.region class="form-control form-control-md" name="region_text" id="region-text" placeholder="Enter Region" %}
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label">Province *</label>
+                                <select name="province" class="form-control form-control-md mb-2"" id="province"></select>
+                                {% render_field address_form.province class="form-control form-control-md" name="province_text" id="province-text" placeholder="Enter Province" %}
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label">City / Municipality *</label>
+                                <select name="city" class="form-control form-control-md mb-2"" id="city"></select>
+                                {% render_field address_form.city class="form-control form-control-md" name="city_text" id="city-text" placeholder="Enter City" %}
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label">Barangay *</label>
+                                <select name="barangay" class="form-control form-control-md mb-2"" id="barangay"></select>
+                                {% render_field address_form.barangay class="form-control form-control-md" name="barangay_text" id="barangay-text" placeholder="Enter Barangay" %}
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="street-text" class="form-label">Venue</label>
+                                {% render_field address_form.street class="form-control form-control-md" id="street-text" placeholder="(e.g. hotel venue, street)"  %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <h4>Job Visibility</h4>
+                <br>
+                <div class="mb-3">
+                    <div class="btn-group d-flex" role="group" aria-label="Job Availability">
+                        <input type="radio" class="btn-check" name="is_active" id="jobfair_active_true" value="true" {% if form.is_active.value == True %}checked{% endif %}>
+                        <label class="btn btn-outline-success customButton p-3" for="jobfair_active_true">
+                            <i class="fa-solid fa-check me-2"></i> Publish Now
+                        </label>
                 
+                        <input type="radio" class="btn-check" name="is_active" id="jobfair_active_false" value="false" {% if form.is_active.value == False %}checked{% endif %}>
+                        <label class="btn btn-outline-secondary customButton p-3" for="jobfair_active_false">
+                            <i class="fa-regular fa-floppy-disk me-2"></i> Save as Draft
+                        </label>
+                    </div>
+                </div>
+
                 <!-- Submit Button -->
                 <div class="mt-4 d-flex justify-content-end gap-2">
                     <a href="{% url 'manage-job-fairs' %}" class="customButton btn btn-outline-danger py-3 px-5">
@@ -174,4 +218,34 @@
         </div>
     </div>
 
+<script>
+    // Elements
+    const locationField = document.getElementById("onsite-venue-section"); // Section for location
+    const urlField = document.getElementById("virtual-link-section"); // Section for URL
+    const jobfairTypeRadios = document.querySelectorAll('input[name="fair_event_held"]');
+
+    // Function to toggle visibility
+    function toggleFields() {
+        const selectedType = document.querySelector('input[name="fair_event_held"]:checked').value;
+
+        if (selectedType === "Onsite") {
+            locationField.style.display = "block";
+            urlField.style.display = "none";
+        } else if (selectedType === "Virtual") {
+            locationField.style.display = "none";
+            urlField.style.display = "block";
+        } else if (selectedType === "Hybrid") {
+            locationField.style.display = "block";
+            urlField.style.display = "block";
+        }
+    }
+
+    // Add event listeners to radio buttons
+    jobfairTypeRadios.forEach(radio => {
+        radio.addEventListener("change", toggleFields);
+    });
+
+    // Initial toggle on page load
+    toggleFields();
+</script>
 {% endblock content %}

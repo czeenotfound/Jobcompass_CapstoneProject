@@ -27,7 +27,7 @@
         <div class="row mt-5 mb-5">
             {% for jobfair in jobfairs %}
                 {% if jobfair.is_featured %}
-                <div class="col-12">
+                <div class="col-12 mb-3">
                     <div class="card event-card">
                         <span class="featured-badge p-3">
                             <span class="badge bg-warning text-dark">Featured Event</span>
@@ -40,20 +40,43 @@
                                 </div>
                                 <div class="col-md-6">
                                     <a href="{% url 'job-fair-info' jobfair.pk %}" class="text-decoration-none text-dark"> 
-                                        <h2 class="mb-2">{{jobfair.title}}</h2>
+                                        <h2 class="mb-2">{{jobfair.title|title}}</h2>
                                     </a>
                                     <p class="text-muted mb-3">
                                         <i class="fas fa-calendar-alt me-2"></i> {{jobfair.start_date|date:'F d, Y'}}
                                         <br>
-                                        <i class="fas fa-clock me-2"></i> {{ jobfair.start_time }} - {{ jobfair.end_time }}
+                                        <i class="fas fa-clock me-2"></i> {{ jobfair.start_time|date:'h:i A' }} - {{ jobfair.end_time|date:'h:i A' }}
                                         <br>
                                         <i class="fas fa-map-marker-alt me-2"></i>
-                                        {% if jobfair.location.barangay and jobfair.location.city and jobfair.location.street %}
-                                            <!-- Display Philippine address if available -->
-                                            {{ jobfair.location.street }}{% if jobfair.location.barangay %}, {{ jobfair.location.barangay }}{% endif %}{% if jobfair.location.city %}, {{ jobfair.location.city }}{% endif %}
+                                        {% if jobfair.fair_event_held == 'Onsite' %}
+                                            <!-- Display Onsite Location -->
+                                            <span class="fw-bold">Onsite:</span>
+                                            {% if jobfair.location.barangay and jobfair.location.city and jobfair.location.street %}
+                                                {{ jobfair.location.street }}{% if jobfair.location.barangay %}, {{ jobfair.location.barangay }}{% endif %}{% if jobfair.location.city %}, {{ jobfair.location.city }}{% endif %}
+                                            {% else %}
+                                                {{ jobfair.location.countrystreet }}{% if jobfair.location.countrystreet %}, {% endif %}{{ jobfair.location.countrycity }}{% if jobfair.location.countrycity %}, {% endif %}{{ jobfair.location.country }}
+                                            {% endif %}
+                                        {% elif jobfair.fair_event_held == 'Virtual' %}
+                                            <!-- Display Virtual Link -->
+                                            <span class="fw-bold">Virtual:</span>
+                                            <a href="{{ jobfair.url_location }}" target="_blank" class="text-decoration-none">
+                                                {{ jobfair.url_location }}
+                                            </a>
+                                        {% elif jobfair.fair_event_held == 'Hybrid' %}
+                                            <span class="fw-bold">Onsite:</span>
+                                            {% if jobfair.location.barangay and jobfair.location.city and jobfair.location.street %}
+                                                {{ jobfair.location.street }}{% if jobfair.location.barangay %}, {{ jobfair.location.barangay }}{% endif %}{% if jobfair.location.city %}, {{ jobfair.location.city }}{% endif %}
+                                            {% else %}
+                                                {{ jobfair.location.countrystreet }}{% if jobfair.location.countrystreet %}, {% endif %}{{ jobfair.location.countrycity }}{% if jobfair.location.countrycity %}, {% endif %}{{ jobfair.location.country }}
+                                            {% endif %}
+    
+                                            <span class="fw-bold">Virtual:</span>
+                                            <a href="{{ jobfair.url_location }}" target="_blank" class="text-decoration-none">
+                                                {{ jobfair.url_location }}
+                                            </a>
                                         {% else %}
-                                            <!-- Display international address if Philippine address is empty -->
-                                            {{ jobfair.location.countrystreet }}{% if jobfair.location.countrystreet %}, {% endif %}{{ jobfair.location.countrycity }}{% if jobfair.location.countrycity %}, {% endif %}{{ jobfair.location.country }}
+                                            <!-- Default message if status is undefined -->
+                                            <span class="text-muted">Location details unavailable</span>
                                         {% endif %}
                                     </p>
                                     <p class="mb-3">{{ jobfair.description|slice:":150" }}...</p>
@@ -66,7 +89,7 @@
                                             </div>
                                         {% else %}
                                             <div class="col-md-3 text-center text-md-end">
-                                                <a href="{% url 'jobfair_register' jobfair.pk %}" class="customButton btn btn-primary btn-lg mb-2 w-100">Register Now</a>
+                                                <a href="{% url 'jobfair_register' jobfair.pk %}" class="customButton btn btn-primary btn-lg mb-2 w-100">Attend Now</a>
                                             </div>
                                         {% endif %}
                                     {% else %}
@@ -84,6 +107,11 @@
                     </div>
                 </div>
                 {% endif %}
+            {% empty %}
+                <div class="customAlert alert alert-danger text-center shadow" role="alert" style="padding: 5rem; margin-bottom: 10vh;">
+                    <img src="{% static 'images/undraw_no_data_re_kwbl.svg' %}" class="mb-4" width="150" height="150" alt="">
+                    <h3>No Records found.</h3>
+                </div>
             {% endfor %}
         </div>
         <!-- Upcoming Events -->
@@ -106,12 +134,35 @@
                                 <i class="fa-solid fa-users-between-lines"></i> {{ jobfair.max_attendees }}
                                 <br>
                                 <i class="fas fa-map-marker-alt me-2"></i> 
-                                {% if jobfair.location.barangay and jobfair.location.city and jobfair.location.street %}
-                                    <!-- Display Philippine address if available -->
-                                    {{ jobfair.location.street }}{% if jobfair.location.barangay %}, {{ jobfair.location.barangay }}{% endif %}{% if jobfair.location.city %}, {{ jobfair.location.city }}{% endif %}
+                                {% if jobfair.fair_event_held == 'Onsite' %}
+                                    <!-- Display Onsite Location -->
+                                    <span class="fw-bold">Onsite:</span>
+                                    {% if jobfair.location.barangay and jobfair.location.city and jobfair.location.street %}
+                                        {{ jobfair.location.street }}{% if jobfair.location.barangay %}, {{ jobfair.location.barangay }}{% endif %}{% if jobfair.location.city %}, {{ jobfair.location.city }}{% endif %}
+                                    {% else %}
+                                        {{ jobfair.location.countrystreet }}{% if jobfair.location.countrystreet %}, {% endif %}{{ jobfair.location.countrycity }}{% if jobfair.location.countrycity %}, {% endif %}{{ jobfair.location.country }}
+                                    {% endif %}
+                                {% elif jobfair.fair_event_held == 'Virtual' %}
+                                    <!-- Display Virtual Link -->
+                                    <span class="fw-bold">Virtual:</span>
+                                    <a href="{{ jobfair.url_location }}" target="_blank" class="text-decoration-none">
+                                        {{ jobfair.url_location }}
+                                    </a>
+                                {% elif jobfair.fair_event_held == 'Hybrid' %}
+                                    <span class="fw-bold">Onsite:</span>
+                                    {% if jobfair.location.barangay and jobfair.location.city and jobfair.location.street %}
+                                        {{ jobfair.location.street }}{% if jobfair.location.barangay %}, {{ jobfair.location.barangay }}{% endif %}{% if jobfair.location.city %}, {{ jobfair.location.city }}{% endif %}
+                                    {% else %}
+                                        {{ jobfair.location.countrystreet }}{% if jobfair.location.countrystreet %}, {% endif %}{{ jobfair.location.countrycity }}{% if jobfair.location.countrycity %}, {% endif %}{{ jobfair.location.country }}
+                                    {% endif %}
+
+                                    <span class="fw-bold">Virtual:</span>
+                                    <a href="{{ jobfair.url_location }}" target="_blank" class="text-decoration-none">
+                                        {{ jobfair.url_location }}
+                                    </a>
                                 {% else %}
-                                    <!-- Display international address if Philippine address is empty -->
-                                    {{ jobfair.location.countrystreet }}{% if jobfair.location.countrystreet %}, {% endif %}{{ jobfair.location.countrycity }}{% if jobfair.location.countrycity %}, {% endif %}{{ jobfair.location.country }}
+                                    <!-- Default message if status is undefined -->
+                                    <span class="text-muted">Location details unavailable</span>
                                 {% endif %}
                             </p>
                             <p class="card-text">{{ jobfair.description|slice:":100" }}...</p>
@@ -124,7 +175,7 @@
                                     </div>
                                 {% else %}
                                     <div class="up-event-card-footer bg-white p-4">
-                                        <a href="{% url 'jobfair_register' jobfair.pk %}" class="customButton btn btn-outline-primary w-100">Register</a>
+                                        <a href="{% url 'jobfair_register' jobfair.pk %}" class="customButton btn btn-outline-primary w-100">Attend</a>
                                     </div>
                                 {% endif %}
                             {% else %}

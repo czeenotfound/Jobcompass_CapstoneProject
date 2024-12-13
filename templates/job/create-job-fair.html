@@ -1,6 +1,7 @@
 {% extends 'users/base.html' %}
 {% block title %}Job Compass | Post a Job Fair {% endblock %}
 {% load widget_tweaks %}
+{% load static %}
 
 {% block content %}
     <div aria-label="breadcrumb" class="custombreadcrumb container bg-light p-4 mb-4 shadow-sm">
@@ -12,6 +13,15 @@
     </div>
     <div class="container">
         <div class="row">
+            {% if form_errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for error in form_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %} 
+                    </ul>
+                </div>
+            {% endif %}
             <h4 class="mt-4 mb-4 col-lg-2"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
             <form class="col-lg-10 card p-5 mb-5" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
@@ -19,34 +29,32 @@
                 <hr>
                 <h4 for="employerSocials" class="form-label mb-3">Job Fair Information</h4>
 
+                
+                <div class="text-center mb-3">
+                    <label for="jobfairimage" class="form-label fw-bold">Job Fair Cover Image</label>
+                    <div class="d-flex align-items-center justify-content-center">
+                        <div class="mb-2 row">
+                            <img src="https://res.cloudinary.com/di2hrzuyq/image/upload/v1734085498/cleu9gd9lelubfgmu1iv.jpg" alt="Current image" class="img-fluid" style="max-width: 250px; max-height: 250px;">
+                        </div>
+                    </div>
+                    <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
+                </div>
+
+                <hr>
+                
                 <div class="mb-3">
                     <label for="jobfairtitle" class="form-label">Job Fair Title</label>
-                    {% render_field form.title class="form-control" %}
+                    {% render_field form.title class="form-control" required=True %}
                 </div>
 
                 <div class="mb-3">
                     <label for="jobfairtitle" class="form-label">Company's Industry</label>
                     <input type="text" disabled class="form-control" name="" id="" placeholder="{{user.company.industry}}">
                 </div>
-                <div class="row">
-                    <div class="col-sm-6 mb-3">
-                        <label for="fair_event_held" class="form-label">Job Fair Type</label>
-                        {% render_field form.fair_event_held class="form-select" %}
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label for="jobfairattendees" class="form-label">Attendees</label>
-                        {% render_field form.max_attendees class="form-control" %}
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label for="jobfairUrlVirtual" class="form-label">URL Virtual (For Virtual Job Fair)</label>
-                    {% render_field form.url_location class="form-control" placeholder="https://www.website.com" %}
-                </div>
 
                 <div class="mb-3">
                     <label for="jobfairdescription" class="form-label">Description</label>
-                    {% render_field form.description class="form-control" rows="4" %}
+                    {% render_field form.description class="form-control" rows="4" required=True %}
                 </div>
 
                 <hr>
@@ -68,7 +76,7 @@
                     <h5 class="mb-3">Job Fair Date</h5>
                     <div class="col-sm-6 mb-3">
                         <label for="jobfairstartDate class="form-label">Start Date</label>
-                        {% render_field form.start_date class="form-control" type="date"  %}
+                        {% render_field form.start_date class="form-control" type="date" required=True%}
                     </div>
                     <div class="col-sm-6 mb-3">
                         <label for="jobfairendDate class="form-label">End Date</label>
@@ -77,7 +85,7 @@
 
                     <div class="col-sm-6 mb-3">
                         <label for="jobfairstartDate class="form-label">Start Time</label>
-                        {% render_field form.start_time class="form-control" type="time"  %}
+                        {% render_field form.start_time class="form-control" type="time" required=True%}
                     </div>
                     <div class="col-sm-6 mb-3">
                         <label for="jobfairendDate class="form-label">End Time</label>
@@ -87,7 +95,7 @@
                     <h5 class="mb-3">Application Date</h5>
                     <div class="col-sm-6 mb-3">
                         <label for="jobfairApplicationStarts class="form-label">Application Start</label>
-                        {% render_field form.application_starts class="form-control" type="date"  %}
+                        {% render_field form.application_starts class="form-control" type="date" required=True%}
                     </div>
                     <div class="col-sm-6 mb-3">
                         <label for="jobfairApplicationDeadline class="form-label">Application Deadline</label>
@@ -97,71 +105,109 @@
 
                 <hr>
 
-                <div class="mb-3">
-                    <label for="jobfairimage" class="form-label fw-bold">Job Fair Cover Image</label>
-                
-                    <!-- Display the current image if it exists -->
-                    {% if form.image.value %}
-                        <div class="mb-2">
-                            <img src="{{ form.image.value.url }}" alt="Current Job Fair Image" class="img-fluid" style="max-width: 200px;" required>
+                <div class="row">
+                    <div class="col-sm-6 mb-3">
+                        <label for="fair_event_held" class="form-label">Job Fair Type</label>
+                        <div class="btn-group d-flex" role="group" aria-label="Job Fair Type">
+                            {% for choice, display in form.fair_event_held.field.choices %}
+                                {% if choice %}
+                                    <input type="radio" class="btn-check" name="fair_event_held" id="jobfair_{{ choice }}" value="{{ choice }}" 
+                                        {% if form.fair_event_held.value == choice %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary customButton p-3" for="jobfair_{{ choice }}">
+                                        {{ display }}
+                                    </label>
+                                {% endif %}
+                            {% endfor %}
                         </div>
-                    {% endif %}
-                    {% render_field form.image class="form-control" %}
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label for="jobfairattendees" class="form-label">Attendees</label>
+                        {% render_field form.max_attendees class="form-control" required=True%}
+                    </div>
+                </div>
+
+                <!-- URL (Virtual) -->
+                <div id="virtual-link-section" style="display: none;" class="py-3">
+                    
+                    <hr>
+                    <h3 class="form-label mb-3">Virtual Job Fair</h3>
+                    <div class="card bg-light p-3 mb-3">
+                        <label for="jobfairUrlVirtual" class="form-label">URL Virtual Link (For Virtual Job Fair)</label>
+                        {% render_field form.url_location class="form-control" placeholder="https://www.website.com" %}
+                    </div>
+                </div>
+                <!-- Location (Onsite) -->
+                <div id="onsite-venue-section" style="display: none;" class="py-3">
+                    <hr>
+                    <h3 class="form-label mb-3">Onsite Job Fair Venue</h3>
+                    <br>
+                    <div class="card bg-light p-5">
+                        <div class="mb-3 row">
+                            <h4 for="employerAddress" class="form-label mb-3">International Location Venue</h4>
+                            <div class="col-sm-6 mb-3">
+                                <label for="country-text" class="form-label">Country</label>
+                                <input type="text" class="form-control" name="country" id="country-text" placeholder="Enter Country">
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label for="countrycity-text" class="form-label">City / Municipality</label>
+                                <input type="text" class="form-control" name="countrycity" id="country-text" placeholder="Enter City">
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label for="countrypostal-text" class="form-label">Postal Code</label>
+                                <input type="text" class="form-control" name="countrypostal" id="country-text" placeholder="Enter Country">
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label for="countrystreet-text" class="form-label">Venue</label>
+                                <input type="text" class="form-control" name="countrystreet" id="country-text" placeholder="Enter Country">
+                            </div>
+
+                            <hr>
+
+                            <h4 for="employerAddress" class="form-label mb-3">Location Venue</h4>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label">Region</label>
+                                <select name="region" class="form-select form-select-md" id="region"></select>
+                                <input type="hidden" class="form-select form-select-md" name="region" id="region-text">
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label">Province</label>
+                                <select name="province" class="form-select form-select-md" id="province"></select>
+                                <input type="hidden" class="form-select form-select-md" name="province" id="province-text">
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label">City / Municipality</label>
+                                <select name="city" class="form-select form-select-md" id="city"></select>
+                                <input type="hidden" class="form-select form-select-md" name="city" id="city-text">
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label">Barangay</label>
+                                <select name="barangay" class="form-select form-select-md" id="barangay"></select>
+                                <input type="hidden" class="form-select form-select-md" name="barangay" id="barangay-text">
+                            </div>
+                            <div class="mb-3">
+                                <label for="street-text" class="form-label">Venue</label>
+                                <input type="text" class="form-control form-control-md" name="street" id="street-text">
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <hr>
 
-                <div class="mb-4 row">
-                    <h4 for="employerAddress" class="form-label mb-3">International Location Venue</h4>
-                    <div class="col-sm-6 mb-3">
-                        <label for="country-text" class="form-label">Country</label>
-                        <input type="text" class="form-control" name="country" id="country-text" placeholder="Enter Country">
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label for="countrycity-text" class="form-label">City / Municipality *</label>
-                        <input type="text" class="form-control" name="countrycity" id="country-text" placeholder="Enter City">
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label for="countrypostal-text" class="form-label">Postal Code</label>
-                        <input type="text" class="form-control" name="countrypostal" id="country-text" placeholder="Enter Country">
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label for="countrystreet-text" class="form-label">Street (Optional)</label>
-                        <input type="text" class="form-control" name="countrystreet" id="country-text" placeholder="Enter Country">
-                    </div>
-
-                    <hr>
-
-                    <h4 for="employerAddress" class="form-label mb-3">Location Venue</h4>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">Region *</label>
-                        <select name="region" class="form-select form-select-md" id="region"></select>
-                        <input type="hidden" class="form-select form-select-md" name="region" id="region-text">
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">Province *</label>
-                        <select name="province" class="form-select form-select-md" id="province"></select>
-                        <input type="hidden" class="form-select form-select-md" name="province" id="province-text">
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">City / Municipality *</label>
-                        <select name="city" class="form-select form-select-md" id="city"></select>
-                        <input type="hidden" class="form-select form-select-md" name="city" id="city-text">
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">Barangay *</label>
-                        <select name="barangay" class="form-select form-select-md" id="barangay"></select>
-                        <input type="hidden" class="form-select form-select-md" name="barangay" id="barangay-text">
-                    </div>
-                    <div class="mb-3">
-                        <label for="street-text" class="form-label">Venue</label>
-                        <input type="text" class="form-control form-control-md" name="street" id="street-text">
-                    </div>
-                </div>
-                
+                <h4>Job Fair Visibility</h4>
+                <br>
                 <div class="mb-3">
-                    <label for="jobTitle" class="form-label">Job Fair Available</label>
-                    {% render_field form.is_active class="form-check-input" %}
+                    <div class="btn-group d-flex" role="group" aria-label="Job Availability">
+                        <input type="radio" class="btn-check" name="is_active" id="job_available_true" value="true" {% if form.is_active.value == True %}checked{% endif %}>
+                        <label class="btn btn-outline-success customButton p-3" for="job_available_true">
+                            <i class="fa-solid fa-check me-2"></i> Publish Now
+                        </label>
+                
+                        <input type="radio" class="btn-check" name="is_active" id="job_available_false" value="false" {% if form.is_active.value == False %}checked{% endif %}>
+                        <label class="btn btn-outline-secondary customButton p-3" for="job_available_false">
+                            <i class="fa-regular fa-floppy-disk me-2"></i> Save as Draft
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Submit Button -->
@@ -177,4 +223,34 @@
         </div>
     </div>
 
+<script>
+    // Elements
+    const locationField = document.getElementById("onsite-venue-section"); // Section for location
+    const urlField = document.getElementById("virtual-link-section"); // Section for URL
+    const jobfairTypeRadios = document.querySelectorAll('input[name="fair_event_held"]');
+
+    // Function to toggle visibility
+    function toggleFields() {
+        const selectedType = document.querySelector('input[name="fair_event_held"]:checked').value;
+
+        if (selectedType === "Onsite") {
+            locationField.style.display = "block";
+            urlField.style.display = "none";
+        } else if (selectedType === "Virtual") {
+            locationField.style.display = "none";
+            urlField.style.display = "block";
+        } else if (selectedType === "Hybrid") {
+            locationField.style.display = "block";
+            urlField.style.display = "block";
+        }
+    }
+
+    // Add event listeners to radio buttons
+    jobfairTypeRadios.forEach(radio => {
+        radio.addEventListener("change", toggleFields);
+    });
+
+    // Initial toggle on page load
+    toggleFields();
+</script>
 {% endblock content %}

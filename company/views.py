@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from datetime import date
 
 from django.http import HttpResponse
 from django.contrib import messages
@@ -84,9 +85,50 @@ def job_analytics(request):
 @login_required(login_url='login')
 def job_applicants(request, pk):
     if request.user.is_employer:
-        job = Job.objects.get(pk=pk)
+        job = get_object_or_404(Job, pk=pk)
         applicants = job.application_set.all().order_by('-submit_date')
-        context = {'job':job, 'applicants':applicants}
+        
+        # Handle status updates
+        if request.method == 'POST':
+            application_id = request.POST.get('application_id')
+            new_status = request.POST.get('status')
+            
+            if application_id and new_status:
+                application = get_object_or_404(Application, pk=application_id)
+                
+                # Check if the employer is authorized to update this application
+                if request.user == application.job.company.user:
+                    # Get or create ApplicationStatus
+                    application_status, created = ApplicationStatus.objects.get_or_create(application=application)
+                    application_status.status = new_status
+                    application_status.save()
+
+                    # Start a conversation if it doesn't exist
+                    conversation, convo_created = Conversation.objects.get_or_create(application=application)
+
+                    # If a new conversation is created, send an initial message
+                    if convo_created:
+                        Message.objects.create(
+                            conversation=conversation,
+                            sender=request.user,
+                            content=f"The status of your application for '{application.job.title}' has been updated to '{application_status.status}'."
+                        )
+                    else:
+                        # Send a message notifying the status change
+                        Message.objects.create(
+                            conversation=conversation,
+                            sender=request.user,
+                            content=f"The status of your application for '{application.job.title}' has been updated to '{application_status.status}'."
+                        )
+
+                    messages.success(request, f"Application status for {application.user.get_full_name()} updated to {new_status}.")
+                else:
+                    messages.warning(request, "Unauthorized to update this application.")
+
+                # Redirect to avoid resubmission on refresh
+                return redirect('job-applicants', pk=pk)
+        
+        context = {'job': job, 'applicants': applicants}
         return render(request, 'company/job-applicants.html', context)
     else:
         messages.warning(request, 'Permission Denied')
@@ -172,6 +214,9 @@ def update_employer_profile(request):
 # register company
 @login_required(login_url='login')
 def register_company(request):
+
+    today = date.today().isoformat() 
+    
     if not request.user.is_authenticated:
         return redirect('login')
     
@@ -227,6 +272,7 @@ def register_company(request):
                 'form': form,
                 'address_form': address_form,
                 'form_errors': form_errors,  # Pass errors to the template
+                'today': today
             }
             return render(request, 'company/update-company.html', context)
     else:

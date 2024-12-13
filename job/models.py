@@ -28,7 +28,8 @@ class Job(models.Model):
     ideal_candidate = models.TextField(blank=True)
     industry = models.ForeignKey(Industry, on_delete=models.DO_NOTHING, null=True, blank=True)
     
-    location = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
+    location = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
+    use_company_location = models.BooleanField(default=False)
 
     employment_type_choices = (
         ('Full-Time', 'Full-Time'),
@@ -225,7 +226,7 @@ class JobFair(models.Model):
 
     # if user picks hybrid fill in both
     # if user picks onsite and what site 
-    location = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True, related_name='jobfair')
+    location = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True, related_name='jobfair')
     # if user picks virtual and what site 
     url_location = models.URLField(null=True, blank=True)
     
@@ -259,6 +260,13 @@ class JobFair(models.Model):
     
     def __str__(self):
         return self.title
+    
+    def save(self, *args, **kwargs):
+        # Check if avatar is being updated
+        if not self.image:  # If there's no image, default image will be used
+            self.image = "https://res.cloudinary.com/di2hrzuyq/image/upload/v1733062519/luabhrtwak2aeu98sq71.jpg"
+        
+        super().save(*args, **kwargs)
     
 class JobFairRegistration(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
