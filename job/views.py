@@ -745,7 +745,14 @@ def create_job_fair(request):
                 var = form.save(commit=False)
                 var.user = request.user
                 var.company = request.user.company
-
+                company_industry = request.user.company.industry
+                    
+                if company_industry:
+                    var.industry = company_industry
+                else:
+                    messages.warning(request, 'Your company does not have an associated industry.')
+                    return redirect('create-job-fair')
+                
                 # Determine if the selected job fair type is "Virtual"
                 job_fair_type = form.cleaned_data.get('fair_event_held')
                 if job_fair_type == "Virtual":
