@@ -68,7 +68,14 @@
                             <div class="text-container">Verification</div>
                         </a>
                     </li>
-
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center {% if request.resolver_match.url_name == 'admin-create-account' %}active{% endif %}" href="{% url 'admin-create-account' %}">
+                            <div class="icon-container text-center">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="text-container">Accounts</div>
+                        </a>
+                    </li>
                     <hr class="nav-item d-md-none">
 
                     <li class="nav-item d-md-none">

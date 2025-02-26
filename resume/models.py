@@ -7,17 +7,24 @@ from io import BytesIO
 from django.core.files import File
 from PIL import Image 
 import os
+import json
 from uuid import uuid4
 from cloudinary.models import CloudinaryField
 
-def validate_resume_file(value):
-    valid_extensions = ['pdf', 'docx']
-    extension = os.path.splitext(value.name)[1][1:].lower()
-    if extension not in valid_extensions:
-        raise ValidationError(f"File extension must be one of: {', '.join(valid_extensions)}.")
-    if value.size > 10 * 1024 * 1024:  # 10 MB size limit
-        raise ValidationError("File size must not exceed 10MB.")
-    
+from django.conf import settings
+
+# Load currency data from JSON
+CURRENCY_FILE = os.path.join(settings.BASE_DIR, 'static/JS/Common-Currency.json')
+
+with open(CURRENCY_FILE, 'r', encoding='utf-8') as file:
+    currency_data = json.load(file)
+
+# Convert JSON to Django choices format
+CURRENCY_CHOICES = [
+    (code, f'{data["symbol"]}') 
+    for code, data in currency_data.items()
+]
+
 class Resume(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
@@ -30,15 +37,45 @@ class Resume(models.Model):
     first_name = models.CharField(max_length=100, blank=True)
     middle_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
-    suffix = models.CharField(max_length=10, blank=True)
+    suffix = models.CharField   (max_length=10, blank=True)
 
     about_me = models.TextField(blank=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True, related_name='resumes')
 
+   # Expected Salary Display Option
+    SALARY_DISPLAY_CHOICES = (
+        ('fixed', 'Fixed Salary'),
+        ('range', 'Salary Range'),
+        ('hidden', 'Do not display'),
+    )
+    salary_display_type = models.CharField(
+        max_length=10, 
+        choices=SALARY_DISPLAY_CHOICES, 
+        default='hidden'
+        ,null=True
+        ,blank=True
+    )
+
+    # Salary Fields
+    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='PHP', null=True, blank=True)
+    expt_salary_fixed = models.PositiveIntegerField(null=True, blank=True, help_text="Enter fixed salary if selected.")
+    expt_salary_min = models.PositiveIntegerField(null=True, blank=True, help_text="Enter minimum salary for range.")
+    expt_salary_max = models.PositiveIntegerField(null=True, blank=True, help_text="Enter maximum salary for range.")
+    expt_salary_mode = models.CharField(
+        max_length=20, 
+        choices=(
+            ('Hourly','Hourly'),
+            ('Daily','Daily'),
+            ('Weekly','Weekly'),
+            ('Monthly','Monthly'),
+            ('Yearly','Yearly')
+        )
+        ,null=True
+        ,blank=True
+    )
+
     # preferences
     job_position = models.CharField(max_length=150, blank=True)
-    expt_salary_min = models.PositiveIntegerField(null=True, blank=True)
-    expt_salary_max = models.PositiveIntegerField(null=True, blank=True)
 
     industry = models.ForeignKey(Industry, on_delete=models.DO_NOTHING, null=True, blank=True)
     location_job_type_choices = (
@@ -61,7 +98,6 @@ class Resume(models.Model):
         'file', 
         resource_type='raw', 
         folder='resume',
-        validators=[validate_resume_file],
         blank=True
     )
 
@@ -73,7 +109,7 @@ class Skill(models.Model):
     name = models.CharField(max_length=50, blank=True)
 
     def __str__(self):
-        return f"Skill - {self.name}"
+        return f"Skill for {self.user_profile.first_name} {self.user_profile.last_name} - {self.name} "
     
 class Education(models.Model):
     user_profile = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='education')

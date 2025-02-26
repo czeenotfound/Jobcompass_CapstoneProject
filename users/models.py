@@ -4,9 +4,13 @@ from django.core.exceptions import ValidationError
 from PIL import Image  # For image processing
 from io import BytesIO
 from django.core.files import File
-import os
 from uuid import uuid4
 from cloudinary.models import CloudinaryField
+
+from django.utils import timezone
+import os
+import random
+import string
 
 # Updated User model
 class User(AbstractUser):
@@ -22,6 +26,8 @@ class User(AbstractUser):
     has_resume = models.BooleanField(default=False)
     has_company = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+
+    is_verified = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         # Check if avatar is being updated

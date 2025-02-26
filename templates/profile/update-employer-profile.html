@@ -39,29 +39,29 @@
                 </div>
                
                 <div class="row">
-                    <div class="col-sm-4 mb-3">
-                        <label for="first_name" class="form-label">First Name</label>
-                        {% render_field employer_form.first_name class="form-control" placeholder="Enter your first name" %}
+                    <div class="col-sm-3 mb-3">
+                        <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
+                        {% render_field employer_form.first_name class="form-control" placeholder="Enter your first name" required=True%}
                     </div>
                     <div class="col-sm-3 mb-3">
-                        <label for="middle_name" class="form-label">Middle Name</label>
-                        {% render_field employer_form.middle_name class="form-control" placeholder="Enter your middle name" %}
+                        <label for="middle_name" class="form-label">Middle Name <span class="text-danger">*</span></label>
+                        {% render_field employer_form.middle_name class="form-control" placeholder="Enter your middle name" required=True%}
                     </div>
                     <div class="col-sm-4 mb-3">
-                        <label for="last_name" class="form-label">Last Name</label>
-                        {% render_field employer_form.last_name class="form-control" placeholder="Enter your last name" %}
+                        <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                        {% render_field employer_form.last_name class="form-control" placeholder="Enter your last name" required=True%}
                     </div>
-                    <div class="col-sm-1 mb-3">
+                    <div class="col-sm-2 mb-3">
                         <label for="suffix" class="form-label">Suffix</label>
-                        {% render_field employer_form.suffix class="form-control" placeholder="Jr., Sr." %}
+                        {% render_field employer_form.suffix class="form-control" placeholder="Jr., Sr., I, II, III, IV" %}
                     </div>
                 </div>
                
                 <!-- Employer Status -->
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label for="employer_status" class="form-label">Employer Status</label>
                     {% render_field employer_form.employer_status class="form-select" %}
-                </div>
+                </div> -->
 
                 <!-- About Me -->
                 <div class="mb-3">
@@ -72,67 +72,47 @@
                 <hr>
 
                 <div class="row">
-                    <h4 for="employerAddress" class="form-label mb-3">International Address</h4>
+                    <h4 for="employerAddress" class="form-label mb-3">Address</h4>
                     <div class="col-sm-6 mb-3">
-                        <label for="country-text" class="form-label">Country</label>
-                        {% render_field address_form.country class="form-control form-control-md" id="country-text" %}
+                        <label for="country-text" class="form-label">Country <span class="text-danger">*</span></label>
+                        {% render_field address_form.country class="form-control form-control-md" id="country-text" placeholder="Select country" required=True %}
                     </div>
                     <div class="col-sm-6 mb-3">
-                        <label for="countrycity-text" class="form-label">City</label>
-                        {% render_field address_form.countrycity class="form-control form-control-md" id="countrycity-text" %}
+                        <label for="countrypostal-text" class="form-label">Postal Code <span class="text-danger">*</span></label>
+                        {% render_field address_form.countrypostal class="form-control form-control-md" id="countrypostal-text" placeholder="Enter your postal code" required=True %}
                     </div>
                     <div class="col-sm-6 mb-3">
-                        <label for="countrypostal-text" class="form-label">Postal Code</label>
-                        {% render_field address_form.countrypostal class="form-control form-control-md" id="countrypostal-text" %}
+                        <label for="region-text" class="form-label">Region <span class="text-danger">*</span></label>
+                        {% render_field address_form.region class="form-control form-control-md" id="region-text" placeholder="Enter your state/province/region" required=True %}
                     </div>
                     <div class="col-sm-6 mb-3">
-                        <label for="countrystreet-text" class="form-label">Street (Optional)</label>
-                        {% render_field address_form.countrystreet class="form-control form-control-md" id="countrystreet-text" %}
+                        <label for="city-text" class="form-label">City <span class="text-danger">*</span></label>
+                        {% render_field address_form.city class="form-control form-control-md" id="city-text" placeholder="Enter your city" required=True %}
                     </div>
-                    <hr>
-
-                    <h4 for="employerAddress" class="form-label mb-3">Philippines Address</h4>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">Region *</label>
-                        <select name="region" class="form-select form-select-md mb-2" id="region"></select>
-                        {% render_field address_form.region class="form-control form-control-md" name="region_text" id="region-text"%}
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">Province *</label>
-                        <select name="province" class="form-select form-select-md mb-2" id="province"></select>
-                        {% render_field address_form.province class="form-control form-control-md" name="province_text" id="province-text" %}
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">City / Municipality *</label>
-                        <select name="city" class="form-select form-select-md mb-2" id="city"></select>
-                        {% render_field address_form.city class="form-control form-control-md" name="city_text" id="city-text" %}
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                        <label class="form-label">Barangay *</label>
-                        <select name="barangay" class="form-select form-select-md mb-2" id="barangay"></select>
-                        {% render_field address_form.barangay class="form-control form-control-md" name="barangay_text" id="barangay-text" %}
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="street-text" class="form-label">Street (Optional)</label>
-                        {% render_field address_form.street class="form-control form-control-md" id="street-text" %}
+                    
+                    <div class="mb-3">
+                        <label for="street-text" class="form-label">Street <span class="text-muted">(Optional)</span></label>
+                        {% render_field address_form.street class="form-control form-control-md" placeholder="Street address" id="street-text" %}
                     </div>
                 </div>
                 <hr>
                 <!-- Social Media Links -->
-                <h4 for="employerSocials" class="form-label mb-3">Socials</h4>
+                <h4 for="employerSocials" class="form-label mb-3">Socials <span class="text-muted">(Optional)</span></h4>
                 <div class="mb-3">
                     <label for="facebook" class="form-label">Facebook</label>
-                    {% render_field employer_form.facebook class="form-control" placeholder="Enter your Facebook URL" %}
+                    {% render_field employer_form.facebook class="form-control" placeholder="URL (e.g., https://facebook.com)" %}
                 </div>
                 <div class="mb-3">
                     <label for="twitter" class="form-label">Twitter</label>
-                    {% render_field employer_form.twitter class="form-control" placeholder="Enter your Twitter URL" %}
+                    {% render_field employer_form.twitter class="form-control" placeholder="URL (e.g., https://x.com)" %}
                 </div>
                 <div class="mb-3">
                     <label for="github" class="form-label">GitHub</label>
-                    {% render_field employer_form.github class="form-control" placeholder="Enter your GitHub URL" %}
+                    {% render_field employer_form.github class="form-control" placeholder="URL (e.g., https://github.com)" %}
                 </div>
-            
+                
+                <hr>
+                
                 <!-- Submit Button -->
                 <div class="mt-4 d-flex justify-content-end gap-2">
                     <a href="{% url 'employer-profile' user.pk %}" class="customButton btn btn-outline-danger py-3 px-5">

@@ -36,7 +36,7 @@
                     <div class="col-md-6">
                         <h4 for="applicantResume" class="form-label mb-3">Document Resume</h4>
                         <div class="mb-3 bg-light p-3">
-                            <label for="resumePDF" class="form-label fw-bold">Upload Resume (.pdf, .docx) *</label>
+                            <label for="resumePDF" class="form-label fw-bold">Upload Resume (.pdf, .docx)</label>
                             {% render_field form.upload_resume class="form-control" id="resumePDF" %}
                         </div>
                     </div>
@@ -46,80 +46,113 @@
             
                 <div class="row">
                     <div class="mb-3 col-lg-4 col-md-6 col-sm-6">
-                        <label for="resumeName" class="form-label">First Name *</label>
-                        {% render_field form.first_name class="form-control" required=True %}
-                        <!-- <input type="text" class="form-control" id="resumeName" placeholder="Enter resume name" required> -->
+                        <label for="resumeName" class="form-label">First Name <span class="text-danger">*</span></label>
+                        {% render_field form.first_name class="form-control" placeholder="Enter your first name" required=True %}
                     </div>
                     <div class="mb-3 col-lg-3 col-md-6 col-sm-6">
-                        <label for="resumeName" class="form-label">Middle Name *</label>
-                        {% render_field form.middle_name class="form-control" required=True %}
-                        <!-- <input type="text" class="form-control" id="resumeName" placeholder="Enter resume name" required> -->
+                        <label for="resumeName" class="form-label">Middle Name <span class="text-danger">*</span></label>
+                        {% render_field form.middle_name class="form-control" placeholder="Enter your middle name" required=True %}
                     </div>
                     <div class="mb-3 col-lg-3 col-md-6 col-sm-6">
-                        <label for="resumeName" class="form-label">Last Name *</label>
-                        {% render_field form.last_name class="form-control" required=True %}
-                        <!-- <input type="text" class="form-control" id="resumeName" placeholder="Enter resume name" required> -->
+                        <label for="resumeName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                        {% render_field form.last_name class="form-control" placeholder="Enter your last name" required=True %}
                     </div>
                     <div class="mb-3 col-lg-2 col-md-6 col-sm-6">
                         <label for="resumeName" class="form-label">Suffix</label>
                         {% render_field form.suffix class="form-control" placeholder="Jr., Sr., I, II, III, IV" %}
-                        <!-- <input type="text" class="form-control" id="resumeName" placeholder="Enter resume name" required> -->
                     </div>
                 </div>
+
                 <div class="row">
-                    <div class="col-sm-4 mb-3">
-                        <label for="industry" class="form-label">Industry *</label>
-                        {% render_field form.industry class="form-control" required=True %}
+                    <div class="col-sm-6 mb-3">
+                        <label for="industry" class="form-label">Industry <span class="text-danger">*</span></label>
+                        {% render_field form.industry class="form-select" required=True %}
                     </div>
 
-                    <div class="col-sm-4 mb-3">
-                        <label for="employment_job_type" class="form-label">Employment Status *</label>
-                        {% render_field form.employment_job_type  class="form-control" required=True %}
-                    </div>
-
-                    <div class="col-sm-4 mb-3">
-                        <label for="location_job_type" class="form-label">Job Status *</label>
-                        {% render_field form.location_job_type class="form-control" required=True %}
-                    </div>
-
-                    <div class="col-sm-4 mb-3">
+                    <div class="col-sm-6 mb-3">
                         <label for="location_job_type" class="form-label">Phone</label>
                         {% render_field avatar_phone_form.phone class="form-control" required=True %}
                     </div>
 
-                    <div class="col-sm-8 mb-3">
+                    <div class="col-md-6 col-sm-6 mb-3">
+                        <label for="employment_job_type" class="form-label">Employment Status <span class="text-danger">*</span></label>
+                        {% render_field form.employment_job_type  class="form-select" required=True %}
+                    </div>
+
+                    <div class="col-md-6 col-sm-6 mb-3">
+                        <label for="location_job_type" class="form-label">Job Status <span class="text-danger">*</span></label>
+                        {% render_field form.location_job_type class="form-select" required=True %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="about-us" class="form-label">About Me</label>
+                    {% render_field form.about_me|attr:"rows:4" class="form-control" %}
+                </div>
+                
+                <!--  SALARY  -->
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <label for="salaryType" class="form-label">Expected Salary</label>
+                        {% render_field form.salary_display_type class="form-select" id="salaryType" onchange="toggleSalaryFields()" required=True %}
+                    </div>
+                    
+                    <div id="currencyField" class="col-md-2 col-sm-6 mb-3">
+                        <label for="currency" class="form-label">Currency</label>
+                        <div class="input-group">
+                            {% render_field form.currency class="form-select" %}
+                        </div>
+                    </div>    
+                    
+                    <!-- Salary Range Fields -->
+                    <div id="salaryRangeFields" class="col-md-5 col-sm-6 mb-3">
                         <label for="salaryRange" class="form-label">Expected Salary Range</label>
                         <div class="input-group">
-                            <span class="input-group-text">₱</span>
+                           
                             {% render_field form.expt_salary_min class="form-control" placeholder="Min" %}
                             <span class="input-group-text">to</span>
                             {% render_field form.expt_salary_max class="form-control" placeholder="Max" %}
                         </div>
                     </div>
+                    <!-- Fixed Salary Field -->
+                    <div id="fixedSalaryField" class="col-md-5 col-sm-6 mb-3 d-none">
+                        <label for="fixedSalary" class="form-label">Fixed Expected Salary</label>
+                        <div class="input-group">
+                            {% render_field form.expt_salary_fixed class="form-control" placeholder="Enter amount" %}
+                        </div>
+                    </div>
+                    <div id="salaryModeField" class="col-md-2 col-sm-6 mb-3">
+                        <label for="salary_mode" class="form-label">Salary Mode</label>
+                        {% render_field form.expt_salary_mode class="form-select" required=True %}
+                    </div>
                 </div>
+
+                <hr> 
                 
+                <style>
+                    .formset-form {
+                        transition: opacity 0.3s ease;
+                    }
+                    
+                    .to-be-deleted {
+                        background-color: #f8f9fa;
+                    }
+                    
+                    .remove-form-btn {
+                        min-width: 80px;
+                    }
+                </style>
 
-                <div class="mb-3">
-                    <label for="about-us" class="form-label">About Me</label>
-                    {% render_field form.about_me|attr:"rows:3" class="form-control" %}
-                </div>
-
-                <hr>
-
-                <!-- Skills Section -->
                 <div class="mb-3">
                     <div class="text-white d-flex justify-content-between align-items-center mb-3">
                         <label class="mb-0 text-dark">
-                            Skills *
-                            <small class="text-danger ms-2">(Minimum 1 skill required)</small>
-                            <br>
-                            <small class="text-danger fw-bold">"Only 3 skills can be added or updated at a time. You can add another skill during your next update."</small>
+                            Skills
                         </label>
                     </div>
                     <div id="skills-container">
                         {{ skill_formset.management_form }}
                         {% for form in skill_formset %}
-                            <div class="skill-form row align-items-center mb-2">
+                            <div class="formset-form skill-form row align-items-center mb-2">
                                 <div class="col-md-10">
                                     <div class="d-none">
                                         {{ form.as_p }}
@@ -131,39 +164,46 @@
                                         <div class="text-danger">{{ form.name.errors }}</div>
                                     {% endif %}
                                 </div>
-                                <div class="col-md-2">
-                                    {% if not forloop.first %}
-                                        <div class="form-check">
-                                            {{ form.DELETE }}
-                                            <label class="form-check-label text-danger">Remove</label>
-                                        </div>
-                                    {% endif %}
+                                <div class="col-md-2 remove-form-container">
+                                    <!-- Regular DELETE field but hidden with CSS -->
+                                    <div style="display: none;">
+                                        {{ form.DELETE }}
+                                    </div>
+                                    
+                                    <!-- Remove button -->
+                                    <button type="button" 
+                                            class="btn btn-danger btn-sm remove-form-btn">
+                                        Remove
+                                    </button>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
                 </div>
+                
+               <hr>
+               
                 <!-- Education Section -->
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <label class="mb-0">
-                            Education *
-                            <small class="text-danger ms-2">(Minimum 1 education required)</small>
-                            <br>
-                            <small class="text-danger fw-bold">"Only 1 education can be added or updated at a time. You can add another education during your next update."</small>
+                            Education
                         </label>
                     </div>
                     <div id="education-container">
                         {{ education_formset.management_form }}
                         {% for form in education_formset %}
-                            <div class="education-form row mb-3">
+                            <div class="formset-form education-form row mb-3">
                                 <div class="col-md-10">
                                     <div class="d-none">
                                         {{ form.as_p }}
                                     </div> 
                                     <p>
+                                        <label class="mb-0 text-dark">Degree </label>
                                         {{ form.degree }}
+                                        <label class="mb-0 text-dark">Institution </label>
                                         {{ form.institution }}
+                                        <label class="mb-0 text-dark">Graduation Year </label>
                                         {{ form.graduation_year }}
                                     </p>
                                     
@@ -177,42 +217,56 @@
                                         <div class="text-danger">{{ form.graduation_year.errors }}</div>
                                     {% endif %}
                                 </div>
-                                <div class="col-md-2">
-                                    {% if not forloop.first %}
-                                        <div class="form-check">
-                                            {{ form.DELETE }}
-                                            <label class="form-check-label text-danger">Remove</label>
-                                        </div>
-                                    {% endif %}
+                                <div class="col-md-2 remove-form-container">
+                                    <!-- Regular DELETE field but hidden with CSS -->
+                                    <div style="display: none;">
+                                        {{ form.DELETE }}
+                                    </div>
+                                    
+                                    <!-- Remove button -->
+                                    <button type="button" 
+                                            class="btn btn-danger btn-sm remove-form-btn">
+                                        Remove
+                                    </button>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
                 </div>
 
+                <hr>
                 <!-- Experience Section -->
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <label class="mb-0">
                             Experience
-                            <small class="text-danger ms-2">(Optional)</small>
-                            <br>
-                            <small class="text-danger fw-bold">"Only 1 experience can be added or updated at a time. You can add another experience during your next update."</small>
                         </label>
                     </div>
                     <div id="experience-container">
                         {{ experience_formset.management_form }}
                         {% for form in experience_formset %}
-                            <div class="experience-form row mb-3">
+                            <div class="formset-form experience-form row mb-3">
                                 <div class="col-md-10">
                                     <div class="d-none">
                                         {{ form.as_p }}
                                     </div> 
                                     <p>
+                                        <label class="mb-0 text-dark">Job Title</label>
                                         {{ form.title }}
+                                        <label class="mb-0 text-dark">Company</label>
                                         {{ form.company}}
-                                        {{ form.start_date }}
-                                        {{ form.end_date }}
+                                        <div class="row">   
+                                            <div class="col-md-6">
+                                                <label class="mb-0 text-dark">Start Date</label>
+                                                {{ form.start_date }}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="mb-0 text-dark">End Date</label>
+                                                {{ form.end_date }}
+                                            </div>
+                                        </div>
+                                       
+                                        <label class="mb-0 text-dark">Job Description</label>
                                         {{ form.description }}
                                     </p>
                                     
@@ -232,33 +286,36 @@
                                         <div class="text-danger">{{ form.description.errors }}</div>
                                     {% endif %}
                                 </div>
-                                <div class="col-md-2">
-                                    {% if not forloop.first %}
-                                        <div class="form-check">
-                                            {{ form.DELETE }}
-                                            <label class="form-check-label text-danger">Remove</label>
-                                        </div>
-                                    {% endif %}
+                                <div class="col-md-2 remove-form-container">
+                                    <!-- Regular DELETE field but hidden with CSS -->
+                                    <div style="display: none;">
+                                        {{ form.DELETE }}
+                                    </div>
+                                    
+                                    <!-- Remove button -->
+                                    <button type="button" 
+                                            class="btn btn-danger btn-sm remove-form-btn">
+                                        Remove
+                                    </button>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
                 </div>
 
+                <hr>
+
                 <!-- Certification Section -->
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <label class="mb-0">
                             Certification 
-                            <small class="text-danger ms-2">(Optional)</small>
-                            <br>
-                            <small class="text-danger fw-bold">"Only 1 certification can be added or updated at a time. You can add another certification during your next update."</small>
                         </label>
                     </div>
                     <div id="certification-container">
                         {{ certification_formset.management_form }}
                         {% for form in certification_formset %}
-                            <div class="certification-form row mb-3">
+                            <div class="formset-form certification-form row mb-3">
                                 <div class="col-md-10">
                                     <div class="d-none">
                                         {{ form.as_p }}
@@ -270,40 +327,46 @@
                                         <div class="text-danger">{{ form.name.errors }}</div>
                                     {% endif %}
                                 </div>
-                                <div class="col-md-2">
-                                    {% if not forloop.first %}
-                                        <div class="form-check">
-                                            {{ form.DELETE }}
-                                            <label class="form-check-label text-danger">Remove</label>
-                                        </div>
-                                    {% endif %}
+                                <div class="col-md-2 remove-form-container">
+                                    <!-- Regular DELETE field but hidden with CSS -->
+                                    <div style="display: none;">
+                                        {{ form.DELETE }}
+                                    </div>
+                                    
+                                    <!-- Remove button -->
+                                    <button type="button" 
+                                            class="btn btn-danger btn-sm remove-form-btn">
+                                        Remove
+                                    </button>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
                 </div>
 
+                <hr>
+
                 <!-- Project Section -->
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <label class="mb-0">
                             Project 
-                            <small class="text-danger ms-2">(Optional)</small>
-                             <br>
-                            <small class="text-danger fw-bold">"Only 1 project can be added or updated at a time. You can add another project during your next update."</small>
                         </label>
                     </div>
                     <div id="project-container">
                         {{ project_formset.management_form }}
                         {% for form in project_formset %}
-                            <div class="project-form row mb-3">
+                            <div class="formset-form project-form row mb-3">
                                 <div class="col-md-10">
                                     <div class="d-none">
                                         {{ form.as_p }}
                                     </div> 
                                     <p>
+                                        <label class="mb-0 text-dark">Project Title</label>
                                         {{ form.title }}
+                                        <label class="mb-0 text-dark">Project Description</label>
                                         {{ form.description}}
+                                        <label class="mb-0 text-dark">Project Url</label>
                                         {{ form.url }}
                                     </p>
                                     
@@ -317,32 +380,36 @@
                                         <div class="text-danger">{{ form.url.errors }}</div>
                                     {% endif %}
                                 </div>
-                                <div class="col-md-2">
-                                    {% if not forloop.first %}
-                                        <div class="form-check">
-                                            {{ form.DELETE }}
-                                            <label class="form-check-label text-danger">Remove</label>
-                                        </div>
-                                    {% endif %}
+                                <div class="col-md-2 remove-form-container">
+                                    <!-- Regular DELETE field but hidden with CSS -->
+                                    <div style="display: none;">
+                                        {{ form.DELETE }}
+                                    </div>
+                                    
+                                    <!-- Remove button -->
+                                    <button type="button" 
+                                            class="btn btn-danger btn-sm remove-form-btn">
+                                        Remove
+                                    </button>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
                 </div>
+
+                <hr>
+
                 <!-- Social Links Section -->
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <label class="mb-0">
-                            Social Links
-                            <small class="text-danger ms-2">(Optional)</small>
-                            <br>
-                            <small class="text-danger fw-bold">"Only 1 social can be added or updated at a time. You can add another social during your next update."</small>
+                            Social Links 
                         </label>
                     </div>
                     <div id="sociallink-container">
                         {{ sociallink_formset.management_form }}
                         {% for form in sociallink_formset %}
-                            <div class="sociallink-form row mb-3">
+                            <div class="formset-form sociallink-form row mb-3">
                                 <div class="col-md-10">
                                     <div class="d-none">
                                         {{ form.as_p }}
@@ -358,53 +425,53 @@
                                         <div class="text-danger">{{ form.url.errors }}</div>
                                     {% endif %}
                                 </div>
-                                <div class="col-md-2">
-                                    {% if not forloop.first %}
-                                        <div class="form-check">
-                                            {{ form.DELETE }}
-                                            <label class="form-check-label text-danger">Remove</label>
-                                        </div>
-                                    {% endif %}
+                                <div class="col-md-2 remove-form-container">
+                                    <div style="display: none;">
+                                        {{ form.DELETE }}
+                                    </div>
+                                    
+                                    <button type="button" 
+                                            class="btn btn-danger btn-sm remove-form-btn">
+                                        Remove
+                                    </button>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
                 </div>
+
                 <hr>
                 <!-- Address -->
                 <div class="row">
                     <h4 for="employerAddress" class="form-label mb-3">Address</h4>
                     <div class="col-sm-6 mb-3">
-                        <label class="form-label">Region *</label>
-                        <select name="region" class="form-select form-select-md mb-2" id="region"></select>
-                        {% render_field address_form.region class="form-control form-control-md" name="region_text" id="region-text" placeholder="Region" %}
+                        <label for="country-text" class="form-label">Country</label>
+                        {% render_field address_form.country class="form-control form-control-md" id="country-text" placeholder="Select country" required=True %}
                     </div>
                     <div class="col-sm-6 mb-3">
-                        <label class="form-label">Province *</label>
-                        <select name="province" class="form-select form-select-md mb-2" id="province"></select>
-                        {% render_field address_form.province class="form-control form-control-md" name="province_text" id="province-text" placeholder="Province"%}
+                        <label for="countrypostal-text" class="form-label">Postal Code</label>
+                        {% render_field address_form.countrypostal class="form-control form-control-md" id="countrypostal-text" placeholder="Enter your postal code" required=True %}
                     </div>
                     <div class="col-sm-6 mb-3">
-                        <label class="form-label">City / Municipality *</label>
-                        <select name="city" class="form-select form-select-md mb-2" id="city"></select>
-                        {% render_field address_form.city class="form-control form-control-md" name="city_text" id="city-text" placeholder="City/Municipality" %}
+                        <label for="region-text" class="form-label">Region</label>
+                        {% render_field address_form.region class="form-control form-control-md" id="region-text" placeholder="Enter your state/province/region" required=True %}
                     </div>
                     <div class="col-sm-6 mb-3">
-                        <label class="form-label">Barangay *</label>
-                        <select name="barangay" class="form-select form-select-md mb-2" id="barangay"></select>
-                        {% render_field address_form.barangay class="form-control form-control-md" name="barangay_text" id="barangay-text" placeholder="Barangay" %}
+                        <label for="city-text" class="form-label">City</label>
+                        {% render_field address_form.city class="form-control form-control-md" id="city-text" placeholder="Enter your city" required=True %}
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="street-text" class="form-label">Street (Optional)</label>
-                        {% render_field address_form.street class="form-control form-control-md" id="street-text" placeholder="Street" %}
+                    
+                    <div class="mb-3">
+                        <label for="street-text" class="form-label">Street <span class="text-muted">(Optional)</span></label>
+                        {% render_field address_form.street class="form-control form-control-md" placeholder="Street address" id="street-text" %}
                     </div>
                 </div>
 
-                <hr>
+                <hr> 
                 <!-- Submit Button -->
 
                 <div class="mt-4 d-flex justify-content-end gap-2">
-                    <a href="{% url 'manage-jobs' %}" class="customButton btn btn-outline-danger py-3 px-5">
+                    <a href="{% url 'dashboard' %}" class="customButton btn btn-outline-danger py-3 px-5">
                         <i class="fa-solid fa-times me-3"></i> Cancel
                     </a>
                     <button type="submit" class="customButton btn btn-primary py-3 px-5">
@@ -414,5 +481,172 @@
             </form>
         </div>
     </div>
+{% block scripts %}
+    <script>
+        function toggleSalaryFields() {
+            const salaryType = document.getElementById("salaryType").value;
+            const salaryRangeFields = document.getElementById("salaryRangeFields");
+            const fixedSalaryField = document.getElementById("fixedSalaryField");
+            const salaryModeField = document.getElementById("salaryModeField");
+            const currencyField = document.getElementById("currencyField");
+
+            if (salaryType === "range") {
+                salaryRangeFields.classList.remove("d-none");
+                fixedSalaryField.classList.add("d-none");
+                salaryModeField.classList.remove("d-none");
+                currencyField.classList.remove("d-none");
+            } else if (salaryType === "fixed") {
+                fixedSalaryField.classList.remove("d-none");
+                salaryRangeFields.classList.add("d-none");
+                salaryModeField.classList.remove("d-none");
+                currencyField.classList.remove("d-none");
+            } else {
+                salaryRangeFields.classList.add("d-none");
+                fixedSalaryField.classList.add("d-none");
+                salaryModeField.classList.add("d-none");
+                currencyField.classList.add("d-none");
+            }
+        }
+
+        // Initialize visibility on page load
+        window.onload = function() {
+            toggleSalaryFields();
+        };
+
+
+        function initializeFormsetManager(prefix, containerSelector, maxForms) {
+            const container = document.querySelector(containerSelector);
+            const totalFormsInput = document.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+            
+            function updateFormIndexes() {
+                const forms = container.querySelectorAll('.formset-form');
+                forms.forEach((form, index) => {
+                    form.querySelectorAll('[name*="-"]').forEach(element => {
+                        element.name = element.name.replace(/-\d+-/, `-${index}-`);
+                        element.id = element.id.replace(/-\d+-/, `-${index}-`);
+                    });
+                    
+                    form.querySelectorAll('label[for*="-"]').forEach(label => {
+                        label.setAttribute('for', label.getAttribute('for').replace(/-\d+-/, `-${index}-`));
+                    });
+                });
+                
+                totalFormsInput.value = forms.length;
+                
+                const addButton = document.querySelector(`#add-${prefix}`);
+                if (addButton) {
+                    addButton.style.display = forms.length >= maxForms ? 'none' : 'block';
+                }
+            }
+            
+            function addForm() {
+                const forms = container.querySelectorAll('.formset-form');
+                if (forms.length >= maxForms) {
+                    alert(`You can only add up to ${maxForms} forms at a time.`);
+                    return;
+                }
+                
+                const lastForm = forms[forms.length - 1];
+                const newForm = lastForm.cloneNode(true);
+                
+                // Clear input values
+                newForm.querySelectorAll('input:not([type="checkbox"])').forEach(input => {
+                    input.value = '';
+                });
+                newForm.querySelectorAll('textarea').forEach(textarea => {
+                    textarea.value = '';
+                });
+                newForm.querySelectorAll('select').forEach(select => {
+                    select.selectedIndex = 0;
+                });
+                
+                // Uncheck DELETE checkbox
+                const deleteCheckbox = newForm.querySelector('input[name$="-DELETE"]');
+                if (deleteCheckbox) {
+                    deleteCheckbox.checked = false;
+                }
+                
+                // Show remove button
+                const removeContainer = newForm.querySelector('.remove-form-container');
+                if (removeContainer) {
+                    removeContainer.style.display = 'block';
+                }
+                
+                // Initialize remove button
+                const removeButton = newForm.querySelector('.remove-form-btn');
+                if (removeButton) {
+                    removeButton.onclick = (e) => removeForm(e, newForm);
+                    removeButton.style.display = 'block';
+                }
+                
+                lastForm.after(newForm);
+                updateFormIndexes();
+            }
+            
+            function removeForm(event, formElement) {
+                event.preventDefault();
+                const form = formElement || event.target.closest('.formset-form');
+                const deleteCheckbox = form.querySelector('input[name$="-DELETE"]');
+                const removeButton = form.querySelector('.remove-form-btn');
+                
+                if (deleteCheckbox) {
+                    if (deleteCheckbox.checked) {
+                        // Unmark for deletion
+                        deleteCheckbox.checked = false;
+                        form.style.opacity = '1';
+                        form.classList.remove('to-be-deleted');
+                        removeButton.textContent = 'Remove';
+                        removeButton.classList.remove('btn-secondary');
+                        removeButton.classList.add('btn-danger');
+                    } else {
+                        // Mark for deletion
+                        deleteCheckbox.checked = true;
+                        form.style.opacity = '0.5';
+                        form.classList.add('to-be-deleted');
+                        removeButton.textContent = 'Undo Remove';
+                        removeButton.classList.remove('btn-danger');
+                        removeButton.classList.add('btn-secondary');
+                    }
+                }
+            }
+            
+            // Initialize add button
+            let addButton = document.querySelector(`#add-${prefix}`);
+            if (!addButton) {
+                addButton = document.createElement('button');
+                addButton.type = 'button';
+                addButton.className = 'btn btn-success mt-2';
+                addButton.id = `add-${prefix}`;
+                addButton.textContent = 'Add More';
+                container.after(addButton);
+            }
+            addButton.onclick = addForm;
+            
+            // Initialize remove buttons
+            container.querySelectorAll('.remove-form-btn').forEach(button => {
+                button.onclick = (e) => removeForm(e);
+            });
+            
+            // Initial update
+            updateFormIndexes();
+        }
+
+        // Initialize all formset managers
+        document.addEventListener('DOMContentLoaded', function() {
+            const formsetConfigs = [
+                { prefix: 'skills', selector: '#skills-container', maxForms: 15 },
+                { prefix: 'education', selector: '#education-container', maxForms: 10 },
+                { prefix: 'experience', selector: '#experience-container', maxForms: 10 },
+                { prefix: 'certification', selector: '#certification-container', maxForms: 15 },
+                { prefix: 'project', selector: '#project-container', maxForms: 15 },
+                { prefix: 'social_link', selector: '#sociallink-container', maxForms: 10 }
+            ];
+            
+            formsetConfigs.forEach(config => {
+                initializeFormsetManager(config.prefix, config.selector, config.maxForms);
+            });
+        });
+    </script>
+{% endblock scripts %}
 
 {% endblock content %}

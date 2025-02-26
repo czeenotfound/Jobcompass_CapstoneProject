@@ -7,9 +7,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required
-from company.models import Company
+from company.models import Company, Employer
 from users.models import User
 from resume.models import Resume
+from users.forms import UserRegistrationForm
 from job.models import Job, Application, JobFair
 
 def login_admin(request):
@@ -36,13 +37,6 @@ def logout_admin(request):
     return redirect('admin-login')
 
 # # Create your views here.
-@login_required(login_url='admin-login')
-def dashboard(request):
-    if not request.user.is_staff:
-        return redirect('admin-login')
-
-    
-    return render(request, 'admin/admin.html')
 
 @login_required(login_url='admin-login')
 def admin_profile(request, pk):
@@ -212,7 +206,7 @@ def toggle_user_status(request, user_id):
     # Ensure the user has permissions (optional, e.g., admin-only toggle)
     if not request.user.is_staff:
         messages.error(request, "You do not have permission to perform this action.")
-        return redirect('dashboard')  # Adjust redirect as needed
+        return redirect('admin-dashboard')  # Adjust redirect as needed
 
     # Get the user object
     user = get_object_or_404(User, pk=user_id)
@@ -278,3 +272,40 @@ def admin_deactivate_job_fair(request, pk):
     else:
         messages.info(request,'Permission Denied!')
         return redirect('admin-dashboard')
+    
+
+def admin_create_account(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.username = user.email
+            user.is_active = True  # Set user as inactive until email is verified
+            user.save()
+
+            role = form.cleaned_data.get('role')
+            if role == 'applicant':
+                user.is_applicant = True
+                user.save()
+                Resume.objects.create(user=user)
+            elif role == 'employer':
+                user.is_employer = True
+                user.save()
+                Company.objects.create(user=user)
+                Employer.objects.create(user=user)
+
+            messages.success(request, 'An account has been created.')
+        else:
+            # Handle form errors and display specific error messages
+            for field in form:
+                for error in field.errors:
+                    messages.error(request, error)
+
+            # Stay on the current step if there are validation errors
+            return render(request, 'admin/admin-create-account.html', {'form': form})
+    else:
+        form = UserRegistrationForm()
+
+    context = {'form': form}
+    return render(request, 'admin/admin-create-account.html',context)

@@ -27,16 +27,10 @@ class Jobfilter(django_filters.FilterSet):
         label="Industry",
         to_field_name='name',  # Filter by the `name` field of the Industry model
     )
-    salary_range = django_filters.ChoiceFilter(
-        choices=get_salary_range_choices(),
-        method='filter_salary_range',
-        label="Salary Range",
-        empty_label="Select Salary Range",  # Set the placeholder here
-    )
 
     class Meta:
         model = Job
-        fields = ['title', 'location', 'employment_job_type', 'industry', 'salary_min', 'salary_max']  
+        fields = ['title', 'location', 'employment_job_type', 'industry', 'salary_fixed', 'salary_min', 'salary_max']  
 
     def filter_location(self, queryset, name, value):
         return queryset.filter(

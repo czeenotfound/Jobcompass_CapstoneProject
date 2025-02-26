@@ -140,7 +140,7 @@
                                                 <input type="hidden" name="company_id" value="{{ company.id }}">
                                                 <input type="hidden" name="verification_status" value="Verified">
                                                 <button type="submit" class="btn btn-sm {% if company.verification_status == 'Verified' %}btn-success{% else %}btn-outline-success{% endif %}">
-                                                    Verified
+                                                    Verify
                                                 </button>
                                             </form>
                                             <form method="post" class="action-buttons d-inline-block">
@@ -148,7 +148,7 @@
                                                 <input type="hidden" name="company_id" value="{{ company.id }}">
                                                 <input type="hidden" name="verification_status" value="Rejected">
                                                 <button type="submit" class="btn btn-sm {% if company.verification_status == 'Rejected' %}btn-danger{% else %}btn-outline-danger{% endif %}">
-                                                    Rejected
+                                                    Reject
                                                 </button>
                                             </form>
                                         </td>

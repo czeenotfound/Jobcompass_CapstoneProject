@@ -15,15 +15,9 @@
     
     {% if request.user.is_applicant %}
         <div class="container mb-5">
-            {% if messages %}
-                <ul class="messages">
-                    {% for message in messages %}
-                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
+            
             <div class="row">
-                <h4 class="mt-4 mb-4 col-lg-2"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
+                <h4 class="mt-4 mb-4 col-lg-2"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
                 
                 <div class="col-lg-10 card p-5 mb-5" method="POST" >
                     <div class="col-md-12 col-lg-5 mb-3">
@@ -31,11 +25,18 @@
                     </div>
                     
                     <hr>
-
+                    
                     <form method="POST" class="mt-4 row">
                         {% csrf_token %}
                         <h4 class="col-md-6">Change Password</h4>
                         <div class="col-md-6">
+                            {% if messages %}
+                                <ul class="messages">
+                                    {% for message in messages %}
+                                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Old Password</label>
                                 {% render_field form.old_password class="form-control" placeholder="Enter your current password" %}

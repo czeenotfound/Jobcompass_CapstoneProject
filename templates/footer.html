@@ -13,37 +13,38 @@
                     <p class="fs-4">Contact Us</p>
                     <ul class="list-unstyled">
                         <li class="my-3">
-                            <span>666 John Doe Rd, Boulevard, CO
-                                7000, Zamboanga City
+                            <span>694 RT Boulevard, Zamboanga City, Philippines
                             </span>
                         </li>
                         <li class="my-3">
-                            <span> +63662323122</span>
+                            <span> +63 000000000</span>
                         </li>
                         <li class="my-3">
-                            <span> jobcompassCO@sample.com</span>
+                            <span> jobcompassco@gmail.com</span>
                         </li>
                     </ul>
                 </div>
-                <!-- <div class="col-md-6 col-lg-3">
+                {% if user.is_authenticated %}
+                <div class="col-md-6 col-lg-3">
                     <p class="fs-4">My Account</p>
                     <ul class="list-unstyled">
                         <li class="my-3">
-                            <a href="{% url 'login' %}" class="text-dark text-decoration-none text-muted footer-link"><i class="fa-solid fa-chevron-right"></i> Profile</a>
+                            <a href="{% if request.user.is_applicant %}{% url 'applicant-profile' user.pk %}{% elif request.user.is_employer %}{% url 'employer-profile' user.pk %}{% endif %}" class="text-dark text-decoration-none text-muted footer-link"><i class="fa-solid fa-chevron-right"></i> Profile</a>
                         </li>
                     </ul>
-                </div> -->
+                </div>
+                {% endif %}
                 <div class="col-md-6 col-lg-3 socials">
                     <p class="fs-4">Follow Us</p>
                     <ul class="list-unstyled">
                         <li class="my-3">
-                            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}" class="text-decoration-none text-muted"><i class="fa-brands fa-facebook footer-link"></i></a>
+                            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}" class="text-decoration-none text-muted" aria-label="Facebook"><i class="fa-brands fa-facebook footer-link"></i></a>
                         </li>
                         <li class="my-3">
-                            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}" class="text-decoration-none text-muted"><i class="fa-brands fa-x-twitter footer-link"></i></a>
+                            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}" class="text-decoration-none text-muted" aria-label="X-Twitter"><i class="fa-brands fa-x-twitter footer-link"></i></a>
                         </li>
                         <li class="my-3">
-                            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}" class="text-decoration-none text-muted"><i class="fa-brands fa-instagram footer-link"></i></a>
+                            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}" class="text-decoration-none text-muted" aria-label="instagram"><i class="fa-brands fa-instagram footer-link"></i></a>
                         </li>
                     </ul>
                 </div>
@@ -52,11 +53,15 @@
     </footer> 
 
     <div class="card-footer text-center bg-dark text-white py-3">
-        &copy; 2024 Job Compass. All rights reserved.
+        &copy; <span id="currentYear"></span> Job Compass. All rights reserved.
     </div>
     <button id="scroll-to-top" onclick="scrollToTop()"><i class="fa-solid fa-chevron-up"></i></button>
     <!-- SCRIPTS -->
     <script src="{% static 'bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'JS/index.js' %}"></script>
+    <script>
+        // Get the current year and set it in the footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>

@@ -26,11 +26,7 @@
                         {% if jobfair.fair_event_held == 'Onsite' %}
                             <!-- Display Onsite Location -->
                             <span class="fw-bold">Onsite:</span>
-                            {% if jobfair.location.barangay and jobfair.location.city and jobfair.location.street %}
-                                {{ jobfair.location.street }}{% if jobfair.location.barangay %}, {{ jobfair.location.barangay }}{% endif %}{% if jobfair.location.city %}, {{ jobfair.location.city }}{% endif %}
-                            {% else %}
-                                {{ jobfair.location.countrystreet }}{% if jobfair.location.countrystreet %}, {% endif %}{{ jobfair.location.countrycity }}{% if jobfair.location.countrycity %}, {% endif %}{{ jobfair.location.country }}
-                            {% endif %}
+                            {{ jobfair.location }}
                         {% elif jobfair.fair_event_held == 'Virtual' %}
                             <!-- Display Virtual Link -->
                             <span class="fw-bold">Virtual:</span>
@@ -112,12 +108,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 mt-3">
+                <div class="col-md-6">
                     {% if jobfair.description %}
-                    <div class="mb-4">
+                    <div class="stats-card mb-4">
                         <h4>Job Fair Description</h4>
                         <div>
-                            <p>{{jobfair.description}}</p>
+                            <p>- {{jobfair.description}}</p>
                         </div>
                     </div>
                     {% endif %}

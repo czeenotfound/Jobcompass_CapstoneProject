@@ -16,6 +16,7 @@ django-debug-toolbar==4.4.6
 django-extensions==3.2.3
 django-filter==24.3
 django-htmx==1.21.0
+django-otp==1.5.4
 django-password-validators==1.7.3
 django-use-email-as-username==1.4.0
 django-widget-tweaks==1.5.0
@@ -40,6 +41,7 @@ pydot==3.0.1
 Pygments==2.18.0
 pyparsing==3.1.4
 python-dateutil==2.9.0.post0
+pywin32==306
 pyzmq==26.2.0
 referencing==0.35.1
 requests==2.32.3

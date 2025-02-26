@@ -5,13 +5,45 @@ from address.models import Address
 from industry.models import Industry
 from cloudinary.models import CloudinaryField
 
+import os
+import json
+from django.conf import settings
+
+# Load currency data from JSON
+CURRENCY_FILE = os.path.join(settings.BASE_DIR, 'static/JS/Common-Currency.json')
+
+with open(CURRENCY_FILE, 'r', encoding='utf-8') as file:
+    currency_data = json.load(file)
+
+# Convert JSON to Django choices format
+CURRENCY_CHOICES = [
+    (code, f'{data["symbol"]}') 
+    for code, data in currency_data.items()
+]
+
 class Job(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100, blank=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     
-    salary_min = models.PositiveIntegerField(null=True, blank=True)
-    salary_max = models.PositiveIntegerField(null=True, blank=True)
+    # Expected Salary Display Option
+    SALARY_DISPLAY_CHOICES = (
+        ('fixed', 'Fixed Salary'),
+        ('range', 'Salary Range'),
+        ('hidden', 'Do not display'),
+    )
+    salary_display_type = models.CharField(
+        max_length=10, 
+        choices=SALARY_DISPLAY_CHOICES, 
+        default='fixed'
+        ,null=True
+        ,blank=True
+    )
+
+    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='PHP')
+    salary_fixed = models.PositiveIntegerField(null=True, blank=True, help_text="Enter fixed salary if selected.")
+    salary_min = models.PositiveIntegerField(null=True, blank=True, help_text="Enter minimum salary for range.")
+    salary_max = models.PositiveIntegerField(null=True, blank=True, help_text="Enter maximum salary for range.")
     salary_mode = models.CharField(
         max_length=10,
         choices=(
@@ -20,12 +52,13 @@ class Job(models.Model):
             ('Weekly','Weekly'),
             ('Monthly','Monthly'),
             ('Yearly','Yearly')
-        ),
-        blank=True
+        )
+        ,null=True
+        ,blank=True
     )
 
-    job_description = models.TextField(blank=True)
-    ideal_candidate = models.TextField(blank=True)
+    job_description = models.TextField(null=True, blank=True)
+    ideal_candidate = models.TextField(null=True, blank=True)
     industry = models.ForeignKey(Industry, on_delete=models.DO_NOTHING, null=True, blank=True)
     
     location = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
@@ -54,19 +87,14 @@ class Job(models.Model):
     
     def __str__(self):
         return self.title
-
-    # def save(self, *args, **kwargs):
-    #     if self.company.verification_status == 'VERIFIED':
-    #         super().save(*args, **kwargs)
-    #     else:
-    #         raise ValueError("Only verified companies can post jobs.")
+    
             
 class RequiredSkill(models.Model):
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     skill_name = models.CharField(max_length=50, blank=True)
     # minimum_proficiency = models.IntegerField()
 
-    def __str__(self):
+    def __str__(self): 
         return f"{self.skill_name} for {self.job}"
     
 class Job_Responsibilities(models.Model):

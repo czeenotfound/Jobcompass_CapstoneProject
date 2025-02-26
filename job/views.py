@@ -10,7 +10,7 @@ from address.models import Address
 from django.db.models.functions import Coalesce
 from users.models import User
 from company.models import Company
-from .forms import CreateJobForm, UpdateJobForm, ApplicationStatusForm, CreateJobFairForm, UpdateJobFairForm
+from .forms import CreateJobForm, UpdateJobForm, CreateJobFairForm, UpdateJobFairForm, RequiredSkillForm, JobResponsibilitiesForm, JobExperienceForm
 from django.db.models import Count, Q, Exists, OuterRef, Subquery,  Value
 from job.filter import JobFairfilter
 
@@ -197,87 +197,20 @@ def application_analytics(request):
     return render(request, 'applicant/application-analytics.html', context)
 
 
-
-
-class RequiredSkillForm(forms.ModelForm):
-    class Meta:
-        model = RequiredSkill
-        fields = ['skill_name']
-        widgets = {
-            'skill_name': forms.TextInput(attrs={
-                'class': 'form-control', 
-                'placeholder': '• Skill (e.g., Python, React, Project Management)'
-            })
-        }
-
 class RequiredSkillFormSet(BaseInlineFormSet):
     def clean(self):
-        # Ensure at least one skill is added
         super().clean()
-        skills = [form.cleaned_data.get('skill_name') for form in self.forms if form.cleaned_data.get('skill_name')]
-        
-        if not skills:
-            raise ValidationError("Please add at least one required skill.")
-
-class JobResponsibilitiesForm(forms.ModelForm):
-    class Meta:
-        model = Job_Responsibilities
-        fields = ['res_name']
-        widgets = {
-            'res_name': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 2,
-                'placeholder': '• Key Responsibility (e.g., Develop web applications)',
-            })
-        }
+        pass
 
 class JobResponsibilitiesFormSet(BaseInlineFormSet):
     def clean(self):
-        # Ensure at least one responsibility is added
         super().clean()
-        responsibilities = [form.cleaned_data.get('res_name') for form in self.forms if form.cleaned_data.get('res_name')]
-        
-        if not responsibilities:
-            raise ValidationError("Please add at least one job responsibility.")
-        
-class JobExperienceForm(forms.ModelForm):
-    class Meta:
-        model = Job_Experience
-        fields = ['exp_name', 'exp_years', 'exp_description']
-        widgets = {
-            'exp_name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Job Title (e.g., Software Developer)',
-            }),
-            'exp_years': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'placeholder': '• Number of Years',
-            }),
-            'exp_description': forms.Textarea(attrs={
-                'class': 'form-control',
-                'placeholder': '• Experience description (e.g., Worked with Python and Django)',
-                'rows': 4,
-            }),
-        }
+        pass
 
 class JobExperienceFormSet(BaseInlineFormSet):
     def clean(self):
-        # Ensure at least one experience entry is added
         super().clean()
-
-        # Check for at least one valid Job Experience entry
-        experiences = [form.cleaned_data for form in self.forms if form.cleaned_data.get('exp_name')]
-
-        if not experiences:
-            raise ValidationError("Please add at least one job experience.")
-
-        # Validate that all required fields are filled
-        for form in self.forms:
-            if form.cleaned_data:  # Ensure form is not empty
-                if not form.cleaned_data.get('exp_name') or not form.cleaned_data.get('exp_years') or not form.cleaned_data.get('exp_description'):
-                    raise ValidationError("Please fill in all fields for each job experience entry.")
-
-        return self.cleaned_data
+        pass
 
 @login_required(login_url='login')
 def create_job(request): 
@@ -294,7 +227,7 @@ def create_job(request):
                 return redirect('dashboard')  
         except Company.DoesNotExist:
             messages.error(request, "You do not have a company profile. Please create one first.")
-            return redirect('register-company')
+            return redirect('register-company') 
 
         # Create formsets with custom base formset for validation
         SkillFormSet = inlineformset_factory(
@@ -302,7 +235,7 @@ def create_job(request):
             RequiredSkill, 
             form=RequiredSkillForm, 
             formset=RequiredSkillFormSet,
-            extra=3,  
+            extra=1,  
             can_delete=True
         )
         
@@ -311,7 +244,7 @@ def create_job(request):
             Job_Responsibilities, 
             form=JobResponsibilitiesForm, 
             formset=JobResponsibilitiesFormSet,
-            extra=3,  
+            extra=1,  
             can_delete=True
         )
 
@@ -360,13 +293,9 @@ def create_job(request):
                         # Create or update a custom Address
                         location, created = Address.objects.get_or_create(
                             country=request.POST.get('country'),
-                            countrycity=request.POST.get('countrycity'),
                             countrypostal=request.POST.get('countrypostal'),
-                            countrystreet=request.POST.get('countrystreet'),
                             region=request.POST.get('region'),
-                            province=request.POST.get('province'),
                             city=request.POST.get('city'),
-                            barangay=request.POST.get('barangay'),
                             street=request.POST.get('street', '')
                         )
                         var.location = location
@@ -444,7 +373,7 @@ def update_job(request, pk):
         RequiredSkill, 
         form=RequiredSkillForm, 
         formset=RequiredSkillFormSet,
-        extra=3,  # Adjust extra forms if needed
+        extra=1,  # Adjust extra forms if needed
         can_delete=True
     )
 
@@ -453,7 +382,7 @@ def update_job(request, pk):
         Job_Responsibilities, 
         form=JobResponsibilitiesForm, 
         formset=JobResponsibilitiesFormSet,
-        extra=3,  # Adjust extra forms if needed
+        extra=1,  # Adjust extra forms if needed
         can_delete=True
     )
 
@@ -762,13 +691,9 @@ def create_job_fair(request):
                     # Create or update the Address based on form input
                     location, created = Address.objects.get_or_create(
                         country=request.POST.get('country'),
-                        countrycity=request.POST.get('countrycity'),
                         countrypostal=request.POST.get('countrypostal'),
-                        countrystreet=request.POST.get('countrystreet'),
                         region=request.POST.get('region'),
-                        province=request.POST.get('province'),
                         city=request.POST.get('city'),
-                        barangay=request.POST.get('barangay'),
                         street=request.POST.get('street', '')
                     )
                     var.location = location

@@ -20,7 +20,7 @@
         </div> 
     {% endif %}
     
-        <div class="container py-4">
+        <div class="container">
             <!-- SEARCH FILTERING -->
             <div class="banner mb-4">
                 <form class="row justify-content-center" method="GET">
@@ -78,67 +78,73 @@
                     </div>
                 </form>
             </div>
-            <!-- END OF SEARCH FILTERING -->
-            <div class="row">
+            <div class="row mb-5">
                 <!-- Job Listings Column -->
                 <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
                     <h3 class="mb-1 mx-2">Jobs For You</h3>
-                    <p>{{ job_filtered_count }} results found</p>
+                    <p>{{ recommended_jobs_count }} results found</p>
                 </div> 
-               
-                <!-- Job Listings Column -->
+                
+                <!-- Recommended Jobs Column -->
                 <div class="col-md-5">
-                    <!-- Job Cards -->
                     <div class="job-listings">
-                        {% for job in job_filter.qs %}
-                         
-                            <div class="card job-card mb-3" onclick="showJobDetails({{ forloop.counter }})">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-4">
-                                        <div class="d-flex align-items-center">
-                                            <img src="{{job.company.avatar.url}}" alt="CompanyLogo" class="img-fluid rounded-circle company-logo me-3">
-                                            <div>
-                                                <h5 class="mb-1 fw-bolder">{{job.title}}</h5>
-                                                <p class="text-muted mb-0">{{job.company}}</p>
-                                                <p class="text-muted mb-0" style="font-size: 12px;">
-                                                    {% if job.location.barangay and job.location.city and job.location.street %}
-                                                        {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
-                                                    {% else %}
-                                                        {{ job.location.countrystreet }}{% if job.location.countrystreet %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
-                                                    {% endif %}
-                                                </p>
-                                            </div>
+                        {% for job in recommended_jobs %}
+                        <div class="card job-card mb-3" data-id="{{ forloop.counter }}" onclick="showJobDetails(this)">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-4">
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ job.company.avatar.url }}" alt="CompanyLogo" class="img-fluid rounded-circle company-logo me-3">
+                                        <div>
+                                            <h5 class="mb-1 fw-bolder">{{ job.title }}</h5>
+                                            <p class="text-muted mb-0">{{ job.company }}</p>
+                                            <p class="text-muted mb-0" style="font-size: 12px;">
+                                                {{ job.location }}
+                                            </p>
                                         </div>
                                     </div>
-                                    <div class="mb-2">
-                                        <ul class="list-unstyled mb-0">
-                                            <li>
-                                                <span class="text-dark p-2"><i class="fas fa-clock me-2"></i> {{job.employment_job_type|title}}</span>
-                                            </li>
-                                            <li>
-                                                <span class="text-dark p-2"><i class="fas fa-map-marker-alt me-2"></i> {{job.employment_job_type|title}}</span>
-                                            </li>
-                                            <li>
-                                                <span class="text-dark p-2"><i class="fa-solid fa-money-bill-wave me-2"></i> ₱ {{job.salary_min}} - ₱ {{job.salary_max}} {{job.salary_mode|title}}</span>
-                                            </li>
-                                        </ul>
-                                    </div>
                                 </div>
-                                <div class="card-footer bg-white" style="border-top: none;"  title="{{ job.posted_date_time|date:'F d, Y H:i:s' }}">
-                                    <span>Posted {{job.posted_date_time|naturaltime}}</span>
+                                <div class="mb-2">
+                                    <ul class="list-unstyled mb-0">
+                                        <li>
+                                            <span class="text-dark p-2"><i class="fas fa-clock me-2"></i> {{ job.employment_job_type|title }}</span>
+                                        </li>
+                                        <li>
+                                            <span class="text-dark p-2"><i class="fas fa-map-marker-alt me-2"></i> {{ job.location_job_type|title }}</span>
+                                        </li>
+                                        <li>
+                                            {% if job.salary_display_type == 'fixed' %}
+                                                <span class="text-dark p-2">
+                                                    <i class="fa-solid fa-money-bill-wave me-2"></i>
+                                                    {{ job.currency }} {{ job.salary_fixed }} {{job.salary_mode|title}}
+                                                </span>
+                                            {% elif job.salary_display_type == 'range' %}
+                                                <span class="text-dark p-2">
+                                                    <i class="fa-solid fa-money-bill-wave me-2"></i>
+                                                    {{ job.currency }} {{ job.salary_min }} - {{ job.currency }} {{ job.salary_max }} {{job.salary_mode|title}}
+                                                </span>
+                                            {% elif job.salary_display_type == 'hidden' %}
+                                            
+                                            {% else %}
+                                                <p>No Salary Information Available</p>
+                                            {% endif %}
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
-                        {% empty %}
-                            <div class="customAlert alert alert-danger text-center p-4 shadow" role="alert">
-                                <h4>No results found</h4>
-                                <p class="mt-2">Please adjust your filters and try again.</p>
+                            <div class="card-footer bg-white" style="border-top: none;" title="{{ job.posted_date_time|date:'F d, Y H:i:s' }}">
+                                <span>Posted {{ job.posted_date_time|naturaltime }}</span>
                             </div>
-                        {% endfor %}
+                        </div>
+                    {% empty %}
+                        <div class="customAlert alert alert-danger text-center p-4 shadow" role="alert">
+                            <h4>No recommended jobs found</h4>
+                            <p class="mt-2">Please adjust your filters and try again.</p>
+                        </div>
+                    {% endfor %}
                     </div>
                 </div>
-                <!-- Job Details Column -->
                 <div class="col-md-7">
-                    {% for job in job_filter.qs %}
+                    {% for job in recommended_jobs %}
                         <div id="job-{{ forloop.counter }}" class="job-details {% if forloop.first %} active {% endif %}">
                             <div class="card job-card-details">
                                 <div class="card-body p-4">
@@ -151,6 +157,16 @@
                                                 <span class="text-muted mb-0">{{job.location_job_type|title}}</span>
                                             </div>
                                         </div>
+                                        <!-- Add Best Match and Not Suitable Labels -->
+                                        <div>
+                                            {% if forloop.first %}
+                                                <span class="badge bg-success text-white">Best Match</span>
+                                            {% endif %}
+                                            {% if job.not_suitable %}
+                                                <span class="badge bg-danger text-white">Not Suitable</span>
+                                            {% endif %}
+                                            <p>Score: {{ job.total_score }}</p>
+                                        </div>
                                     </div>
                                     
                                     <div class="d-flex flex-column mb-4">
@@ -159,11 +175,7 @@
                                                 <i class="fa-solid fa-location-dot text-mute"></i>
                                             </div>
                                             <span> 
-                                                {% if job.location.barangay and job.location.city and job.location.street %}
-                                                    {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
-                                                {% else %}
-                                                    {{ job.location.countrystreet }}{% if job.location.countrystreet %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
-                                                {% endif %}
+                                                {{ job.location }}
                                             </span>
                                         </div>
                                         <div class="d-flex align-items-center mb-1">
@@ -178,13 +190,35 @@
                                             </div>
                                             <div>{{job.employment_job_type|title}}</div>
                                         </div>
-                                        <div class="d-flex align-items-center">
-                                            <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
-                                                <i class="fa-solid fa-money-bill-wave"></i>
+
+                                        {% if job.salary_display_type == 'fixed' %}
+                                            <div class="d-flex align-items-center">
+                                                <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
+                                                    <i class="fa-solid fa-money-bill-wave"></i>
+                                                </div>
+                                                <div>{{ job.currency }} {{ job.salary_fixed }} {{job.salary_mode|title}}</div>
                                             </div>
-                                            <div>₱ {{job.salary_min}} - ₱ {{job.salary_max}} {{job.salary_mode|title}}</div>
-                                        </div>
+                                        {% elif job.salary_display_type == 'range' %}
+                                            <div class="d-flex align-items-center">
+                                                <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
+                                                    <i class="fa-solid fa-money-bill-wave"></i>
+                                                </div>
+                                                <div>{{ job.currency }} {{ job.salary_min }} - {{ job.currency }} {{ job.salary_max }} {{job.salary_mode|title}}</div>
+                                            </div>
+                                        {% elif job.salary_display_type == 'hidden' %}
+
+                                        {% else %}
+                                            <p>No Salary Information Available</p>
+                                        {% endif %}
                                     </div>
+
+                                     <!-- Add Not Suitable Warning in Details -->
+                                    {% if job.not_suitable %}
+                                        <div class="alert alert-danger mt-3">
+                                            <i class="fas fa-exclamation-triangle"></i> Your skills do not match the requirements for this job.
+                                        </div>
+                                    {% endif %}
+
                                     {% if user.is_authenticated and user.is_applicant %} 
                                         <div class="mb-4">
                                             {% if job.has_applied %}
@@ -194,7 +228,7 @@
                                                     <a href="#" class="btn btn-danger customButton disabled">Application Rejected</a>
                                                 {% else %}
                                                     <button type="button" class="btn btn-danger customButton px-4" data-bs-toggle="modal" data-bs-target="#confirmModal" 
-                                                        data-action-url="{% url 'unapply-job' job.pk %}">Unapply
+                                                        data-action-url="{% url 'unapply-job' job.pk %}">Cancel Application
                                                     </button>
                                                 {% endif %}
                                             {% else %}
@@ -267,23 +301,10 @@
                                 </div>
                             </div>
                         </div>
-                        
                     {% empty %}
                         <div class="customAlert alert alert-danger text-center shadow" role="alert" style="padding: 5rem; margin-bottom: 10vh;">
                             <img src="{% static 'images/undraw_no_data_re_kwbl.svg' %}" class="mb-4" width="150" height="150" alt="">
                             <h3>No results found.</h3>
-                            {% if request.GET.title %} for "{{ request.GET.title }}"{% endif %}
-                            {% if request.GET.location %} in "{{ request.GET.location }}"{% endif %}
-                            {% if request.GET.industry %} under "{{ request.GET.industry }}" industry{% endif %}
-                            {% if request.GET.employment_job_type %} with job type "{{ request.GET.employment_job_type }}"{% endif %}
-                            {% if request.GET.salary_range %}
-                                {% for key, label in salary_range_choices %}
-                                    {% if key == request.GET.salary_range %}
-                                        with a salary range "{{ label }}".
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                            <p class="mt-2">Please adjust your filters and try again.</p>
                         </div>
                     {% endfor %}
                 </div>
@@ -411,17 +432,32 @@
                                                 <label class="fw-bolder" for="skills">Applicant Location</label>
                                                 <ul class="list-unstyled mb-0">
                                                     <li>
-                                                        <span> {{resume.address.barangay}}, {{resume.address.city}}</span> 
+                                                        <span> {{resume.address}}</span> 
                                                     </li>
                                                 </ul>
                                             </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="fw-bolder" for="skills">Expected Salary</label>
-                                                <ul class="list-unstyled mb-0">
-                                                    <li>
-                                                        <span>₱ {{resume.expt_salary_min}} - ₱ {{resume.expt_salary_max}}</span> 
-                                                    </li>
-                                                </ul>
+
+                                            <div id="salaryDisplay" class="col-md-6">
+                                                {% if resume.salary_display_type == 'fixed' %}
+                                                    <label class="fw-bolder" for="skills">Expected Salary</label>
+                                                    <ul class="list-unstyled mb-0">
+                                                        <li>
+                                                            <span> {{ resume.currency }} {{ resume.expt_salary_fixed }}</span>
+                                                        </li>
+                                                    </ul>
+                                                {% elif resume.salary_display_type == 'range' %}
+                                                    <label class="fw-bolder" for="skills">Expected Salary Range</label>
+                                                    <ul class="list-unstyled mb-0">
+                                                        <li>
+                                                            <span> {{ resume.currency }} {{ resume.expt_salary_min }} - {{ resume.currency }} {{ resume.expt_salary_max }}</span>
+                                                        </li>
+                                                    </ul>
+                                                {% elif resume.salary_display_type == 'hidden' %}
+                                                    <label class="fw-bolder" for="skills">Expected Salary Information</label>
+                                                    <p>Hidden</p>
+                                                {% else %}
+                                                    <p>No Salary Information Available</p>
+                                                {% endif %}
                                             </div>
 
                                             <hr>

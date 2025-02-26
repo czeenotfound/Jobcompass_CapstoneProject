@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
+from django.db.models import Q, Count, Case, When, IntegerField, F
 
 from job.models import Job, SaveJob, Application, ApplicationStatus, Conversation, Message
 from company.models import Company, Employer
@@ -13,6 +14,8 @@ from job.filter import Jobfilter
 from resume.filter import Resumefilter
 from django.contrib.auth.decorators import login_required
 from job.filter import get_salary_range_choices
+
+from django.db.models.functions import Lower
 
 
 # # Create your views here.
@@ -40,7 +43,7 @@ def dashboard(request):
                     ).values('status')[:1]  
                 ),
                 Value('NOT_APPLIED') 
-            )
+            ) 
         ) \
         .select_related('company', 'industry', 'location') \
         .order_by('-posted_date_time'))
@@ -65,10 +68,7 @@ def dashboard(request):
         is_profile_complete = all([
             employer.first_name,
             employer.last_name,
-            employer.employer_status,
-            employer.address,  # Check if address exists
-            employer.address.street if employer.address else None,  # Check if address fields are populated
-            employer.address.city if employer.address else None
+            employer.address,
         ])
     except Employer.DoesNotExist:
         # Employer profile does not exist
@@ -78,12 +78,82 @@ def dashboard(request):
 
     resume_filtered_count = resume_filter.qs.count()
 
+    
+    # Fetch the user's resume
+    try:
+        resume = Resume.objects.get(user=request.user)
+    except Resume.DoesNotExist:
+        resume = None
+
+    # Recommended jobs based on resume details
+    
+    if resume:
+        applicant_skills = list(resume.skills.values_list(Lower('name'), flat=True))
+
+        recommended_jobs = Job.objects.filter(
+            Q(industry=resume.industry) |
+            Q(requiredskill__skill_name__in=applicant_skills)
+        ).distinct() 
+
+        recommended_jobs = recommended_jobs.annotate(
+            industry_match=Case(
+                When(industry=resume.industry, then=1), 
+                default=0,
+                output_field=IntegerField()
+            ),
+            skill_match_count=Count(
+                "requiredskill",
+                filter=Q(requiredskill__skill_name__in=applicant_skills)
+            ),
+            has_applied=Exists(
+                Application.objects.filter(
+                    user=request.user,
+                    job=OuterRef('pk')
+            )
+            ),
+            is_saved=Exists(
+                SaveJob.objects.filter(
+                    user=request.user,
+                    job=OuterRef('pk')
+                )
+            ),
+            application_status=Coalesce(
+                Subquery(
+                    ApplicationStatus.objects.filter(
+                        application__job=OuterRef('pk'),
+                        application__user=request.user
+                    ).values('status')[:1]  
+                ),
+                Value('NOT_APPLIED') 
+            ) 
+        ).annotate(
+            total_score=F("industry_match") + F("skill_match_count"),
+            best_match=Case(
+                When(total_score__gte=3, then=Value(True)),
+                default=Value(False),
+                output_field=IntegerField()
+            ),
+            not_suitable=Case(
+                When(total_score__lte=1, then=Value(True)),  
+                default=Value(False),
+                output_field=IntegerField()
+            )
+        ).order_by("-total_score")
+
+    else:
+        recommended_jobs = Job.objects.none()
+
+
+    recommended_jobs_count = recommended_jobs.count()
+
     context = {
         'job_filter': job_filter,
         'job_filtered_count': job_filtered_count,
         'resume_filtered_count': resume_filtered_count,
         'resume_filter': resume_filter,
-        'salary_range_choices': get_salary_range_choices(),  # Pass to template
+        'salary_range_choices': get_salary_range_choices(),
+        'recommended_jobs': recommended_jobs,
+        'recommended_jobs_count': recommended_jobs_count,
         'is_profile_complete': is_profile_complete
     }
 
@@ -146,10 +216,7 @@ def employer_profile(request, pk):
         is_profile_complete = all([
             employer.first_name,
             employer.last_name,
-            employer.employer_status,
             employer.address,  # Check if address exists
-            employer.address.street if employer.address else None,  # Check if address fields are populated
-            employer.address.city if employer.address else None
         ])
     except Employer.DoesNotExist:
         # Employer profile does not exist

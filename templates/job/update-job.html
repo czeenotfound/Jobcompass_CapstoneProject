@@ -47,21 +47,45 @@
                         <label for="location_job_type" class="form-label">Job Type</label>
                         {% render_field form.location_job_type class="form-select" %}
                     </div>
+                </div>
 
-                    <div class="col-sm-7 mb-3">
+                <!--  SALARY  -->
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <label for="salaryType" class="form-label">Salary</label>
+                        {% render_field form.salary_display_type class="form-select" id="salaryType" onchange="toggleSalaryFields()" required=True %}
+                    </div>
+                    
+                    <div id="currencyField" class="col-md-2 col-sm-6 mb-3">
+                        <label for="currency" class="form-label">Currency</label>
+                        <div class="input-group">
+                            {% render_field form.currency class="form-select" %}
+                        </div>
+                    </div>    
+                    
+                    <!-- Salary Range Fields -->
+                    <div id="salaryRangeFields" class="col-md-5 col-sm-6 mb-3">
                         <label for="salaryRange" class="form-label">Salary Range</label>
                         <div class="input-group">
-                            <span class="input-group-text">₱</span>
+                           
                             {% render_field form.salary_min class="form-control" placeholder="Min" %}
                             <span class="input-group-text">to</span>
                             {% render_field form.salary_max class="form-control" placeholder="Max" %}
                         </div>
                     </div>
-                    <div class="col-sm-5 mb-3">
+                    <!-- Fixed Salary Field -->
+                    <div id="fixedSalaryField" class="col-md-5 col-sm-6 mb-3 d-none">
+                        <label for="fixedSalary" class="form-label">Fixed Salary</label>
+                        <div class="input-group">
+                            {% render_field form.salary_fixed class="form-control" placeholder="Enter amount" %}
+                        </div>
+                    </div>
+                    <div id="salaryModeField" class="col-md-2 col-sm-6 mb-3">
                         <label for="salary_mode" class="form-label">Salary Mode</label>
-                        {% render_field form.salary_mode class="form-select" %}
+                        {% render_field form.salary_mode class="form-select" required=True %}
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label for="jobdescription" class="form-label">Job Description</label>
                     {% render_field form.job_description class="form-control" rows="4" %}
@@ -71,20 +95,19 @@
                     {% render_field form.ideal_candidate class="form-control" rows="4" %}
                 </div>
 
+                <hr>
+
                 <!-- Responsibilities Section -->
                 <div class="mb-3">
                     <div class="text-white d-flex justify-content-between align-items-center mb-3">
                         <label class="mb-0 text-dark">
-                            Job Responsibilities
-                            <small class="text-danger ms-2">(Minimum 1 responsibility required)</small>
-                            <br>
-                            <small class="text-danger fw-bold">"Only 3 responsibilities can be added or updated at a time. You can add another responsibility during your next update."</small>
+                            Job responsibilities
                         </label>
                     </div>
                     <div id="responsibilities-container">
                         {{ responsibility_formset.management_form }}
                         {% for form in responsibility_formset %}
-                            <div class="responsibility-form row align-items-center mb-2">
+                            <div class="formset-form responsibility-form row align-items-center mb-2">
                                 <div class="col-md-10">
                                     <div class="d-none">
                                         {{ form.as_p }}
@@ -93,33 +116,34 @@
                                         {{ form.res_name }}
                                     </p>
                                 </div>
-                                <div class="col-md-2">
-                                    {% if not forloop.first %}
-                                        <div class="form-check">
-                                            {{ form.DELETE }}
-                                            <label class="form-check-label text-danger">Remove</label>
-                                        </div>
-                                    {% endif %}
+                                <div class="col-md-2 remove-form-container">
+                                    <div style="display: none;">
+                                        {{ form.DELETE }}
+                                    </div>
+                                    
+                                    <button type="button" 
+                                            class="btn btn-danger btn-sm remove-form-btn">
+                                        Remove
+                                    </button>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
                 </div>
 
+                <hr>
+
                 <!-- Skills Formset -->
                 <div class="mb-4">
                     <div class="text-white d-flex justify-content-between align-items-center mb-3">
                         <label class="mb-0 text-dark">
                             Required Skills
-                            <small class="text-danger ms-2">(Minimum 1 skill required)</small>
-                            <br>
-                            <small class="text-danger fw-bold">"Only 3 skills can be added or updated at a time. You can add another skill during your next update."</small>
                         </label>
                     </div>
                     <div id="skills-container">
                         {{ skill_formset.management_form }}
                         {% for form in skill_formset %}
-                            <div class="skill-form row align-items-center">
+                            <div class="formset-form skill-form row align-items-center">
                                 <div class="col-md-10">
                                     <div class="d-none">
                                         {{ form.as_p }}
@@ -128,33 +152,34 @@
                                         {{ form.skill_name }}
                                     </p>
                                 </div>
-                                <div class="col-md-2">
-                                    {% if not forloop.first %}
-                                        <div class="form-check">
-                                            {{ form.DELETE }}
-                                            <label class="form-check-label text-danger">Remove</label>
-                                        </div>
-                                    {% endif %}
+                                <div class="col-md-2 remove-form-container">
+                                    <div style="display: none;">
+                                        {{ form.DELETE }}
+                                    </div>
+                                    
+                                    <button type="button" 
+                                            class="btn btn-danger btn-sm remove-form-btn">
+                                        Remove
+                                    </button>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
                 </div>
 
+                <hr>
+
                 <!-- Experience Section -->
                 <div class="mb-3">
                     <div class="text-white d-flex justify-content-between align-items-center mb-3">
                         <label class="mb-0 text-dark">
-                            Experience Required
-                            <small class="text-danger ms-2">(Minimum 1 experience required)</small>
-                            <br>
-                            <small class="text-danger fw-bold">"Only 1 experiences can be added or updated at a time. You can add another experience during your next update."</small>
+                            Experience required
                         </label>
                     </div>
                     <div id="experiences-container">
                         {{ experience_formset.management_form }}
                         {% for form in experience_formset %}
-                            <div class="experience-form row align-items-center mb-2">
+                            <div class="formset-form experience-form row align-items-center mb-2">
                                 <div class="col-md-10">
                                     <div class="d-none">
                                         {{ form.as_p }}
@@ -166,13 +191,15 @@
                                     </p>
                                     
                                 </div>
-                                <div class="col-md-2">
-                                    {% if not forloop.first %}
-                                        <div class="form-check">
-                                            {{ form.DELETE }}
-                                            <label class="form-check-label text-danger">Remove</label>
-                                        </div>
-                                    {% endif %}
+                                <div class="col-md-2 remove-form-container">
+                                    <div style="display: none;">
+                                        {{ form.DELETE }}
+                                    </div>
+
+                                    <button type="button" 
+                                            class="btn btn-danger btn-sm remove-form-btn">
+                                        Remove
+                                    </button>
                                 </div>
                             </div>
                         {% endfor %}
@@ -199,68 +226,34 @@
                     <h4 for="joblocation" class="form-label mb-3">Job Location</h4>
                     <span class="fw-bold">Local Address</span>
                     <p id="company-address">
-                        {{ user.company.address.street }}, {{ user.company.address.barangay }}, {{ user.company.address.city }}, 
-                        {{ user.company.address.province }}, {{ user.company.address.region }}
+                        {{ user.company.address }}
                     </p>
-                    
-                    {% if user.company.address.countrystreet or user.company.address.countrycity or user.company.address.country %}
-                        <span class="fw-bold">International Address</span>
-                        <p id="company-address">
-                            {{ user.company.address.countrystreet|title }}, {{ user.company.address.countrycity|title }}, {{ user.company.address.country|title }}
-                        </p>
-                    {% else %}
-                        <p class="text-muted">No international address available.</p>
-                    {% endif %}
                 </div>
 
                 <div id="custom-address-fields" style="display: none;" class="card bg-light p-5">
                     <h4><i class="fa-solid fa-location-dot me-2"></i> Custom Address</h4>
                     <br>
                     <div class="row">
-                        <h4 for="employerAddress" class="form-label mb-3">International Job Location</h4>
                         <div class="col-sm-6 mb-3">
                             <label for="country-text" class="form-label">Country</label>
-                            {% render_field address_form.country class="form-control form-control-md" id="country-text" placeholder="Enter Country"%}
-                        </div>
-                        <div class="col-sm-6 mb-3">
-                            <label for="countrycity-text" class="form-label">City</label>
-                            {% render_field address_form.countrycity class="form-control form-control-md" id="countrycity-text" placeholder="Enter City/Municipality"%}
+                            {% render_field address_form.country class="form-control form-control-md" id="country-text" placeholder="Select country" required=True %}
                         </div>
                         <div class="col-sm-6 mb-3">
                             <label for="countrypostal-text" class="form-label">Postal Code</label>
-                            {% render_field address_form.countrypostal class="form-control form-control-md" id="countrypostal-text" placeholder="Enter Postal Code"%}
+                            {% render_field address_form.countrypostal class="form-control form-control-md" id="countrypostal-text" placeholder="Enter your postal code" required=True %}
                         </div>
                         <div class="col-sm-6 mb-3">
-                            <label for="countrystreet-text" class="form-label">Street (Optional)</label>
-                            {% render_field address_form.countrystreet class="form-control form-control-md" id="countrystreet-text" placeholder="Enter Street"%}
-                        </div>
-
-                        <hr>
-
-                        <h4 for="employerAddress" class="form-label mb-3">Job Location</h4>
-                        <div class="col-sm-6 mb-3">
-                            <label class="form-label">Region *</label>
-                            <select name="region" class="form-control form-control-md mb-2" id="region"></select>
-                            {% render_field address_form.region class="form-control form-control-md" name="region_text" id="region-text" placeholder="Enter Region" %}
+                            <label for="region-text" class="form-label">Region</label>
+                            {% render_field address_form.region class="form-control form-control-md" id="region-text" placeholder="Enter your state/province/region" required=True %}
                         </div>
                         <div class="col-sm-6 mb-3">
-                            <label class="form-label">Province *</label>
-                            <select name="province" class="form-control form-control-md mb-2" id="province"></select>
-                            {% render_field address_form.province class="form-control form-control-md" name="province_text" id="province-text" placeholder="Enter Province"  %}
+                            <label for="city-text" class="form-label">City</label>
+                            {% render_field address_form.city class="form-control form-control-md" id="city-text" placeholder="Enter your city" required=True %}
                         </div>
-                        <div class="col-sm-6 mb-3">
-                            <label class="form-label">City / Municipality *</label>
-                            <select name="city" class="form-control form-control-md mb-2" id="city"></select>
-                            {% render_field address_form.city class="form-control form-control-md" name="city_text" id="city-text" placeholder="Enter City/Municipality" %}
-                        </div>
-                        <div class="col-sm-6 mb-3">
-                            <label class="form-label">Barangay *</label>
-                            <select name="barangay" class="form-control form-control-md mb-2" id="barangay"></select>
-                            {% render_field address_form.barangay class="form-control form-control-md" name="barangay_text" id="barangay-text" placeholder="Enter Barangay" %}
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <label for="street-text" class="form-label">Street (Optional)</label>
-                            {% render_field address_form.street class="form-control form-control-md" id="street-text" placeholder="Enter Street" %}
+                        
+                        <div class="mb-3">
+                            <label for="street-text" class="form-label">Street <span class="text-muted">(Optional)</span></label>
+                            {% render_field address_form.street class="form-control form-control-md" placeholder="Street address" id="street-text" %}
                         </div>
                     </div>
                 </div>
@@ -322,6 +315,166 @@
 
     // Initialize the display based on the default selected radio button
     toggleAddressFields();
+
+    function toggleSalaryFields() {
+        const salaryType = document.getElementById("salaryType").value;
+        const salaryRangeFields = document.getElementById("salaryRangeFields");
+        const fixedSalaryField = document.getElementById("fixedSalaryField");
+        const salaryModeField = document.getElementById("salaryModeField");
+        const currencyField = document.getElementById("currencyField");
+
+        if (salaryType === "range") {
+            salaryRangeFields.classList.remove("d-none");
+            fixedSalaryField.classList.add("d-none");
+            salaryModeField.classList.remove("d-none");
+            currencyField.classList.remove("d-none");
+        } else if (salaryType === "fixed") {
+            fixedSalaryField.classList.remove("d-none");
+            salaryRangeFields.classList.add("d-none");
+            salaryModeField.classList.remove("d-none");
+            currencyField.classList.remove("d-none");
+        } else {
+            salaryRangeFields.classList.add("d-none");
+            fixedSalaryField.classList.add("d-none");
+            salaryModeField.classList.add("d-none");
+            currencyField.classList.add("d-none");
+        }
+    }
+
+    // Initialize visibility on page load
+    window.onload = function() {
+        toggleSalaryFields();
+    };
+
+    function initializeFormsetManager(prefix, containerSelector, maxForms) {
+        const container = document.querySelector(containerSelector);
+        const totalFormsInput = document.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+        
+        function updateFormIndexes() {
+            const forms = container.querySelectorAll('.formset-form');
+            forms.forEach((form, index) => {
+                form.querySelectorAll('[name*="-"]').forEach(element => {
+                    element.name = element.name.replace(/-\d+-/, `-${index}-`);
+                    element.id = element.id.replace(/-\d+-/, `-${index}-`);
+                });
+                
+                form.querySelectorAll('label[for*="-"]').forEach(label => {
+                    label.setAttribute('for', label.getAttribute('for').replace(/-\d+-/, `-${index}-`));
+                });
+            });
+            
+            totalFormsInput.value = forms.length;
+            
+            const addButton = document.querySelector(`#add-${prefix}`);
+            if (addButton) {
+                addButton.style.display = forms.length >= maxForms ? 'none' : 'block';
+            }
+        }
+        
+        function addForm() {
+            const forms = container.querySelectorAll('.formset-form');
+            if (forms.length >= maxForms) {
+                alert(`You can only add up to ${maxForms} forms at a time.`);
+                return;
+            }
+            
+            const lastForm = forms[forms.length - 1];
+            const newForm = lastForm.cloneNode(true);
+            
+            // Clear input values
+            newForm.querySelectorAll('input:not([type="checkbox"])').forEach(input => {
+                input.value = '';
+            });
+            newForm.querySelectorAll('textarea').forEach(textarea => {
+                textarea.value = '';
+            });
+            newForm.querySelectorAll('select').forEach(select => {
+                select.selectedIndex = 0;
+            });
+            
+            // Uncheck DELETE checkbox
+            const deleteCheckbox = newForm.querySelector('input[name$="-DELETE"]');
+            if (deleteCheckbox) {
+                deleteCheckbox.checked = false;
+            }
+            
+            // Show remove button
+            const removeContainer = newForm.querySelector('.remove-form-container');
+            if (removeContainer) {
+                removeContainer.style.display = 'block';
+            }
+            
+            // Initialize remove button
+            const removeButton = newForm.querySelector('.remove-form-btn');
+            if (removeButton) {
+                removeButton.onclick = (e) => removeForm(e, newForm);
+                removeButton.style.display = 'block';
+            }
+            
+            lastForm.after(newForm);
+            updateFormIndexes();
+        }
+        
+        function removeForm(event, formElement) {
+            event.preventDefault();
+            const form = formElement || event.target.closest('.formset-form');
+            const deleteCheckbox = form.querySelector('input[name$="-DELETE"]');
+            const removeButton = form.querySelector('.remove-form-btn');
+            
+            if (deleteCheckbox) {
+                if (deleteCheckbox.checked) {
+                    // Unmark for deletion
+                    deleteCheckbox.checked = false;
+                    form.style.opacity = '1';
+                    form.classList.remove('to-be-deleted');
+                    removeButton.textContent = 'Remove';
+                    removeButton.classList.remove('btn-secondary');
+                    removeButton.classList.add('btn-danger');
+                } else {
+                    // Mark for deletion
+                    deleteCheckbox.checked = true;
+                    form.style.opacity = '0.5';
+                    form.classList.add('to-be-deleted');
+                    removeButton.textContent = 'Undo Remove';
+                    removeButton.classList.remove('btn-danger');
+                    removeButton.classList.add('btn-secondary');
+                }
+            }
+        }
+        
+        // Initialize add button
+        let addButton = document.querySelector(`#add-${prefix}`);
+        if (!addButton) {
+            addButton = document.createElement('button');
+            addButton.type = 'button';
+            addButton.className = 'btn btn-success mt-2';
+            addButton.id = `add-${prefix}`;
+            addButton.textContent = 'Add More';
+            container.after(addButton);
+        }
+        addButton.onclick = addForm;
+        
+        // Initialize remove buttons
+        container.querySelectorAll('.remove-form-btn').forEach(button => {
+            button.onclick = (e) => removeForm(e);
+        });
+        
+        // Initial update
+        updateFormIndexes();
+    }
+
+    // Initialize all formset managers
+    document.addEventListener('DOMContentLoaded', function() {
+        const formsetConfigs = [
+            { prefix: 'responsibilities', selector: '#responsibilities-container', maxForms: 15 },
+            { prefix: 'skills', selector: '#skills-container', maxForms: 15 },
+            { prefix: 'experiences', selector: '#experiences-container', maxForms: 15 }
+        ];
+        
+        formsetConfigs.forEach(config => {
+            initializeFormsetManager(config.prefix, config.selector, config.maxForms);
+        });
+    });
 
 </script>
 {% endblock content %}

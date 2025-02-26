@@ -471,9 +471,11 @@ document.getElementById("filter-btn").addEventListener("click", function() {
     mainHeading.classList.toggle("d-none");
     subHeading.classList.toggle("d-none");
 });
+function showJobDetails(element) {
+    // Get job ID from the data attribute
+    const jobId = element.getAttribute("data-id");
 
-function showJobDetails(jobId) {
-    // Remove 'active' class from all job cards and hide all job details
+    // Remove 'active' class from all job cards and job details
     document.querySelectorAll('.job-card').forEach(card => {
         card.classList.remove('active');
     });
@@ -481,10 +483,11 @@ function showJobDetails(jobId) {
         detail.classList.remove('active');
     });
 
-    // Add 'active' class to the clicked job card and display corresponding job details
-    document.querySelector(`.job-card[onclick="showJobDetails(${jobId})"]`).classList.add('active');
+    // Add 'active' class to the clicked job card and show corresponding job details
+    element.classList.add('active');
     document.getElementById(`job-${jobId}`).classList.add('active');
 }
+
 
 function showInboxDetails(inboxId) {
     // Remove 'active' class from all job cards and hide all job details
@@ -508,36 +511,36 @@ function showInboxDetails(inboxId) {
 }
 
 
-// JavaScript to manage the step flow
-let currentStep = 1;
+// // JavaScript to manage the step flow
+// let currentStep = 1;
 
-function nextStep(step) {
-    if (validateStep(step)) {
-        // Hide current step
-        document.getElementById('step' + step).classList.add('d-none');
-        // Show next step
-        document.getElementById('step' + (step + 1)).classList.remove('d-none');
-        currentStep = step + 1;
+// function nextStep(step) {
+//     if (validateStep(step)) {
+//         // Hide current step
+//         document.getElementById('step' + step).classList.add('d-none');
+//         // Show next step
+//         document.getElementById('step' + (step + 1)).classList.remove('d-none');
+//         currentStep = step + 1;
 
-        // Show the navigation buttons once we're past step 1
-        if (currentStep > 1) {
-            document.getElementById('navigationButtons').classList.remove('d-none');
-        }
-    }
-}
+//         // Show the navigation buttons once we're past step 1
+//         if (currentStep > 1) {
+//             document.getElementById('navigationButtons').classList.remove('d-none');
+//         }
+//     }
+// }
 
-function previousStep() {
-    // Hide current step
-    document.getElementById('step' + currentStep).classList.add('d-none');
-    // Show previous step
-    document.getElementById('step' + (currentStep - 1)).classList.remove('d-none');
-    currentStep -= 1;
+// function previousStep() {
+//     // Hide current step
+//     document.getElementById('step' + currentStep).classList.add('d-none');
+//     // Show previous step
+//     document.getElementById('step' + (currentStep - 1)).classList.remove('d-none');
+//     currentStep -= 1;
 
-    // Hide the "Previous" button if we're on the first step
-    if (currentStep === 1) {
-        document.getElementById('navigationButtons').classList.add('d-none');
-    }
-}
+//     // Hide the "Previous" button if we're on the first step
+//     if (currentStep === 1) {
+//         document.getElementById('navigationButtons').classList.add('d-none');
+//     }
+// }
 
 function validateStep(step) {
     // Simple validation for required fields

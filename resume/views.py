@@ -7,146 +7,35 @@ from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 from .models import Resume,Skill, Education, Experience, Certification,Project, SocialLink
 from django.forms import formset_factory
-from .forms import UpdateResumeForm
+from .forms import UpdateResumeForm, SkillForm, EducationForm, ExperienceForm, CertificationForm, ProjectForm, SocialLinkForm
 from address.forms import AddressForm
 from users.models import User
 from users.forms import UpdateAvatarPhoneForm
 from django.http import JsonResponse
 
-class SkillForm(forms.ModelForm):
-    class Meta:
-        model = Skill
-        fields = ['name']
-        widgets = {
-            'name': forms.TextInput(attrs={
-                'class': 'form-control', 
-                'placeholder': '• Skill (e.g., Python, React, Project Management)'
-            })
-        }
 
 class SkillFormSet(BaseInlineFormSet):
     def clean(self):
-        # Ensure at least one skill is added
         super().clean()
-        skills = [form.cleaned_data.get('name') for form in self.forms if form.cleaned_data.get('name')]
-        
-        if not skills:
-            raise ValidationError("Please add at least one required skill.")
-
-class EducationForm(forms.ModelForm):
-    class Meta:
-        model = Education
-        fields = ['degree', 'institution', 'graduation_year']
-        widgets = {
-            'degree': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Degree (e.g., High School Graduate, Bachelor of Arts in Psychology)',
-            }),
-            'institution': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Institution (e.g., XYZ High School, ABC University)',
-            }),
-            'graduation_year': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Graduation Year (e.g., 2023)',
-                'min': 1900,
-                'max': 2100,
-            }),
-        }
-        
+        # No specific validation since projects are optional
+        pass
 
 class EducationFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
-        if not any(form.cleaned_data.get('degree') for form in self.forms if form.cleaned_data):
-            raise ValidationError("Please add at least one education entry.")
-
-        for form in self.forms:
-            if form.cleaned_data and form.cleaned_data.get('graduation_year'):
-                graduation_year = form.cleaned_data['graduation_year']
-                if graduation_year < 1900 or graduation_year > 2100:
-                    raise ValidationError("Graduation year must be between 1900 and 2100.")
-        
-class ExperienceForm(forms.ModelForm):
-    class Meta:
-        model = Experience
-        fields = ['title', 'company', 'start_date', 'end_date', 'description']
-        widgets = {
-            'title': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Job Title (e.g., Software Developer)',
-            }),
-            'company': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Company Name (e.g., Google)',
-            }),
-            'start_date': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date',
-            }),
-            'end_date': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date',
-            }),
-            'description': forms.Textarea(attrs={
-                'class': 'form-control',
-                'placeholder': 'Job Description (e.g., Developed scalable web applications)',
-                'rows': 4,
-            }),
-        }
-
+        # No specific validation since projects are optional
+        pass
 class ExperienceFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
-        for form in self.forms:
-            # Skip forms marked for deletion
-            if form.cleaned_data.get('DELETE', False):
-                continue
-
-            # Check that all fields in a form are filled if the form is not empty
-            if form.cleaned_data and not all(
-                form.cleaned_data.get(field) for field in ['title', 'company', 'start_date', 'end_date', 'description']
-            ):
-                raise ValidationError("Please fill in all fields for each job experience entry.")
-
+        # No specific validation since projects are optional
+        pass
         
-class CertificationForm(forms.ModelForm):
-    class Meta:
-        model = Certification
-        fields = ['name']
-        widgets = {
-            'name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Certification Name (e.g., AWS Certified Solutions Architect)',
-            }),
-        }
-
 class CertificationFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
         # No specific validation since certifications are optional
         pass
-
-
-class ProjectForm(forms.ModelForm):
-    class Meta:
-        model = Project
-        fields = ['title', 'description', 'url']
-        widgets = {
-            'title': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Project Title (e.g., Personal Portfolio Website)',
-            }),
-            'description': forms.Textarea(attrs={
-                'class': 'form-control',
-                'placeholder': 'Project Description (e.g., A personal portfolio showcasing skills)',
-                'rows': 4,
-            }),
-            'url': forms.URLInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Project URL (e.g., https://github.com/yourproject)',
-            }),
-        }
 
 class ProjectFormSet(BaseInlineFormSet):
     def clean(self):
@@ -154,27 +43,10 @@ class ProjectFormSet(BaseInlineFormSet):
         # No specific validation since projects are optional
         pass
 
-
-class SocialLinkForm(forms.ModelForm):
-    class Meta:
-        model = SocialLink
-        fields = ['platform', 'url']
-        widgets = {
-            'platform': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Platform (e.g., LinkedIn, GitHub)',
-            }),
-            'url': forms.URLInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Social URL (e.g., https://linkedin.com/in/username)',
-            }),
-        }
-
 class SocialLinkFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
         pass
-
 
 
 def create_resume(request):
@@ -192,7 +64,7 @@ def create_resume(request):
             Skill, 
             form=SkillForm, 
             formset=SkillFormSet, 
-            extra=3, 
+            extra=1, 
             can_delete=True
         )
         ResumeEducationFormSet = inlineformset_factory(

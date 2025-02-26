@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Verify Your Job Compass Account</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #f4f4f4; 
+            margin: 0; 
+            padding: 0; 
+        }
+        .verify-container { 
+            max-width: 600px; 
+            background: hsl(252, 30%, 95%);
+            margin: 20px auto; 
+            padding: 20px; 
+            border-radius: 20px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .verify-logo { 
+            padding: 2rem 0;
+            text-align: center; 
+            margin-bottom: 20px;
+        }
+        .verify-btn { 
+            display: inline-block; 
+            padding: 12px 20px; 
+            background: #acd4ff;
+            border-radius: 5px; 
+            font-weight: bold; 
+        }
+        p{
+            font-size: 16px;
+        }
+        a{
+            text-decoration: none;
+        }
+        .verify-footer { 
+            text-align: center; 
+            font-size: 12px; 
+            color: #666; 
+            margin-top: 20px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="verify-container">
+        <div class="verify-logo">
+            <img src="https://res.cloudinary.com/di2hrzuyq/image/upload/v1739724165/lpkqsalzgvzlsnc9g1rf.png" alt="Job Compass" width="250">
+        </div>
+        <h2 style="text-align: center;">Verify Your Account</h2>
+        <p>Hello <strong>{{ user.first_name|title }}</strong>,</p>
+        <p>Thank you for signing up for <strong>Job Compass</strong>! To activate your account and start your job search, please verify your email address by clicking the button below:</p>
+        <p style="text-align: center;">
+            <a href="{{ verification_link }}" class="verify-btn">Verify My Email</a>
+        </p>
+        <p>If the button doesn’t work, you can also verify your account by clicking this link:</p>
+        <p><a href="{{ verification_link }}">{{ verification_link }}</a></p>
+        <p>If you didn’t create an account, you can safely ignore this email.</p>
+        <hr>
+        <div class="verify-footer">
+            &copy; 2025 Job Compass. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>

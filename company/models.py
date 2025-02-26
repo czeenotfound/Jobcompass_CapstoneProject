@@ -87,6 +87,7 @@ class Employer(models.Model):
     employer_status = models.CharField(
         max_length=50, 
         choices=employer_status_choices, 
+        null=True,
         blank=True
     )
 

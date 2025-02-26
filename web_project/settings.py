@@ -35,16 +35,21 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default='django-insecure-j@+x+5zwid@6k
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-# ALLOWED_HOSTS = ["*"]
+DEBUG = True
+ALLOWED_HOSTS = ["*"]
 
-DEBUG = not os.environ.get("DATABASE_URL")  # False in production, True in development
 
-ALLOWED_HOSTS = []
+# UNCOMMENT THIS FOR PRODUCTION 
 
-RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+# DEBUG = not os.environ.get("DATABASE_URL")  # False in production, True in development
+
+# ALLOWED_HOSTS = []
+
+# RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+# if RENDER_EXTERNAL_HOSTNAME:
+#     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+# ===================================================================================================
 
 # Application definition
 
@@ -56,7 +61,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-
     'django_password_validators',
     
     'localadmin',
@@ -69,6 +73,9 @@ INSTALLED_APPS = [
 
     'dashboard',
     
+    'django_otp',
+    'django_otp.plugins.otp_email',
+    
     'django_htmx',
     'widget_tweaks',
     'django_filters',
@@ -80,6 +87,17 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'users.User'
+
+# OTP PURPOSES ==============================
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'jobcompassco@gmail.com'
+EMAIL_HOST_PASSWORD = 'chdouxgaurddtqrb'
+
+# ============================================ 
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -133,16 +151,16 @@ WSGI_APPLICATION = 'web_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
-    "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+
+# DATABASES = {
+#     "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
+# }
 
 # postgresql://jobcompass_app_user:jSrQGtdfpdxWEVbtaHF2172dNK8OMfOi@dpg-ct684k3v2p9s7398nk1g-a.singapore-postgres.render.com/jobcompass_app
 
@@ -228,4 +246,8 @@ GRAPH_MODELS = {
   'group_models': True,
 }
 
-INTERNAL_IPS = []
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]

@@ -21,12 +21,15 @@
         <!-- Signup Form Section -->
         
         <div class="w-100 signup-form d-flex flex-column gap-5 align-items-center justify-content-center h-100 p-3">
-            <h2 class="mb-4 fw-normal text-center">Create an Account</h2>
+            <h2 class="mb-2 fw-normal text-center">Create an Account</h2>
             <form method="POST" id="signupForm">
                 {% csrf_token %}
                 
+                <!-- Hidden input to store the current step -->
+                <input type="hidden" id="currentStep" name="current_step" value="{{ current_step|default:1 }}">
+
                 <!-- Step 1: Name Fields -->
-                <div id="step1" class="step row mb-5">
+                <div id="step1" class="step row mb-5" {% if current_step != 1 %}class="d-none"{% endif %}>
                     <div class="mb-4">
                         <div class="d-flex justify-content-center">
                             <label class="form-label">I am an</label>
@@ -40,42 +43,53 @@
                             <label class="choiceButton btn btn-outline-primary w-50" for="employer"><img src="{% static 'images/employer (Small).png' %}" width="100px" alt="">Employer</label>
                         </div>  
                     </div>
-                    <div class="col-sm-6">
-                        <label for="firstName" class="form-label">First Name</label> 
-                        <div class="bubbleform mb-3">
-                            <input type="text" class="form-control border-0 p-0" id="firstName" name="first_name" placeholder="John" required>
+                    <div class="row p-0 m-0">
+                        <div class="col-sm-6">
+                            <label for="firstName" class="form-label">First Name</label> 
+                            <div class="bubbleform mb-3">
+                                {% render_field form.first_name class="form-control border-0 p-0" placeholder="John" required=True %}
+                                {% if form.first_name.errors %}
+                                    <div class="invalid">{{ form.first_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-6">
+                            <label for="lastName" class="form-label">Last Name</label>
+                            <div class="bubbleform mb-3">
+                                {% render_field form.last_name class="form-control border-0 p-0" placeholder="Doe" required=True %}
+                                {% if form.last_name.errors %}
+                                    <div class="invalid">{{ form.last_name.errors }}</div>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="col-sm-6">
-                        <label for="lastName" class="form-label">Last Name</label>
-                        <div class="bubbleform mb-3">
-                            <input type="text" class="form-control border-0 p-0" id="lastName" name="last_name" placeholder="Doe" required>
-                        </div>
-                    </div>
 
                     <div class="d-flex justify-content-center">
-                        <button type="button" class="customButton btn-primary w-50 mt-3" onclick="nextStep(1)">Next</button>
+                        <button type="button" class="customButton btn-primary w-50 mt-3" onclick="nextStep(2)">Next</button>
                     </div>
                 </div>
 
                 <!-- Step 2: Contact Info -->
-                <div id="step2" class="step d-none row ">
-                    <div class="col-sm-6">
-                        <label for="email" class="form-label">Email Address</label>
-                        <div class="bubbleform d-flex gap-3 align-items-center">
-                            <i class="fa-regular fa-envelope"></i>
-                            {% render_field form.email class="form-control border-0 p-0" placeholder="name@sample.com" required=True %}
+                <div id="step2" class="step d-none row " {% if current_step != 2 %}class="d-none"{% endif %}>
+                    <div class="row p-0 m-0">
+                        <div class="col-sm-6">
+                            <label for="email" class="form-label">Email Address</label>
+                            <div class="bubbleform d-flex gap-3 align-items-center">
+                                <i class="fa-regular fa-envelope"></i>
+                                {% render_field form.email class="form-control border-0 p-0" placeholder="name@sample.com" required=True %}
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <div class="bubbleform mb-3">
+                                {% render_field  form.phone class="form-control border-0 py-0 px-0 ps-5" id="phone" placeholder="Enter your phone number" required=True %}      
+                                <input type="hidden" id="country_code" name="country_code">
+                            </div>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <label for="phone" class="form-label">Phone Number</label>
-                        <div class="bubbleform mb-3">
-                            {% render_field  form.phone class="form-control border-0 py-0 px-0 ps-5" id="phone" placeholder="Enter your phone number" required=True %}
-                                       
-                            <input type="hidden" id="country_code" name="country_code">
-                        </div>
-                    </div>
+                   
                     
                     <div class="col-12 mt-2">
                         <label for="password" class="form-label">Create Password</label>
@@ -87,7 +101,8 @@
                                 </span>
                             </div>
                         </div>
-                        <div id="requirements" class="text-muted mt-1 my-auto">
+
+                        <div id="requirements" class="text-muted mt-1 my-auto mb-3">
                             <span id="letters" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must be At least 8 letters</span>
                             <br>
                             <span id="uppercase" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must Contain At least 1 uppercase letter</span>
@@ -98,6 +113,7 @@
                             <br>
                             <span id="special" class="invalid"><i class="fa-solid fa-circle-xmark"></i> Must Contain At least 1 special character</span>
                         </div>
+
                         <label for="confirmPassword" class="form-label">Confirm Password</label>
                         <div class="bubbleform mb-3 position-relative">
                             {% render_field form.password2 id="confirmPassword" class="form-control border-0 p-0" placeholder="Confirm Password" required=True %}
@@ -106,16 +122,11 @@
                             </span>
                         </div>
                     </div>
-                    <div class="d-flex justify-content-center">
+                    <div class="d-flex justify-content-center gap-3">
+                        <button type="button" class="customButton btn btn-secondary w-50" onclick="prevStep(1)">Previous</button>
                         <button type="submit" class="customButton btn btn-primary w-50">Sign Up</button>
                     </div>
                 </div>
-
-                <!-- Navigation (Hidden by default) -->
-                <div id="navigationButtons" class="d-none d-flex justify-content-center">
-                    <button type="button" class="customButton btn btn-secondary w-50 mt-3" onclick="previousStep()">Previous</button>
-                </div>
-
                 <p class="mt-3 text-center">Already have an account? <a class="text-decoration-none" href="{% url 'login' %}">Log In</a></p>
             </form>
             
@@ -125,6 +136,47 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 <script src="{% static 'JS/login.js' %}"></script>
+
+<script>
+    function nextStep(step) {
+        const currentStep = document.getElementById('currentStep').value;
+        if (!validateStep(currentStep)) {
+            return; // Stop navigation if validation fails
+        }
+
+        document.getElementById('currentStep').value = step;
+        showStep(step);
+    }
+
+    function prevStep(step) {
+        document.getElementById('currentStep').value = step;
+        showStep(step);
+    }
+
+    function showStep(step) {
+        var steps = document.getElementsByClassName('step');
+        for (var i = 0; i < steps.length; i++) {
+            steps[i].classList.add('d-none'); // Add 'd-none' to hide all steps
+        }
+        document.getElementById('step' + step).classList.remove('d-none'); // Remove 'd-none' to show the current step
+    }
+
+    function validateStep(step) {
+        const inputs = document.querySelectorAll(`#step${step} input, #step${step} textarea, #step${step} select`);
+        for (let input of inputs) {
+            if (input.required && !input.value.trim()) {
+                input.reportValidity(); // Show validation message
+                return false; // Stop validation on the first invalid field
+            }
+        }
+        return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var currentStep = document.getElementById('currentStep').value;
+        showStep(currentStep);
+    });
+</script>
 
 {% block scripts %}
 

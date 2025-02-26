@@ -26,3 +26,4 @@ toggleConfirmPassword.addEventListener('click', () => {
         icon.className = 'fa-solid fa-eye-slash'; // Switch to eye-slash icon
     }
 });
+
