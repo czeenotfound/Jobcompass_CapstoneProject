@@ -9,11 +9,19 @@
                 <li class="nav-item"><a href="{% url 'home' %}#aboutus" class="nav-link link-body-emphasis px-2">About</a></li>
             </ul>
             <ul class="nav">
-                <li class="nav-item"><a href="{% url 'login' %}" class="nav-link link-body-emphasis px-2">Login</a></li>
-                <li class="nav-item"><a href="{% url 'register' %}" class="nav-link link-body-emphasis px-2">Sign up</a></li>
+                {% if request.resolver_match.url_name not in "login register" %}
+                    <li class="nav-item">
+                        <a href="{% url 'login' %}" class="nav-link link-body-emphasis px-2">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'register' %}" class="nav-link link-body-emphasis px-2">Sign up</a>
+                    </li>
+                {% endif %}
             </ul>
+            
         </div>
     </nav>
+
     <div id="navbar" class="bg-light fixed-top sticky-top">
         <nav class="navbar navbar-light bg-light navbar-expand-md bg-faded justify-content-center py-3">
             <div class="container">
@@ -27,7 +35,7 @@
                    
                     <ul class="nav navbar-nav ms-auto w-100 justify-content-end gap-3 text-center">
                         <li class="nav-item position-relative">
-                            <a href="{% url 'home' %}#findjobs" class="nav-link link-body-emphasis px-2">Find Jobs</a>
+                            <a href="{% url 'home' %}#findjobs" class="nav-link link-body-emphasis px-2" id="findjobs-link">Find Jobs</a>
                         </li>
                         <li class="nav-item">
                             <a href="{% url 'jobfair' %}" class="nav-link link-body-emphasis px-2">Job Fairs</a>
@@ -42,8 +50,9 @@
 {% elif request.user.is_applicant %}
     
     <!-- NAVBAR -->
-    <div id="navbar" class="bg-light fixed-top sticky-top shadow-sm">
-        <nav class="navbar navbar-light bg-light navbar-expand-md bg-faded justify-content-center py-3 mb-3">
+    <div id="navbar" class="bg-light fixed-top shadow-sm">
+
+        <nav class="navbar navbar-light bg-light navbar-expand-md bg-faded justify-content-center py-3">
             <div class="container">
                 <a href="{% url 'dashboard' %}" class="navbar-brand d-flex w-50 me-auto">
                     <span class="fw-bold fs-4">Job Compass</span>
@@ -118,8 +127,8 @@
     
 {% elif request.user.is_employer %}
     <!-- NAVBAR -->
-    <div id="navbar" class="bg-light fixed-top sticky-top mb-4 shadow">
-        <nav class="navbar navbar-dark bg-dark navbar-expand-md bg-faded justify-content-center py-3 mb-3">
+    <div id="navbar" class="bg-light fixed-top shadow-sm">
+        <nav class="navbar navbar-dark bg-dark navbar-expand-md bg-faded justify-content-center py-3">
             <div class="container">
                 <a href="{% url 'dashboard' %}" class="navbar-brand d-flex w-50 me-auto flex-column">
                     <span class="fw-bold fs-4">Job Compass</span>

@@ -7,17 +7,63 @@
         <ol class="breadcrumb mb-0 d-flex justify-content-end">
             <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark text-muted">Employer Profile</a></li>
-            <li class="breadcrumb-item active text-dark" aria-current="page">Update Employer Profile</li>
+            <li class="breadcrumb-item active text-dark" aria-current="page">Update Profile</li>
         </ol>
     </div>
     <div class="container">
         <div class="row">
-            <h4 class="mt-4 mb-4 col-lg-2"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
+            <div class="mt-4 mb-4 col-lg-2"> 
+                
+                <style>
+                    #navMenu {
+                        position: sticky;
+                        top: 120px;
+                        z-index: 1000; 
+                        
+                    }
+
+                    #navMenu .nav-link{
+                        color: #000000;
+                        opacity: 0.8;
+                    }
+                    #navMenu .nav-link:hover {
+                        color: #000000;
+                        opacity: 1;
+                        padding: 0.9em 2em;
+                        border-bottom: 2px solid #474747;
+
+                    }
+
+                    #navMenu .nav{
+                        background-color: #ffffff;
+                        border-left: 5px solid #474747;
+                    }
+                </style>
+                <!-- Navigation Menu -->
+                <nav id="navMenu">
+                    <h4 >
+                        <a href="{% url 'dashboard' %}" class="text-decoration-none text-dark">
+                        <i class="fa-solid fa-chevron-left"></i> Back</a>
+                    </h4>
+                    <ul class="nav me-auto text-left d-lg-block mt-5 p-2">
+                        <li class="nav-item"> 
+                            <a href="#personalinfo" class="nav-link px-2">Personal Info</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#socials" class="nav-link px-2">Socials</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#address" class="nav-link px-2">Address</a>
+                        </li>
+                        
+                    </ul>
+                </nav>
+               
+            </div>
             <form class="col-lg-10 card p-5 mb-5" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
-                <h1 class="mb-4">Update Employer Profile</h1>
-                <hr>
-                <h4 for="employerSocials" class="form-label mb-3">Personal Information</h4>
+                <h1 class="mb-4">Update Profile</h1>
+                <h4 id="personalinfo" class="form-label mb-3">Personal Information</h4>
                 <div class="row">
                     <div class="col-3 d-flex align-items-center justify-content-center">
                         {% if avatar_phone_form.avatar.value %}
@@ -28,7 +74,7 @@
                     </div>
                     <div class="col-9 mb-3 bg-light p-3">
                         <label for="userAvatar" class="form-label fw-bold">User Avatar</label>
-                        <input type="file" name="{{ avatar_phone_form.avatar.name }}" id="userAvatar" class="form-control">
+                        <input type="file" name="{{ avatar_phone_form.avatar.name }}" id="userAvatar" class="form-control" accept="image/*">
                     
                         {% if avatar_phone_form.avatar.errors %}
                             <div class="text-danger">
@@ -71,46 +117,61 @@
 
                 <hr>
 
-                <div class="row">
-                    <h4 for="employerAddress" class="form-label mb-3">Address</h4>
-                    <div class="col-sm-6 mb-3">
-                        <label for="country-text" class="form-label">Country <span class="text-danger">*</span></label>
-                        {% render_field address_form.country class="form-control form-control-md" id="country-text" placeholder="Select country" required=True %}
+                <!-- Social Media Links -->
+                <div id="socials" class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="fs-2 mb-0">
+                            Socials
+                        </label> 
                     </div>
-                    <div class="col-sm-6 mb-3">
-                        <label for="countrypostal-text" class="form-label">Postal Code <span class="text-danger">*</span></label>
-                        {% render_field address_form.countrypostal class="form-control form-control-md" id="countrypostal-text" placeholder="Enter your postal code" required=True %}
+                    <div class="mb-3">
+                        <label for="facebook" class="form-label">Facebook</label>
+                        {% render_field employer_form.facebook class="form-control" placeholder="URL (e.g., https://facebook.com)" %}
                     </div>
-                    <div class="col-sm-6 mb-3">
-                        <label for="region-text" class="form-label">Region <span class="text-danger">*</span></label>
-                        {% render_field address_form.region class="form-control form-control-md" id="region-text" placeholder="Enter your state/province/region" required=True %}
+                    <div class="mb-3">
+                        <label for="twitter" class="form-label">Twitter</label>
+                        {% render_field employer_form.twitter class="form-control" placeholder="URL (e.g., https://x.com)" %}
                     </div>
-                    <div class="col-sm-6 mb-3">
-                        <label for="city-text" class="form-label">City <span class="text-danger">*</span></label>
-                        {% render_field address_form.city class="form-control form-control-md" id="city-text" placeholder="Enter your city" required=True %}
+                    <div class="mb-3">
+                        <label for="github" class="form-label">GitHub</label>
+                        {% render_field employer_form.github class="form-control" placeholder="URL (e.g., https://github.com)" %}
+                    </div>
+                </div>
+
+                <hr>
+
+                <div id="address">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="fs-2 mb-0">
+                                Address
+                        </label> 
+                    </div>
+                    <div class="createresume-card bg-light row">
+                        <div class="col-sm-6 mb-3">
+                            <label for="country-text" class="form-label">Country <span class="text-danger">*</span></label>
+                            {% render_field address_form.country class="form-control form-control-md" id="country-text" placeholder="Select country" required=True %}
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <label for="countrypostal-text" class="form-label">Postal Code <span class="text-danger">*</span></label>
+                            {% render_field address_form.countrypostal class="form-control form-control-md" id="countrypostal-text" placeholder="Enter your postal code" required=True %}
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <label for="region-text" class="form-label">Region <span class="text-danger">*</span></label>
+                            {% render_field address_form.region class="form-control form-control-md" id="region-text" placeholder="Enter your state/province/region" required=True %}
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <label for="city-text" class="form-label">City <span class="text-danger">*</span></label>
+                            {% render_field address_form.city class="form-control form-control-md" id="city-text" placeholder="Enter your city" required=True %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="street-text" class="form-label">Street <span class="text-muted">(Optional)</span></label>
+                            {% render_field address_form.street class="form-control form-control-md" placeholder="Street address" id="street-text" %}
+                        </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="street-text" class="form-label">Street <span class="text-muted">(Optional)</span></label>
-                        {% render_field address_form.street class="form-control form-control-md" placeholder="Street address" id="street-text" %}
-                    </div>
                 </div>
-                <hr>
-                <!-- Social Media Links -->
-                <h4 for="employerSocials" class="form-label mb-3">Socials <span class="text-muted">(Optional)</span></h4>
-                <div class="mb-3">
-                    <label for="facebook" class="form-label">Facebook</label>
-                    {% render_field employer_form.facebook class="form-control" placeholder="URL (e.g., https://facebook.com)" %}
-                </div>
-                <div class="mb-3">
-                    <label for="twitter" class="form-label">Twitter</label>
-                    {% render_field employer_form.twitter class="form-control" placeholder="URL (e.g., https://x.com)" %}
-                </div>
-                <div class="mb-3">
-                    <label for="github" class="form-label">GitHub</label>
-                    {% render_field employer_form.github class="form-control" placeholder="URL (e.g., https://github.com)" %}
-                </div>
-                
+
                 <hr>
                 
                 <!-- Submit Button -->
@@ -126,5 +187,33 @@
             
         </div>
     </div>
+
+{% block scripts %}
+<script>
+     document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll("nav a[href^='#']").forEach(anchor => {
+                anchor.addEventListener("click", function (event) {
+                    event.preventDefault(); // Prevent default anchor behavior
+
+                    const targetId = this.getAttribute("href").substring(1); // Get the target ID (without '#')
+                    const targetSection = document.getElementById(targetId);
+
+                    if (targetSection) {
+                        // Get original scroll position of the section
+                        const originalOffset = targetSection.getBoundingClientRect().top + window.scrollY;
+                        
+                        // Add margin only when the link is clicked
+                        const extraMargin = 100; // Adjust margin based on navbar height
+                        
+                        window.scrollTo({
+                            top: originalOffset - extraMargin,
+                            behavior: "smooth"
+                        });
+                    }
+                });
+            });
+        });
+</script>
+{% endblock scripts %}
 
 {% endblock content %}

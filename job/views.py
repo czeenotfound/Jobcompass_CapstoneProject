@@ -4,13 +4,13 @@ from django.forms import inlineformset_factory, BaseInlineFormSet
 from django.core.exceptions import ValidationError
 from django import forms
 from django.contrib import messages
-from .models import Job, SaveJob, Application, ApplicationStatus, JobFair, RequiredSkill, Job_Responsibilities, Job_Experience, JobFairRegistration
+from .models import Job, SaveJob, Application, ApplicationStatus, JobFair, RequiredSkill, Job_Responsibilities, Job_IdealCandidates, Job_Benefits, Job_Experience, Job_Education, JobFairRegistration
 from address.forms import AddressForm
 from address.models import Address
 from django.db.models.functions import Coalesce
 from users.models import User
 from company.models import Company
-from .forms import CreateJobForm, UpdateJobForm, CreateJobFairForm, UpdateJobFairForm, RequiredSkillForm, JobResponsibilitiesForm, JobExperienceForm
+from .forms import CreateJobForm, UpdateJobForm, CreateJobFairForm, UpdateJobFairForm, RequiredSkillForm, JobResponsibilitiesForm, JobIdealCandidatesForm, JobBenefitsForm, JobExperienceForm, JobEducationForm
 from django.db.models import Count, Q, Exists, OuterRef, Subquery,  Value
 from job.filter import JobFairfilter
 
@@ -207,11 +207,27 @@ class JobResponsibilitiesFormSet(BaseInlineFormSet):
         super().clean()
         pass
 
+class Job_iDealCandidatesFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        pass
+
+class jobBenefitsFormSet(BaseInlineFormSet):    
+    def clean(self):
+        super().clean()
+        pass
+
 class JobExperienceFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
         pass
 
+class JobEducationFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        pass
+ 
+ 
 @login_required(login_url='login')
 def create_job(request): 
     if request.user.is_employer and request.user.has_company:
@@ -238,12 +254,30 @@ def create_job(request):
             extra=1,  
             can_delete=True
         )
-        
+         
         ResponsibilityFormSet = inlineformset_factory(
             Job, 
             Job_Responsibilities, 
             form=JobResponsibilitiesForm, 
             formset=JobResponsibilitiesFormSet,
+            extra=1,  
+            can_delete=True
+        )
+
+        IdealCandidateFormSet = inlineformset_factory(
+            Job, 
+            Job_IdealCandidates, 
+            form=JobIdealCandidatesForm, 
+            formset=Job_iDealCandidatesFormSet,
+            extra=1,  
+            can_delete=True
+        )
+
+        BenefitsFormSet = inlineformset_factory(
+            Job, 
+            Job_Benefits, 
+            form=JobBenefitsForm, 
+            formset=jobBenefitsFormSet,
             extra=1,  
             can_delete=True
         )
@@ -257,16 +291,28 @@ def create_job(request):
             can_delete=True
         )
 
+        EducationFormSet = inlineformset_factory(
+            Job, 
+            Job_Education, 
+            form=JobEducationForm, 
+            formset=JobEducationFormSet,
+            extra=1,  
+            can_delete=True
+        )
+
         if request.method == 'POST':
             form = CreateJobForm(request.POST)
             skill_formset = SkillFormSet(request.POST, prefix='skills')
             responsibility_formset = ResponsibilityFormSet(request.POST, prefix='responsibilities')
-            experience_formset = ExperienceFormSet(request.POST, prefix='experiences')    
+            idealcandidate_formset = IdealCandidateFormSet(request.POST, prefix='idealcandidates')
+            benefits_formset = BenefitsFormSet(request.POST, prefix='benefits')
+            experience_formset = ExperienceFormSet(request.POST, prefix='experiences') 
+            education_formset = EducationFormSet(request.POST, prefix='education')
     
             form_errors = []
 
             if form.is_valid():
-                if skill_formset.is_valid() and responsibility_formset.is_valid() and experience_formset.is_valid():
+                if skill_formset.is_valid() and responsibility_formset.is_valid() and idealcandidate_formset.is_valid() and benefits_formset.is_valid() and experience_formset.is_valid() and education_formset.is_valid():
                     var = form.save(commit=False)
                     var.user = request.user
                     var.company = request.user.company
@@ -304,11 +350,17 @@ def create_job(request):
                     # Save formsets
                     skill_formset.instance = var
                     responsibility_formset.instance = var
+                    idealcandidate_formset.instance = var
+                    benefits_formset.instance = var
                     experience_formset.instance = var
+                    education_formset.instance = var
                     
                     skill_formset.save()
                     responsibility_formset.save()
+                    idealcandidate_formset.save()
+                    benefits_formset.save()
                     experience_formset.save()
+                    education_formset.save()
 
                     messages.info(request, 'New Job has been created')
                     return redirect('dashboard')
@@ -328,6 +380,20 @@ def create_job(request):
                             if form_errors_list:
                                 form_errors.append(f"Responsibility {i} Error: {form_errors_list}")
                     
+                    if not idealcandidate_formset.is_valid():
+                        for error in idealcandidate_formset.non_form_errors():
+                            form_errors.append(f"Ideal Candidates Error: {error}")
+                        for i, form_errors_list in enumerate(idealcandidate_formset.errors, 1):
+                            if form_errors_list:
+                                form_errors.append(f"Ideal Candidate {i} Error: {form_errors_list}")
+
+                    if not benefits_formset.is_valid():
+                        for error in benefits_formset.non_form_errors():
+                            form_errors.append(f"Benefits Error: {error}")
+                        for i, form_errors_list in enumerate(benefits_formset.errors, 1):
+                            if form_errors_list:
+                                form_errors.append(f"Benefit {i} Error: {form_errors_list}")
+                    
                     if not experience_formset.is_valid():
                         for error in experience_formset.non_form_errors():
                             form_errors.append(f"Experiences Error: {error}")
@@ -335,11 +401,21 @@ def create_job(request):
                             if form_errors_list:
                                 form_errors.append(f"Experience {i} Error: {form_errors_list}")
 
+                    if not education_formset.is_valid():
+                        for error in education_formset.non_form_errors():
+                            form_errors.append(f"Educations Error: {error}")
+                        for i, form_errors_list in enumerate(education_formset.errors, 1):
+                            if form_errors_list:
+                                form_errors.append(f"Education {i} Error: {form_errors_list}")
+
             context = {
                 'form': form,
                 'skill_formset': skill_formset,
                 'responsibility_formset': responsibility_formset,
+                'idealcandidate_formset': idealcandidate_formset,
+                'benefits_formset': benefits_formset,
                 'experience_formset': experience_formset,
+                'education_formset' : education_formset,
                 'form_errors': form_errors
             }
             return render(request, 'job/create-job.html', context)
@@ -349,13 +425,19 @@ def create_job(request):
             form = CreateJobForm()
             skill_formset = SkillFormSet(prefix='skills')
             responsibility_formset = ResponsibilityFormSet(prefix='responsibilities')
+            idealcandidate_formset = IdealCandidateFormSet(prefix='idealcandidates')
+            benefits_formset = BenefitsFormSet(prefix='benefits')
             experience_formset = ExperienceFormSet(prefix='experiences')
+            education_formset = EducationFormSet(prefix="education")
             
             context = {
                 'form': form,
                 'skill_formset': skill_formset,
                 'responsibility_formset': responsibility_formset,
+                'idealcandidate_formset': idealcandidate_formset,
+                'benefits_formset': benefits_formset,
                 'experience_formset': experience_formset,
+                'education_formset' : education_formset,
             }
             return render(request, 'job/create-job.html', context)
     else:
@@ -386,6 +468,24 @@ def update_job(request, pk):
         can_delete=True
     )
 
+    IdealcandidateFormset = inlineformset_factory(
+        Job,
+        Job_IdealCandidates,
+        form=JobIdealCandidatesForm,
+        formset=Job_iDealCandidatesFormSet,
+        extra=1,
+        can_delete=True
+    )
+
+    BenefitsFormset = inlineformset_factory(
+        Job,
+        Job_Benefits,
+        form=JobBenefitsForm,
+        formset=jobBenefitsFormSet,
+        extra=1,
+        can_delete=True
+    )
+
     ExperienceFormSet = inlineformset_factory(
         Job, 
         Job_Experience, 
@@ -395,24 +495,42 @@ def update_job(request, pk):
         can_delete=True
     )
 
+    EducationFormSet = inlineformset_factory(
+        Job, 
+        Job_Education, 
+        form=JobEducationForm, 
+        formset=JobEducationFormSet,
+        extra=1,  
+        can_delete=True
+    )
+
+
     if request.method == 'POST':
         form = UpdateJobForm(request.POST, instance=job)
         address_form = AddressForm(request.POST, instance=address)
         skill_formset = SkillFormSet(request.POST, prefix='skills', instance=job)
         responsibility_formset = ResponsibilityFormSet(request.POST, prefix='responsibilities', instance=job)
+        idealcandidate_formset = IdealcandidateFormset(request.POST, prefix='idealcandidates', instance=job)
+        benefits_formset = BenefitsFormset(request.POST, prefix='benefits', instance=job)
         experience_formset = ExperienceFormSet(request.POST, prefix='experiences', instance=job)
+        education_formset = EducationFormSet(request.POST, prefix='education', instance=job)
 
-        if form.is_valid() and address_form.is_valid() and skill_formset.is_valid() and responsibility_formset.is_valid() and experience_formset.is_valid():
+        form_errors = []
+
+        if form.is_valid() and address_form.is_valid() and skill_formset.is_valid() and responsibility_formset.is_valid() and idealcandidate_formset.is_valid() and benefits_formset.is_valid() and experience_formset.is_valid() and education_formset.is_valid():
             # Save address and job
             address_instance = address_form.save()
             job = form.save(commit=False)
             job.location = address_instance
             job.save()
 
-            # Save formsets (skills, responsibilities, experiences)
+            # Save formsets (skills, responsibilities, idealcandidates, benefits, experiences)
             skill_formset.save()
             responsibility_formset.save()
+            idealcandidate_formset.save()
+            benefits_formset.save()
             experience_formset.save()
+            education_formset.save()
 
             messages.info(request, 'Job information has been updated')
             return redirect('manage-jobs')
@@ -425,14 +543,20 @@ def update_job(request, pk):
         address_form = AddressForm(instance=address)
         skill_formset = SkillFormSet(prefix='skills', instance=job)
         responsibility_formset = ResponsibilityFormSet(prefix='responsibilities', instance=job)
+        idealcandidate_formset = IdealcandidateFormset(prefix='idealcandidates', instance=job)
+        benefits_formset = BenefitsFormset(prefix='benefits', instance=job)
         experience_formset = ExperienceFormSet(prefix='experiences', instance=job)
+        education_formset = EducationFormSet(prefix='education', instance=job)
 
     context = {
         'form': form,
         'address_form': address_form,
         'skill_formset': skill_formset,
         'responsibility_formset': responsibility_formset,
+        'idealcandidate_formset': idealcandidate_formset,
+        'benefits_formset': benefits_formset,
         'experience_formset': experience_formset,
+        'education_formset' : education_formset,
     }
     return render(request, 'job/update-job.html', context)
     

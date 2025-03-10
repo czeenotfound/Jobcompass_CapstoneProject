@@ -110,15 +110,28 @@ class Skill(models.Model):
 
     def __str__(self):
         return f"Skill for {self.user_profile.first_name} {self.user_profile.last_name} - {self.name} "
-    
+
 class Education(models.Model):
+    EDUCATION_LEVEL_CHOICES = [
+        ('high_school', 'High School'),
+        ('associate', 'Associate Degree'),
+        ('bachelor', 'Bachelor’s Degree'),
+        ('master', 'Master’s Degree'),
+        ('doctorate', 'Doctorate (Ph.D.)'),
+        ('vocational', 'Vocational/Technical'),
+        ('other', 'Other'),
+    ]
+
     user_profile = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='education')
+    education_level = models.CharField(
+        max_length=20, choices=EDUCATION_LEVEL_CHOICES, null=True, blank=True
+    )
     degree = models.CharField(max_length=100, blank=True)
     institution = models.CharField(max_length=100, blank=True)
-    graduation_year = models.IntegerField(null=True, blank=True)
+    graduation_date = models.DateField(blank=True, null=True) 
 
     def __str__(self):
-        return f"Education - {self.degree} - {self.institution} - {self.graduation_year}"
+        return f"{self.get_education_level_display()} - {self.degree} - {self.institution} -  ({self.graduation_date if self.graduation_date else 'N/A'})"
     
 class Experience(models.Model):
     user_profile = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='experiences')

@@ -8,10 +8,18 @@
     <link rel="stylesheet" href="{% static 'bootstrap-5.0.2-dist/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'CSS/main.css' %}">
     <link rel="stylesheet" href="{% static 'fontawesome-free-6.5.1/css/all.min.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+    
     <link rel="icon" href="{% static 'images/icons8-compass-64white.png' %}">
+
+    
     <!-- for location purposes -->
     <script src="{% static 'JS/jquery.min.js' %}"></script>
     <script src="{% static 'JS/ph-address-selector.js' %}"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    {% block extra_head %}
+    {% endblock %}
     <script src="{% static 'JS/jquery-3.7.1.js' %}"></script>
 
     <!-- Add SweetAlert2 script -->
@@ -20,20 +28,22 @@
 <body>
 
     {% include 'navbar.html' %}
+    
+    <div style="margin-top: 100px;">
+        {% block content %}
 
-    {% block content %}
-
-    {% endblock content %}
-
+        {% endblock content %} 
+    </div>
+    
+    
     {% include 'footer.html' %}
 
-    
     <button id="scroll-to-top" onclick="scrollToTop()"><i class="fa-solid fa-chevron-up"></i></button>
     <!-- SCRIPTS -->
     {% block scripts %}
        
     {% endblock %}
-    <script src="{% static 'bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js' %}"></script>
+   
     <!-- main script js -->
     {% if messages %}
         <script>
@@ -57,6 +67,7 @@
             });
         </script>
     {% endif %}
+    
     <script src="{% static 'JS/index.js' %}"></script>
     
 </body>

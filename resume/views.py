@@ -17,30 +17,26 @@ from django.http import JsonResponse
 class SkillFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
-        # No specific validation since projects are optional
         pass
 
 class EducationFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
-        # No specific validation since projects are optional
         pass
+    
 class ExperienceFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
-        # No specific validation since projects are optional
         pass
         
 class CertificationFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
-        # No specific validation since certifications are optional
         pass
 
 class ProjectFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
-        # No specific validation since projects are optional
         pass
 
 class SocialLinkFormSet(BaseInlineFormSet):
@@ -109,6 +105,7 @@ def create_resume(request):
         if request.method == 'POST':
             form = UpdateResumeForm(request.POST, request.FILES, instance=resume)
             address_form = AddressForm(request.POST, instance=address)
+            
             avatar_phone_form = UpdateAvatarPhoneForm(request.POST, request.FILES, instance=user)
             skill_formset = ResumeSkillFormSet(request.POST, prefix='skills', instance=resume)
             education_formset = ResumeEducationFormSet(request.POST, prefix='education', instance=resume)
@@ -126,10 +123,14 @@ def create_resume(request):
                 # Save the address
                 address_instance = address_form.save(commit=False)
                 address_instance.user = user
+
+                address.country_name = request.POST.get('country_name', '')
+                address.state_name = request.POST.get('state_name', '')
+            
+
                 address_instance.save()
                 resume_instance.address = address_instance
                 resume_instance.save()
-
                 avatar_phone_form.save()
                 skill_formset.save()
                 education_formset.save()

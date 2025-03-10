@@ -1,10 +1,12 @@
 from django.contrib import admin
-from .models import Job, RequiredSkill, Job_Responsibilities, Job_Experience, SaveJob, Application, ApplicationStatus, Conversation, Message, JobFair, JobFairRegistration
+from .models import Job, RequiredSkill, Job_Responsibilities, Job_IdealCandidates, Job_Benefits, Job_Experience, SaveJob, Application, ApplicationStatus, Conversation, Message, JobFair, JobFairRegistration
 
 # Register your models here.
 admin.site.register(Job)
 admin.site.register(RequiredSkill)
 admin.site.register(Job_Responsibilities)
+admin.site.register(Job_IdealCandidates)
+admin.site.register(Job_Benefits)
 admin.site.register(Job_Experience)
 
 admin.site.register(SaveJob)

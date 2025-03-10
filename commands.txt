@@ -15,6 +15,9 @@ ERD diagram
 For adding multiple data for industries
  - py manage.py add_industries
 
+For adding multiple data for skills
+ - py manage.py import_skills
+
 ### 
 For python libraries
  - pip uninstall <package-name>

@@ -17,6 +17,7 @@
     </ul>
 </div >
 <div class="content-wrapper">
+    
     <!--  SECTION  -->
     <section id="landsection" class="text-white text-center d-flex align-items-center mb-5">
         <div class="container">
@@ -70,18 +71,10 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-xs-12 col-sm-6 col-md-3">
-                        <label for="salaryrange">Salary Range</label>
-                        <div class="bubbleformfilter d-flex gap-3 align-items-center">
-                            <i class="fa-solid fa-money-bill-wave me-2 text-dark"></i>
-                            {% render_field job_filter.form.salary_range class="form-select border-0 p-0" id="salaryrange" %}
-                        </div>
-                    </div>
                 </div>
             </form>
         </div>
     </section>
-    
     <div id="findjobs">
         <div class="container">
     
@@ -100,11 +93,7 @@
                                                 <h5 class="mb-1 fw-bolder">{{job.title}}</h5>
                                                 <p class="text-muted mb-0">{{job.company}}</p>
                                                 <p class="text-muted mb-0" style="font-size: 12px;">
-                                                    {% if job.location.barangay and job.location.city and job.location.street %}
-                                                        {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
-                                                    {% else %}
-                                                        {{ job.location.countrystreet }}{% if job.location.countrystreet %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
-                                                    {% endif %}
+                                                    {{ job.location }}
                                                 </p>
                                             </div>
                                         </div>
@@ -118,7 +107,21 @@
                                                 <span class="text-dark p-2"><i class="fas fa-map-marker-alt me-2"></i> {{job.location_job_type|title}}</span>
                                             </li>
                                             <li>
-                                                <span class="text-dark p-2"><i class="fa-solid fa-money-bill-wave me-2"></i> ₱ {{job.salary_min}} - ₱ {{job.salary_max}} {{job.salary_mode|title}}</span>
+                                                {% if job.salary_display_type == 'fixed' %}
+                                                    <span class="text-dark p-2">
+                                                        <i class="fa-solid fa-money-bill-wave me-2"></i>
+                                                        {{ job.currency }} {{ job.salary_fixed|intcomma }} {{job.salary_mode|title}}
+                                                    </span>
+                                                {% elif job.salary_display_type == 'range' %}
+                                                    <span class="text-dark p-2">
+                                                        <i class="fa-solid fa-money-bill-wave me-2"></i>
+                                                        {{ job.currency }} {{ job.salary_min|intcomma }} - {{ job.currency }} {{ job.salary_max|intcomma }} {{job.salary_mode|title}}
+                                                    </span>
+                                                {% elif job.salary_display_type == 'hidden' %}
+                                                
+                                                {% else %}
+                                                    <p>No Salary Information Available</p>
+                                                {% endif %}
                                             </li>
                                         </ul>
                                     </div>
@@ -158,11 +161,7 @@
                                                 <i class="fa-solid fa-location-dot text-mute"></i>
                                             </div>
                                             <span>
-                                                {% if job.location.barangay and job.location.city and job.location.street %}
-                                                    {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
-                                                {% else %}
-                                                    {{ job.location.countrystreet }}{% if job.location.countrystreet %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
-                                                {% endif %}
+                                                {{ job.location }}
                                             </span>
                                         </div>
                                         <div class="d-flex align-items-center mb-1">
@@ -177,73 +176,157 @@
                                             </div>
                                             <div>{{job.employment_job_type|title}}</div>
                                         </div>
-                                        <div class="d-flex align-items-center">
-                                            <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
-                                                <i class="fa-solid fa-money-bill-wave"></i>
+                                        
+                                        {% if job.salary_display_type == 'fixed' %}
+                                            <div class="d-flex align-items-center">
+                                                <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
+                                                    <i class="fa-solid fa-money-bill-wave"></i>
+                                                </div>
+                                                <div>{{ job.currency }} {{ job.salary_fixed|intcomma }} {{job.salary_mode|title}}</div>
                                             </div>
-                                            <div>₱ {{ job.get_salary_display }} {{job.salary_min}} - ₱ {{job.salary_max}} {{job.salary_mode|title}}</div>
-                                        </div>
+                                        {% elif job.salary_display_type == 'range' %}
+                                            <div class="d-flex align-items-center">
+                                                <div class="icon-container me-3 d-flex justify-content-center align-items-center" style="min-width: 30px;">
+                                                    <i class="fa-solid fa-money-bill-wave"></i>
+                                                </div>
+                                                <div>{{ job.currency }} {{ job.salary_min|intcomma }} - {{ job.currency }} {{ job.salary_max|intcomma }} {{job.salary_mode|title}}</div>
+                                            </div>
+                                        {% elif job.salary_display_type == 'hidden' %}
+
+                                        {% else %}
+                                            <p>No Salary Information Available</p>
+                                        {% endif %}
                                     </div>
                                     <div class="mb-4">
                                         <a href="{% url 'apply-job' job.pk %}" class="btn btn-primary customButton me-2 px-4">Apply Now</a>
                                         
-                                        <a href="{% url 'save-job' job.pk %}" class="btn btn-outline-secondary customButton px-4">Save</a>
+                                        <a href="{% url 'save-job' job.pk %}" class="btn btn-outline-secondary customButton px-4"><i class="fa-solid fa-bookmark me-2"></i> Save</a>
                                     </div>
 
 
                                     {% if job.job_description %}
                                         <div class="mb-4">
-                                            <h6>Job Description</h6>
+                                            <h6 class="fw-bold">Job Description</h6>
                                             <p>{{job.job_description}}</p>
                                         </div>
                                     {% endif %}
                                     
-                                    {% if job.ideal_candidate %}
-                                        <div class="mb-4">
-                                            <h6>Ideal Candidate</h6>
-                                            <p>{{job.ideal_candidate}}</p>
-                                        </div>
-                                    {% endif %}
-
-                                    
                                     {% if job.requiredskill_set.exists %}
                                         <div class="mb-4">
-                                            <h6>Required Skills</h6>
-                                            {% for skill in job.requiredskill_set.all %}
-                                                <span class="skill-badge">{{skill.skill_name}}, </span>
-                                            {% empty %}
-                                                <li>No skills required</li>
-                                            {% endfor %}
+                                            <h6 class="fw-bold">Required Skills</h6>
+                                            <div class="d-flex flex-wrap">
+                                                {% for skill in job.requiredskill_set.all %}
+                                                <span class="skillbadge me-2 mb-1">{{ skill.skill_name }}</span>
+                                                {% empty %}
+                                                <span class="skillbadge me-2 mb-1">No skills listed.</span>
+                                                {% endfor %}
+                                            </div>
                                         </div>
                                     {% endif %}
 
                                     {% if job.job_responsibilities_set.exists %}
                                         <div class="mb-4">
-                                            <h6>Responsibilities</h6>
-                                            <ul>
+                                            <h6 class="fw-bold">Responsibilities</h6>
+                                            <ul class="list-unstyled">
                                                 {% for responsibility in job.job_responsibilities_set.all %}
-                                                    <li>{{ responsibility.res_name }}</li>
-                                                {% empty %}
-                                                    <li>No responsibilities listed</li>
-                                                {% endfor %}
-                                            </ul>
-                                        </div>
-                                    {% endif %}
-                                    
-                                    {% if job.job_experience_set.exists %}
-                                        <div class="mb-4">
-                                            <h6>Experience</h6>
-                                            <ul>
-                                                {% for experience in job.job_experience_set.all %}
-                                                    <li>{{ experience.exp_name }} ({{ experience.exp_years }} years)
-                                                        <p> - {{ experience.exp_description }}</p>
+                                                    <li class="d-flex align-items-start mb-2">
+                                                        <i class="fa-solid fa-check-circle text-primary mt-2 me-2"></i>
+                                                        <span>{{ responsibility.res_name }}</span>
                                                     </li>
                                                 {% empty %}
-                                                    <li>No experience required</li>
+                                                    <li class="text-muted">No responsibilities listed</li>
                                                 {% endfor %}
                                             </ul>
                                         </div>
                                     {% endif %}
+
+                                    {% if job.job_education_set.exists %}
+                                        <div class="mb-4">
+                                            <h6 class="fw-bold mb-2">Educational Attainment</h6>
+                                            <ul class="list-unstyled">
+                                                {% for education in job.job_education_set.all %}
+                                                    <li class="d-flex align-items-start mb-2">
+                                                        <i class="fa-solid fa-graduation-cap mt-1 me-2"></i>
+                                                        {% if education.degree %}
+                                                            <div class="d-flex flex-column">
+                                                                <span class="fw-semibold">
+                                                                    {{ education.degree|title }}
+                                                                </span>
+                                                                <span class="text-muted">{{ education.get_education_level_display }}</span>
+                                                            </div>
+                                                            
+                                                        {% endif %}
+                                                        
+                                                        
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+
+                                                   
+                                    {% if job.job_idealcandidates_set.exists %}
+                                        <div class="mb-4">
+                                            <h6 class="fw-bold">Ideal Candidate</h6>
+                                            <ul class="list-unstyled">
+                                                {% for idealcandidate in job.job_idealcandidates_set.all %}
+                                                    <li class="d-flex align-items-start mb-2">
+                                                        - {{ idealcandidate.ideal_name }}
+                                                    </li>
+                                                {% empty %}
+                                                    <li>No ideal candidate listed.</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if job.job_benefits_set.exists %}
+                                        <div class="mb-4">
+                                            <h6 class="fw-bold">Benefits</h6>
+                                            <ul class="list-unstyled">
+                                                {% for benefit in job.job_benefits_set.all %}
+                                                    <li class="mb-2">
+                                                        - {{ benefit.bene_name }}
+                                                    </li>
+                                                {% empty %}
+                                                    <li>No benefits listed.</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if job.job_experience_set.exists %}
+                                        <div class="mb-4">
+                                            <h6 class="fw-bold">
+                                                <i class="bi bi-briefcase-fill"></i> Job Experience
+                                            </h6>
+                                            <ul class="list-unstyled">
+                                                {% for experience in job.job_experience_set.all %}
+                                                    <li class="d-flex align-items-start mb-3 px-3">
+                                                        <div class="d-flex flex-column">
+                                                            <span class="fw-semibold">
+                                                                {{ experience.exp_name }}
+                                                            </span>
+                                                            
+                                                            <!-- Display Fixed or Range Experience -->
+                                                            {% if experience.exp_type == 'fixed' and experience.exp_years %}
+                                                                <span class="text-muted">{{ experience.exp_years }} year/s of experience</span>
+                                                            {% elif experience.exp_type == 'range' and experience.min_exp_years and experience.max_exp_years %}
+                                                                <span class="text-muted">{{ experience.min_exp_years }} - {{ experience.max_exp_years }} year/s of experience</span>
+                                                            {% endif %}
+                                                            
+                                                            {% if experience.exp_description %}
+                                                                <span class="text-muted">{{ experience.exp_description }}</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </li>
+                                                {% empty %}
+                                                    <li class="text-muted">No experience required.</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+
                                 </div>
                             </div>
                         </div>
@@ -307,14 +390,14 @@
     </section>
     
     <div id="aboutus">
-        <div class="bg-light">
+        <div class="bg-light py-5">
             <section class="container mb-5 py-5">
                 <h1>About Us</h1>
                 <div class="row">
                     <div class="col-md-6">
-                        <img src="static/images/undraw_team_work_k-80-m (1).svg" class="img-fluid rounded" width="600px" height="400px" alt="About Job Portal">
+                        <img src="static/images/undraw_team_work_k-80-m (1).svg" class="img-fluid rounded py-sm-5" width="600px" height="400px" alt="About Job Portal">
                     </div>
-                    <div class="col-md-6 d-flex align-items-center">
+                    <div class="col-md-6 d-flex align-items-center py-sm-5 py-3">
                         <div>
                             <h2>Who We Are</h2>
                             <p>At Job Compass, we aim to empower both applicants and employers by providing an intuitive, powerful job portal designed for simplicity and effectiveness. Our mission is to make job search and hiring efficient and impactful.</p>
@@ -364,12 +447,11 @@
 
 
         <!-- Testimonials Section -->
-        <section class="testimonials mt-5 bg-white mb-5 p-5">
+        <!-- <section class="testimonials mt-5 bg-white mb-5 p-5">
             <div class="container mb-4">
                 <h1 class="text-left mt-5 mb-5">What People Say About Us</h1>
     
                 <div class="row g-4">
-                    <!-- First Testimonial -->
                     <div class="col-lg-4">
                         <div class="testimonial-card bg-white">
                             <i class="fa-solid fa-quote-left text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
@@ -385,7 +467,6 @@
                         
                     </div>
         
-                    <!-- Second Testimonial -->
                     <div class="col-lg-4">
                         <div class="testimonial-card bg-white">
                             <i class="fa-solid fa-quote-left text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
@@ -400,8 +481,6 @@
                             <div class="mt-3 person-name">- Jane Smith, Employer</div>
                         </div>
                     </div>
-        
-                    <!-- Third Testimonial -->
                     <div class="col-lg-4">
                         <div class="testimonial-card bg-white">
                             <i class="fa-solid fa-quote-left text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
@@ -417,7 +496,7 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </section> -->
     </div>
     <style>
         /* Custom styles */

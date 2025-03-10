@@ -181,19 +181,34 @@
 {% block scripts %}
 
 <script>
+    let iti; // Declare the intlTelInput variable globally
+    
     // Initialize the intl-tel-input plugin
     document.addEventListener('DOMContentLoaded', function () {
         var input = document.querySelector("#phone");
-        var iti = window.intlTelInput(input, {
+        iti = window.intlTelInput(input, {
             preferredCountries: ["ph", "us", "sg"], // Preferred countries
             utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // Utils script for formatting
         });
 
         // Add an event listener for country changes
         input.addEventListener('countrychange', function () {
-            var countryCode = iti.getSelectedCountryData().dialCode; // Get the country dial code
-            document.querySelector('#country_code').value = countryCode; // Set hidden field value
+            // Get the country data and store it
+            var countryData = iti.getSelectedCountryData();
+            var countryCode = countryData.dialCode;
+            var countryIso = countryData.iso2;
+            
+            // Save in hidden field and localStorage for persistence
+            document.querySelector('#country_code').value = countryCode;
+            localStorage.setItem('selectedCountryIso', countryIso);
         });
+
+        // Restore previously selected country (if any)
+        const savedCountry = localStorage.getItem('selectedCountryIso');
+        if (savedCountry) {
+            iti.setCountry(savedCountry);
+            document.querySelector('#country_code').value = iti.getSelectedCountryData().dialCode;
+        }
 
         // On form submit, update the phone input with the full phone number
         document.querySelector("form").addEventListener("submit", function (e) {
@@ -201,7 +216,6 @@
             document.querySelector("#phone").value = phoneNumber;
         });
     });
-    
 
     // Validate the password against criteria
     function validatePassword() {
