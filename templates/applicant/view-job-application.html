@@ -10,32 +10,39 @@
     </ol>
 </div>
 
-<div class="container mt-5">
     <div class="container">
         <h4 class="mt-4 mb-4 col-lg-2"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
     </div>
 
     <div class="custom-container container bg-white applicantProfile-card">
         <div class="p-5 mb-5">
-            <div class="row mb-4">
-                <div class="col-sm-6">
-                    <h2> {{ application.job.title }}</h2>
-                    <p class="fs-4 text-muted mb-0">{{job.location_job_type|title}}</p>
-                    <span class="mb-3 fs-5">Salary: ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }}</span>
-                    {% if user.is_authenticated and user.is_applicant %} 
-                        <div class="mb-4 mt-3">
-                            <a href="{% url 'job-info' application.job.id %}" class="btn btn-outline-primary customButton mb-2 px-3">
-                                <i class="fa-solid fa-eye"></i> View Job Details
-                            </a>
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="col-sm-6">
-                    <h2> Application Status</h2>
-                    <p class="fs-4 text-muted mb-0">{{ application.applicationstatus.status|title }}</p>
-                    
-                    <div class="mt-3">
-                        <a href="{% url 'inbox' %}" class="btn btn-outline-primary customButton px-3">
+            <div class="applicationStatusbanner row mb-5">
+                <div class="col-md-12">
+                    <h2 class="mb-3"> Application Status</h2>
+
+                    {% with status=application.applicationstatus.status %}
+                        {% if status == 'SUBMITTED' %}
+                            <span class="fs-4 status-badge status-submitted">Submitted</span>
+                        {% elif status == 'UNDER_REVIEW' %}
+                            <span class="fs-4 status-badge status-review">Under Review</span>
+                        {% elif status == 'INTERVIEW' %}
+                            <span class="fs-4 status-badge status-interview">Interview Scheduled</span>
+                        {% elif status == 'OFFERED' %}
+                            <span class="fs-4 status-badge status-offered">Offered</span>
+                        {% elif status == 'ACCEPTED' %}
+                            <span class="fs-4 status-badge status-accepted">Accepted</span>
+                        {% elif status == 'REJECTED' %}
+                            <span class="fs-4 status-badge status-rejected">Rejected</span>
+                        {% endif %}
+                    {% endwith %}
+                    <div class="mt-3 ">
+                        {% if application.applicationstatus.status in "INTERVIEW, OFFERED" %}
+                        <button class="btn btn-secondary customButton px-3" data-bs-toggle="modal" data-bs-target="#detailsModal">
+                            <i class="fa-solid fa-info-circle"></i> View Details
+                        </button> 
+                        {% endif %}
+
+                        <a href="{% url 'inbox' %}" class="btn btn-outline-light customButton px-3">
                             <i class="fa-solid fa-mail"></i> View Inbox
                         </a>
                     </div>
@@ -43,33 +50,124 @@
             </div>
             
             <div class="row">
-                <div class="col-sm-6">
-                    <div class="mt-4 mb-4">
-                        <h4>Your Information</h4>
-                        <div class="mt-4">
-                            <p><strong>Name:</strong> {{ application.user.get_full_name|title }}</p>
-                            <p><strong>Email:</strong> {{ application.user.email }}</p>
-                            <p><strong>Phone:</strong> {{ application.user.phone}}</p>
-                        </div>
-                    </div>
+                <div class="col-md-7">
+                    <h2> {{ application.job.title }}</h2>
+                    <p class="fs-4 text-muted mb-0">{{ application.job.location_job_type|title}}</p>
 
-                    {% if job.ideal_candidate %}
-                    <div class="mb-4">
-                        <h4>Ideal Candidate</h4>
-                        <div>
-                            <p>{{job.ideal_candidate}}</p>
-                        </div>
-                    </div>
-                    {% endif %}    
+                    {% if application.job.salary_display_type == 'fixed' %}
+                        <span class="mb-3 fs-5">Salary: {{ application.job.currency }} {{ application.job.salary_fixed|intcomma }} {{application.job.salary_mode|title}}</span>
+                    {% elif application.job.salary_display_type == 'range' %}
+                        <span class="mb-3 fs-5">Salary: {{ application.job.currency }} {{ application.job.salary_min|intcomma }} - {{ application.job.currency }} {{ application.job.salary_max|intcomma }} {{application.job.salary_mode|title}}</span>
+                    {% elif application.job.salary_display_type == 'hidden' %}
+
+                    {% else %}
+                        <p>No Salary Information Available</p>
+                    {% endif %}
 
                     
+                    <hr>
+
+                    <h4>Job Location</h4>
+                    <div>
+                        <p> 
+                            {{ application.job.location }}
+                        </p>
+                    </div>
+
+                    {% if application.job.job_description %}
+                    <div class="mb-4">
+                        <h4>Job Description</h4>
+                        <div>
+                            <p>{{application.job.job_description}}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if application.job.job_idealcandidates_set.exists %}
+                    <div class="mb-4">
+                        <h4>Ideal Candidate</h3>
+                        <ul>
+                            {% for idealcandidate in application.job.job_idealcandidates_set.all %}
+                                <li>{{ idealcandidate.ideal_name }}</li>
+                            {% empty %}
+                                <li>No ideal Candidate listed</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}  
+
+                    
+                    {% if application.job.job_responsibilities_set.exists %}
+                    <div class="mb-4">
+                        <h4>Job Responsibilities</h4>
+                        <div>
+                            <ul>
+                                {% for responsibility in application.job.job_responsibilities_set.all %}
+                                    <li>{{ responsibility.res_name }}</li>
+                                {% empty %}
+                                    <li>No responsibilities listed</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+
+
+                    {% if application.job.job_experience_set.exists %}
+                        <div class="mb-4">
+                            <h4>Job Experience</h4>
+                            <ul class="list-unstyled">
+                                {% for experience in application.job.job_experience_set.all %}
+                                    <li>{{ experience.exp_name }} ({{ experience.exp_years }} years)
+                                        <p> • {{ experience.exp_description }}</p>
+                                    </li>
+                                {% empty %}
+                                    <li>No experience required</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+
+                    {% if application.job.requiredskill_set.exists %}
+                    <div class="mb-4">
+                        <h4>Skills</h4>
+                        <div class="d-flex flex-wrap">
+                            {% for skill in application.job.requiredskill_set.all %}
+                                <span class="skillbadge me-2 mb-1">{{ skill.skill_name }}</span>
+                            {% empty %}
+                                <span class="skillbadge me-2 mb-1">No skills specified</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+
+                    {% if application.job.job_benefits_set.exists %}
+                    <div class="mb-4">
+                        <h4>Benefits</h4>
+                        <ul>
+                            {% for benefit in application.job.job_benefits_set.all %}
+                                <li>{{ benefit.bene_name }}</li>
+                            {% empty %}
+                                <li>No benefits listed</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
                 </div>
-                <div class="col-md-6">
+                
+                <div class="col-md-5">
                     <div class="stats-card mb-3">
                         <div class="mb-4">
                             <p>Company Name</p>
-                            <h4>{{ application.job.company.company_name|title }}</h4>
-                            <h6>{{ application.job.industry|title }}</h6>
+                            <div class="d-flex align-items-center">
+                                <img src="{{ application.job.company.avatar.url }}" alt="Company Logo" class="img-fluid rounded-circle company-logo me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                <div>
+                                    <h4 class="mb-0">{{ application.job.company|title }}</h4>
+                                    <h6 class="text-muted">{{ application.job.company.industry|title }}</h6>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="stats-card mb-3">
@@ -83,11 +181,83 @@
                             <span>{{ application.job.company.email }}</span>
                         </div>
                     </div>
-                    
+                </div>
+                
+            </div>
+      
+<!-- 
+            {% if application.feedback_set.exists %}
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h4>Feedback</h4>
+                    {% for feedback in application.feedback_set.all %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ feedback.feedback_type|title }} Feedback</h5>
+                            <p class="card-text"><strong>Content:</strong> {{ feedback.content }}</p>
+                            <p class="card-text"><strong>Rating:</strong> {{ feedback.rating }}</p>
+                            <p class="card-text"><strong>Date:</strong> {{ feedback.feedback_date|date:"F j, Y, g:i a" }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
-                
+            {% endif %}
+
+            {% if application.notification_set.exists %}
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h4>Notifications</h4>
+                    {% for notification in application.notification_set.all %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <p class="card-text">{{ notification.message }}</p>
+                            <p class="card-text"><small class="text-muted">Sent on {{ notification.sent_date|date:"F j, Y, g:i a" }}</small></p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %} -->
+        </div>
+    </div>      
+            
+    <!-- Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-4 shadow-lg">
+            <div class="modal-header bg-primary text-white rounded-top">
+                <h5 class="modal-title" id="detailsModalLabel">Application Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                {% if application.applicationstatus.status == "INTERVIEW" %}
+                    <h4 class="mb-3">📅 Interview Details</h4>
+                    {% for interview in application.interview_set.all %}
+                        <div class="card shadow-sm border-0 mb-3 rounded-3">
+                            <div class="card-body p-4">
+                                <h5 class="card-title fw-bold">{{ interview.interview_type|title }} Interview</h5>
+                                <p class="mb-2"><strong>📆 Date:</strong> {{ interview.interview_date|date:"F j, Y, g:i a" }}</p>
+                                <p class="mb-2"><strong>👤 Interviewer:</strong> {{ interview.interviewer }}</p>
+                                <p class="mb-0"><strong>📝 Notes:</strong> {{ interview.notes }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% elif application.applicationstatus.status == "OFFERED" %}
+                    <h4 class="mb-3">🎉 Job Offer Details</h4>
+                    <div class="card shadow-sm border-0 rounded-3">
+                        <div class="card-body p-4">
+                            <p class="mb-2"><strong>💰 Salary:</strong> ₱ {{ application.offer.salary }}</p>
+                            <p class="mb-2"><strong>🎁 Benefits:</strong> {{ application.offer.benefits }}</p>
+                            <p class="mb-2"><strong>📅 Offer Date:</strong> {{ application.offer.offer_date|date:"F j, Y" }}</p>
+                            <p class="mb-0"><strong>⏳ Expiration Date:</strong> {{ application.offer.expiration_date|date:"F j, Y" }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
+
+
 {% endblock %}

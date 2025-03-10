@@ -9,7 +9,7 @@
             <li class="breadcrumb-item active text-dark" aria-current="page">View Job</li>
         </ol>
     </div>
-<!-- Main Section -->
+    <!-- Main Section -->
     <div class="container">
         <h4 class="mt-4 mb-4 col-lg-2"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
     </div>
@@ -17,11 +17,19 @@
     <div class="custom-container container bg-white applicantProfile-card">
         <div class="p-5 mb-5">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-7">
                     <h2>{{job.title}}</h2>
                     <p class="fs-4 text-muted mb-0">{{job.location_job_type|title}}</p>
-                    <span class="mb-3 fs-5">Salary: ₱ {{job.salary_min}} - ₱ {{job.salary_max}}</span>
 
+                    {% if job.salary_display_type == 'fixed' %}
+                        <span class="mb-3 fs-5">Salary: {{ job.currency }} {{ job.salary_fixed|intcomma }} {{job.salary_mode|title}}</span>
+                    {% elif job.salary_display_type == 'range' %}
+                        <span class="mb-3 fs-5">Salary: {{ job.currency }} {{ job.salary_min|intcomma }} - {{ job.currency }} {{ job.salary_max|intcomma }} {{job.salary_mode|title}}</span>
+                    {% elif job.salary_display_type == 'hidden' %}
+
+                    {% else %}
+                        <span class="mb-3 fs-5">No Salary Information Available</span>
+                    {% endif %}
                     {% if user.is_authenticated and user.is_applicant %} 
                     <div class="mt-4 mb-4">
                         {% if job.has_applied %}
@@ -31,7 +39,7 @@
                                 <a href="#" class="btn btn-danger customButton disabled">Application Rejected</a>
                             {% else %}
                                 <button type="button" class="btn btn-danger customButton px-4" data-bs-toggle="modal" data-bs-target="#confirmModal" 
-                                    data-action-url="{% url 'unapply-job' job.pk %}">Unapply
+                                    data-action-url="{% url 'unapply-job' job.pk %}">Cancel Application
                                 </button>
                             {% endif %}
                         {% else %}
@@ -45,32 +53,20 @@
                         {% endif %}
                     </div>
                     {% endif %}
-                </div>
-                
+                    
+                    <hr>
 
-                <div class="col-md-6 mb-4">
                     <h4>Job Location</h4>
-                    <div>
+                    <div class="mb-5">
                         <p> 
-                        {% if job.location.barangay and job.location.city and job.location.street %}
-                            <!-- Display Philippine address if available -->
-                            {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
-                        {% else %}
-                            <!-- Display international address if Philippine address is empty -->
-                            {{ job.location.countrystreet }}{% if job.location.countrystreet %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
-                        {% endif %}
+                            {{ job.location }}
                         </p>
                     </div>
-                </div>
-            </div>
-            
 
-            <hr>
 
-            <div class="row">
-                <div class="col-sm-8">
                     {% if job.job_description %}
-                    <div class="mb-4">
+                    <hr>
+                    <div class="mb-5">
                         <h4>Job Description</h4>
                         <div>
                             <p>{{job.job_description}}</p>
@@ -78,18 +74,24 @@
                     </div>
                     {% endif %}
 
-                    {% if job.ideal_candidate %}
-                    <div class="mb-4">
-                        <h4>Ideal Candidate</h4>
-                        <div>
-                            <p>{{job.ideal_candidate}}</p>
-                        </div>
+                    {% if job.job_idealcandidates_set.exists %}
+                    <hr>
+                    <div class="mb-5">
+                        <h4>Ideal Candidate</h3>
+                        <ul>
+                            {% for idealcandidate in job.job_idealcandidates_set.all %}
+                                <li>{{ idealcandidate.ideal_name }}</li>
+                            {% empty %}
+                                <li>No ideal Candidate listed</li>
+                            {% endfor %}
+                        </ul>
                     </div>
-                    {% endif %}    
+                    {% endif %}  
 
                     
                     {% if job.job_responsibilities_set.exists %}
-                    <div class="mb-4">
+                    <hr>
+                    <div class="mb-5">
                         <h4>Job Responsibilities</h4>
                         <div>
                             <ul>
@@ -105,25 +107,27 @@
 
 
                     {% if job.job_experience_set.exists %}
-                        <div class="mb-4">
-                            <h4>Job Experience</h4>
-                            <ul class="list-unstyled">
-                                {% for experience in job.job_experience_set.all %}
-                                    <li>{{ experience.exp_name }} ({{ experience.exp_years }} years)
-                                        <p> • {{ experience.exp_description }}</p>
-                                    </li>
-                                {% empty %}
-                                    <li>No experience required</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
+                    <hr>
+                    <div class="mb-5">
+                        <h4>Job Experience</h4>
+                        <ul class="list-unstyled">
+                            {% for experience in job.job_experience_set.all %}
+                                <li>{{ experience.exp_name }} ({{ experience.exp_years }} years)
+                                    <p> • {{ experience.exp_description }}</p>
+                                </li>
+                            {% empty %}
+                                <li>No experience required</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                     {% endif %}
 
 
                     {% if job.requiredskill_set.exists %}
-                    <div class="mb-4">
+                    <hr>
+                    <div class="mb-5">
                         <h4>Skills</h4>
-                        <div>
+                        <div class="d-flex flex-wrap">
                             {% for skill in job.requiredskill_set.all %}
                                 <span class="skillbadge me-2 mb-1">{{ skill.skill_name }}</span>
                             {% empty %}
@@ -133,14 +137,37 @@
                     </div>
                     {% endif %}
 
+
+                    {% if job.job_benefits_set.exists %}
+                    <hr>
+                    <div class="mb-5">
+                        <h4>Benefits</h4>
+                        <ul>
+                            {% for benefit in job.job_benefits_set.all %}
+                                <li>{{ benefit.bene_name }}</li>
+                            {% empty %}
+                                <li>No benefits listed</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
                     
                 </div>
-                <div class="col-md-4">
+                
+
+                <div class="col-md-5 mb-4">
                     <div class="stats-card mb-3">
                         <div class="mb-4">
+                           
                             <p>Company Name</p>
-                            <h4>{{job.company|title}}</h4>
-                            <h6>{{job.company.industry|title}}</h6>
+                            <div class="d-flex align-items-center">
+                                <img src="{{ job.company.avatar.url }}" alt="Company Logo" class="img-fluid rounded-circle company-logo me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                <div>
+                                    <h4 class="mb-0">{{ job.company|title }}</h4>
+                                    <h6 class="text-muted">{{ job.company.industry|title }}</h6>
+                                </div>
+                            </div>
+                            
                         </div>
                     </div>
                     <div class="stats-card mb-3">
@@ -154,6 +181,12 @@
                             <span>{{user.email}}</span>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    
                 </div>
             </div>
         </div>

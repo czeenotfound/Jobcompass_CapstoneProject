@@ -9,7 +9,7 @@ from django.db.models import Count, Avg, F
 
 from .models import Company, Employer
 from address.models import Address
-from job.models import Job, Application, ApplicationStatus, JobFair, Conversation, Message, JobFairRegistration
+from job.models import Job, Application, ApplicationStatus, JobFair, Conversation, Message, JobFairRegistration, Interview, Offer, Feedback, Notification
 from users.models import User
 from resume.models import Resume
 
@@ -80,8 +80,6 @@ def job_analytics(request):
     }
 
     return render(request, 'company/job-analytics.html', context)
-
-# job applicants 
 @login_required(login_url='login')
 def job_applicants(request, pk):
     if request.user.is_employer:
@@ -119,6 +117,67 @@ def job_applicants(request, pk):
                             conversation=conversation,
                             sender=request.user,
                             content=f"The status of your application for '{application.job.title}' has been updated to '{application_status.status}'."
+                        )
+
+                    # Handle Interview creation
+                    if new_status == 'INTERVIEW':
+                        interview_date = request.POST.get('interview_date')
+                        interview_type = request.POST.get('interview_type')
+                        interviewer = request.POST.get('interviewer')
+                        notes = request.POST.get('notes', '')
+
+                        Interview.objects.create(
+                            application=application,
+                            interview_date=interview_date,
+                            interview_type=interview_type,
+                            interviewer=interviewer,
+                            notes=notes
+                        )
+
+                        # Send notification for interview
+                        Notification.objects.create(
+                            application=application,
+                            message=f"An interview has been scheduled for your application for '{application.job.title}'."
+                        )
+
+                    # Handle Offer creation
+                    if new_status == 'OFFERED':
+                        salary = request.POST.get('salary')
+                        benefits = request.POST.get('benefits')
+                        offer_date = request.POST.get('offer_date')
+                        expiration_date = request.POST.get('expiration_date')
+
+                        Offer.objects.create(
+                            application=application,
+                            salary=salary,
+                            benefits=benefits,
+                            offer_date=offer_date,
+                            expiration_date=expiration_date
+                        )
+
+                        # Send notification for offer
+                        Notification.objects.create(
+                            application=application,
+                            message=f"A job offer has been made for your application for '{application.job.title}'."
+                        )
+
+                    # Handle Feedback creation
+                    if new_status in ['REJECTED', 'ACCEPTED']:
+                        feedback_type = 'APPLICANT' if new_status == 'REJECTED' else 'INTERVIEWER'
+                        content = request.POST.get('feedback_content')
+                        rating = request.POST.get('rating', 0)
+
+                        Feedback.objects.create(
+                            application=application,
+                            feedback_type=feedback_type,
+                            content=content,
+                            rating=rating
+                        )
+
+                        # Send notification for feedback
+                        Notification.objects.create(
+                            application=application,
+                            message=f"Feedback has been provided for your application for '{application.job.title}'."
                         )
 
                     messages.success(request, f"Application status for {application.user.get_full_name()} updated to {new_status}.")

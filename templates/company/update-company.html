@@ -3,6 +3,13 @@
 {% load widget_tweaks %}
 
 {% block content %}
+    <div aria-label="breadcrumb" class="custombreadcrumb container bg-light p-4 mb-4 shadow-sm">
+        <ol class="breadcrumb mb-0 d-flex justify-content-end">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark text-muted">Dashboard</a></li>
+            <li class="breadcrumb-item active text-dark" aria-current="page">Company</li>
+        </ol>
+    </div>
+
     <div class="container">
         <div class="row">
             {% if form_errors %}
@@ -14,20 +21,79 @@
                     </ul>
                 </div>
             {% endif %}
-            <h4 class="mt-4 mb-4 col-lg-2"><a href="{% url 'dashboard' %}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
+            <div class="mt-4 mb-4 col-lg-2"> 
+                
+                <style>
+                    #navMenu {
+                        position: sticky;
+                        top: 120px;
+                        z-index: 1000; 
+                        
+                    }
+
+                    #navMenu .nav-link{
+                        color: #000000;
+                        opacity: 0.8;
+                    }
+                    #navMenu .nav-link:hover {
+                        color: #000000;
+                        opacity: 1;
+                        padding: 0.9em 2em;
+                        border-bottom: 2px solid #474747;
+
+                    }
+
+                    #navMenu .nav{
+                        background-color: #ffffff;
+                        border-left: 5px solid #474747;
+                    }
+                </style>
+                <!-- Navigation Menu -->
+                <nav id="navMenu">
+                    <h4 >
+                        <a href="{% url 'dashboard' %}" class="text-decoration-none text-dark">
+                        <i class="fa-solid fa-chevron-left"></i> Back</a>
+                    </h4>
+                    <ul class="nav me-auto text-left d-lg-block mt-5 p-2">
+                        <li class="nav-item"> 
+                            <a href="#companyinfo" class="nav-link px-2">Company Info</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#companyaddress" class="nav-link px-2">Address</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#companysocials" class="nav-link px-2">Socials</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#operations" class="nav-link px-2">Operations</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
             <form class="col-lg-10 card p-5 mb-5" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <h1 class="mb-4">Register your Company</h1> 
 
-                <h4 for="employerSocials" class="form-label mb-3">Company Information</h4>
-                <div class="text-center">
-                    <label for="userAvatar" class="form-label fw-bold">Company Logo</label>
-                    {% if form.avatar.value %}
-                        <div class="mb-2">
-                            <img src="{{form.avatar.value.url}}" alt="Current logo" class="img-fluid rounded-circle" style="height: 150px; width: 150px;">
-                        </div>
-                    {% endif %}
-                    <input type="file" id="image" name="avatar" class="form-control" accept="image/*">
+                <h4 id="companyinfo" class="form-label mb-3">Company Information</h4>
+                <div class="row">
+                    <div class="col-3 d-flex align-items-center justify-content-center">
+                        {% if form.avatar.value %}
+                            <div class="mb-2">
+                                <img src="{{ form.avatar.value.url }}" alt="Current Logo" class="img-fluid rounded-circle" style="height: 150px; width: 150px;">
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-9 mb-3 bg-light p-3">
+                        <label for="image" class="form-label fw-bold">Company Logo</label>
+                        <input type="file" name="{{ form.avatar.name }}" id="image" class="form-control" accept="image/*">
+                    
+                        {% if form.avatar.errors %}
+                            <div class="text-danger">
+                                {{ form.avatar.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <hr>
@@ -35,7 +101,7 @@
                 <!-- Company Name -->
                 <div class="mb-3">
                     <label for="companyName" class="form-label">Company Name <span class="text-danger">*</spanc></label>
-                    {% render_field form.company_name class="form-control" placeholder="Enter Company Name" required=True %}
+                    {% render_field form.company_name class="form-control p-3 fs-5" placeholder="Enter Company Name" required=True %}
                 </div>
 
                 <div class="row mb-3">
@@ -47,9 +113,7 @@
                         <label for="companyPhone" class="form-label">Company Phone <span class="text-danger">*</spanc></label>
                         {% render_field form.phone class="form-control" placeholder="Phone or Landline" required=True %}
                     </div>
-                </div>
 
-                <div class="row">
                     <div class="col-6 mb-3 d-flex flex-column justify-content-end">
                         <label for="industry" class="form-label">Select Company Industry <span class="text-danger">*</spanc></label>
                         <select class="form-control" name="industry" id="industry">
@@ -83,23 +147,27 @@
                 <hr>
 
                 <!-- Location -->
-                <div class="row">
-                    <h4 for="employerAddress" class="form-label mb-3">Company Address</h4>
+                <div id="companyaddress" class="d-flex justify-content-between align-items-center mb-3">
+                    <label class="fs-2 mb-0">
+                        Company Address
+                    </label>
+                </div>
+                <div class="employerform-card bg-light row">
                     <div class="col-sm-6 mb-3">
                         <label for="country-text" class="form-label">Country <span class="text-danger">*</span></label>
-                        {% render_field address_form.country class="form-control form-control-md" id="country-text" placeholder="Select country" required=True %}
+                        {% render_field address_form.country class="form-control form-control-md" id="country-text" placeholder="Select country" %}
                     </div>
                     <div class="col-sm-6 mb-3">
                         <label for="countrypostal-text" class="form-label">Postal Code <span class="text-danger">*</span></label>
-                        {% render_field address_form.countrypostal class="form-control form-control-md" id="countrypostal-text" placeholder="Enter your postal code" required=True %}
+                        {% render_field address_form.countrypostal class="form-control form-control-md" id="countrypostal-text" placeholder="Enter your postal code" %}
                     </div>
                     <div class="col-sm-6 mb-3">
                         <label for="region-text" class="form-label">Region <span class="text-danger">*</span></label>
-                        {% render_field address_form.region class="form-control form-control-md" id="region-text" placeholder="Enter your state/province/region" required=True %}
+                        {% render_field address_form.region class="form-control form-control-md" id="region-text" placeholder="Enter your state/province/region" %}
                     </div>
                     <div class="col-sm-6 mb-3">
                         <label for="city-text" class="form-label">City <span class="text-danger">*</span></label>
-                        {% render_field address_form.city class="form-control form-control-md" id="city-text" placeholder="Enter your city" required=True %}
+                        {% render_field address_form.city class="form-control form-control-md" id="city-text" placeholder="Enter your city" %}
                     </div>
                     
                     <div class="mb-3">
@@ -111,51 +179,179 @@
                 <hr>
                 
                 <!-- Social Media Links -->
-                <h4 for="employerSocials" class="form-label mb-3">Socials <span class="text-muted">(Optional)</span></h4>
-                <div class="mb-3">
-                    <label for="facebook" class="form-label">Facebook</label>
-                    {% render_field form.facebook class="form-control" placeholder="URL (e.g., https://facebook.com)" %}
+                <div id="companysocials" class="d-flex justify-content-between align-items-center mb-3">
+                    <label class="fs-2 mb-0">
+                        Socials <span class="text-muted">(Optional)</span>
+                    </label>
                 </div>
-                <div class="mb-3">
-                    <label for="twitter" class="form-label">Twitter</label>
-                    {% render_field form.twitter class="form-control" placeholder="URL (e.g., https://twitter.com)" %}
+                <div class="employerform-card bg-light">
+                     <div class="mb-3">
+                        <label for="facebook" class="form-label">Facebook</label>
+                        {% render_field form.facebook class="form-control" placeholder="URL (e.g., https://facebook.com)" %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="twitter" class="form-label">Twitter</label>
+                        {% render_field form.twitter class="form-control" placeholder="URL (e.g., https://twitter.com)" %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="github" class="form-label">Instagram</label>
+                        {% render_field form.github class="form-control" placeholder="URL (e.g., https://instagram.com)" %}
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="github" class="form-label">Instagram</label>
-                    {% render_field form.github class="form-control" placeholder="URL (e.g., https://instagram.com)" %}
-                </div>
+               
 
                 <hr>
 
-                <h4 for="employerAddress" class="form-label mb-3">Operational Information</h4>
+                <div id="operations" class="d-flex justify-content-between align-items-center mb-3">
+                    <label class="fs-2 mb-0">
+                        Operational Information
+                    </label>
+                </div>
 
                 <div class="card-body alert-warning mb-3">
                     <small class="text-danger fw-bold mb-3">
                     "To verify your company and gain permission to post jobs or organize job fairs, please ensure you provide all required documents."
                     </small>
                 </div>
-                <div class="mb-3">
-                    <label for="tinNumber" class="form-label">TIN Number <span class="text-danger">*</spanc></label>
-                    {% render_field form.tin_number class="form-control" placeholder="123-456-789-000"%}
+
+                <div class="employerform-card bg-light">
+
+                    
+                    <div class="mb-3">
+                        <label for="tinNumber" class="form-label fw-bold">
+                            TIN Number <span class="text-danger">*</span>
+                        </label>
+                        {% render_field form.tin_number class="form-control p-3 fs-5" placeholder="123-456-789-000" required="True" %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="birfile" class="form-label fw-bold">
+                            <i class="fa-solid fa-file-pdf text-danger me-1"></i> BIR Certificate of Registration 
+                            <span class="text-muted">(PDF) <span class="text-danger">*</span></span>
+                        </label>
+                        <div class="input-group">
+                            <label class="input-group-text btn bg-primary text-white" for="birfile">
+                                <i class="fa-solid fa-upload me-3"></i> Upload
+                            </label>    
+                            <div class="d-none">
+                                {% render_field form.bir_file class="form-control" id="birfile" accept=".pdf" %}
+                            </div>
+                            
+                    
+                            <input type="text" class="form-control" id="birfile-name" value="View Current File" readonly>
+                        </div>
+                    
+                        {% if form.instance.bir_file %}
+                            <script>
+                                document.addEventListener("DOMContentLoaded", function () {
+                                    let birFileName = document.getElementById("birfile-name");
+                                    birFileName.value = "View Current File";
+                                    birFileName.classList.add("text-secondary", "fw-bold");
+                                    birFileName.style.cursor = "pointer";
+                                    birFileName.addEventListener("click", function () {
+                                        window.open("{{ form.instance.bir_file.url }}", "_blank");
+                                    });
+                                });
+                            </script>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="dti_file" class="form-label fw-bold">
+                            <i class="fa-solid fa-file-pdf text-danger me-1"></i> DTI Certificate of Registration 
+                            <span class="text-muted">(PDF) <span class="text-danger">*</span></span>
+                        </label>
+                        <div class="input-group">
+                            <label class="input-group-text btn bg-success text-white" for="dti_file">
+                                <i class="fa-solid fa-upload me-3"></i> Upload
+                            </label>
+                            <div class="d-none">
+                                {% render_field form.dti_file class="form-control" id="dti_file" accept=".pdf" %}
+                            </div>
+                                
+                    
+                            <input type="text" class="form-control" id="dti_file-name" value="No file chosen" readonly>
+                        </div>
+                    
+                        {% if form.instance.dti_file %}
+                            <script>
+                                document.addEventListener("DOMContentLoaded", function () {
+                                    let dtiFileName = document.getElementById("dti_file-name");
+                                    dtiFileName.value = "View Current File";
+                                    dtiFileName.classList.add("text-secondary", "fw-bold");
+                                    dtiFileName.style.cursor = "pointer";
+                                    dtiFileName.addEventListener("click", function () {
+                                        window.open("{{ form.instance.dti_file.url }}", "_blank");
+                                    });
+                                });
+                            </script>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="birfile" class="form-label">BIR Certificate of Registration (Docx, PDF)<span class="text-danger">*</spanc></label>
-                    {% render_field form.bir_file class="form-control" %}
-                </div>  
-                <div class="mb-3">
-                    <label for="dti_file" class="form-label">DTI Certificate of Registration <span class="text-danger">*</spanc></label>
-                    {% render_field form.dti_file class="form-control" %}
-                </div>
+                
+                
+
 
                 <hr>
                 
-                <!-- Submit Button -->
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-secondary w-100 p-3">Submit</button>
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a href="{% url 'dashboard' %}" class="customButton btn btn-outline-danger py-3 px-5">
+                        <i class="fa-solid fa-times me-3"></i> Cancel
+                    </a>
+                    <button type="submit" class="customButton btn btn-secondary py-3 px-5">
+                        <i class="fa-solid fa-save me-3"></i> Submit
+                    </button>
                 </div>
             </form>
         </div>
     </div>
+
+{% block scripts %}
+
+<script>
+    document.getElementById("birfile").addEventListener("change", function () {
+        let fileName = this.files.length > 0 ? this.files[0].name : "No file chosen";
+        let birFileName = document.getElementById("birfile-name");
+
+        if (this.files.length > 0) {
+            birFileName.value = fileName;
+            birFileName.classList.remove("text-primary", "fw-bold");
+            birFileName.style.cursor = "default";
+            birFileName.onclick = null;
+        }
+    });
+
+    document.getElementById("dti_file").addEventListener("change", function() {
+        let fileName = this.files.length > 0 ? this.files[0].name : "No file chosen";
+        document.getElementById("dti_file-name").value = fileName;
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("nav a[href^='#']").forEach(anchor => {
+            anchor.addEventListener("click", function (event) {
+                event.preventDefault(); // Prevent default anchor behavior
+
+                const targetId = this.getAttribute("href").substring(1); // Get the target ID (without '#')
+                const targetSection = document.getElementById(targetId);
+
+                if (targetSection) {
+                    // Get original scroll position of the section
+                    const originalOffset = targetSection.getBoundingClientRect().top + window.scrollY;
+                    
+                    // Add margin only when the link is clicked
+                    const extraMargin = 100; // Adjust margin based on navbar height
+                    
+                    window.scrollTo({
+                        top: originalOffset - extraMargin,
+                        behavior: "smooth"
+                    });
+                }
+            });
+        });
+    });
+
+</script>
+
+{% endblock scripts%}
     
 {% endblock content %}
 

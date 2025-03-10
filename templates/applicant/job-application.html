@@ -27,7 +27,7 @@
 
             {% include 'sidebar.html' %}
             
-            <div class="jobApplication col-12 col-lg-9 p-0">
+            <div class="jobApplication col-lg-9">
                 <div class="card-body p-0">
                     <!-- Status Tabs -->
                     <ul class="nav nav-tabs d-flex justify-content-between" id="applicationTabs" role="tablist">
@@ -106,19 +106,31 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                     </svg>
-                                                    {% if application.job.location.barangay and application.job.location.city and application.job.location.street %}
-                                                        <!-- Display Philippine address if available -->
-                                                        {{ application.job.location.street|title }}{% if application.job.location.barangay|title %}, {{ application.job.location.barangay|title }}{% endif %}{% if application.job.location.city|title %}, {{ application.job.location.city|title }}{% endif %}
-                                                    {% else %}
-                                                        <!-- Display international address if Philippine address is empty -->
-                                                        {{ application.job.location.street|title }}{% if application.job.location.street|title %}, {% endif %}{{ application.job.location.countrycity|title }}{% if application.job.location.countrycity|title %}, {% endif %}{{ application.job.location.country|title }}
-                                                    {% endif %}
+                                                    {{ application.job.location|title }}
                                                 </div>
                                                 <div class="d-flex align-items-center">
-                                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                    </svg>
-                                                    ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }}
+                                                    {% if application.job.salary_display_type == 'fixed' %}
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        {{ application.job.currency }} {{ application.job.salary_fixed|intcomma }} {{application.job.salary_mode|title}}
+                                                        
+                                                    {% elif application.job.salary_display_type == 'range' %}
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        {{ application.job.currency }} {{ application.job.salary_min|intcomma }} - {{ application.job.currency }} {{ application.job.salary_max|intcomma }} {{application.job.salary_mode|title}}
+                                                    {% elif application.job.salary_display_type == 'hidden' %}
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        No Salary Information Available
+                                                    {% else %}
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        <p>No Salary Information Available</p>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                             <div class="text-muted small">
@@ -184,10 +196,28 @@
                                                         {% endif %}
                                                     </div>
                                                     <div class="d-flex align-items-center">
-                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                        </svg>
-                                                        ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }}
+                                                        {% if application.job.salary_display_type == 'fixed' %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            {{ application.job.currency }} {{ application.job.salary_fixed|intcomma }} {{application.job.salary_mode|title}}
+                                                            
+                                                        {% elif application.job.salary_display_type == 'range' %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            {{ application.job.currency }} {{ application.job.salary_min|intcomma }} - {{ application.job.currency }} {{ application.job.salary_max|intcomma }} {{application.job.salary_mode|title}}
+                                                        {% elif application.job.salary_display_type == 'hidden' %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            No Salary Information Available
+                                                        {% else %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            <p>No Salary Information Available</p>
+                                                        {% endif %}
                                                     </div>
                                                 </div>
                                                 <div class="text-muted small">
@@ -257,10 +287,28 @@
                                                         {% endif %}
                                                     </div>
                                                     <div class="d-flex align-items-center">
-                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                        </svg>
-                                                        ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }}
+                                                        {% if application.job.salary_display_type == 'fixed' %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            {{ application.job.currency }} {{ application.job.salary_fixed|intcomma }} {{application.job.salary_mode|title}}
+                                                            
+                                                        {% elif application.job.salary_display_type == 'range' %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            {{ application.job.currency }} {{ application.job.salary_min|intcomma }} - {{ application.job.currency }} {{ application.job.salary_max|intcomma }} {{application.job.salary_mode|title}}
+                                                        {% elif application.job.salary_display_type == 'hidden' %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            No Salary Information Available
+                                                        {% else %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            <p>No Salary Information Available</p>
+                                                        {% endif %}
                                                     </div>
                                                 </div>
                                                 <div class="text-muted small">
@@ -330,10 +378,28 @@
                                                         {% endif %}
                                                     </div>
                                                     <div class="d-flex align-items-center">
-                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                        </svg>
-                                                        ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }}
+                                                        {% if application.job.salary_display_type == 'fixed' %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            {{ application.job.currency }} {{ application.job.salary_fixed|intcomma }} {{application.job.salary_mode|title}}
+                                                            
+                                                        {% elif application.job.salary_display_type == 'range' %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            {{ application.job.currency }} {{ application.job.salary_min|intcomma }} - {{ application.job.currency }} {{ application.job.salary_max|intcomma }} {{application.job.salary_mode|title}}
+                                                        {% elif application.job.salary_display_type == 'hidden' %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            No Salary Information Available
+                                                        {% else %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            <p>No Salary Information Available</p>
+                                                        {% endif %}
                                                     </div>
                                                 </div>
                                                 <div class="text-muted small">
@@ -403,10 +469,28 @@
                                                         {% endif %}
                                                     </div>
                                                     <div class="d-flex align-items-center">
-                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                        </svg>
-                                                        ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }}
+                                                        {% if application.job.salary_display_type == 'fixed' %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            {{ application.job.currency }} {{ application.job.salary_fixed|intcomma }} {{application.job.salary_mode|title}}
+                                                            
+                                                        {% elif application.job.salary_display_type == 'range' %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            {{ application.job.currency }} {{ application.job.salary_min|intcomma }} - {{ application.job.currency }} {{ application.job.salary_max|intcomma }} {{application.job.salary_mode|title}}
+                                                        {% elif application.job.salary_display_type == 'hidden' %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            No Salary Information Available
+                                                        {% else %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            <p>No Salary Information Available</p>
+                                                        {% endif %}
                                                     </div>
                                                 </div>
                                                 <div class="text-muted small">
@@ -473,10 +557,28 @@
                                                         {% endif %}
                                                     </div>
                                                     <div class="d-flex align-items-center">
-                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                        </svg>
-                                                        ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }} ({{ application.job.salary_mode }})
+                                                         {% if application.job.salary_display_type == 'fixed' %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            {{ application.job.currency }} {{ application.job.salary_fixed|intcomma }} {{application.job.salary_mode|title}}
+                                                            
+                                                        {% elif application.job.salary_display_type == 'range' %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            {{ application.job.currency }} {{ application.job.salary_min|intcomma }} - {{ application.job.currency }} {{ application.job.salary_max|intcomma }} {{application.job.salary_mode|title}}
+                                                        {% elif application.job.salary_display_type == 'hidden' %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            No Salary Information Available
+                                                        {% else %}
+                                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                            <p>No Salary Information Available</p>
+                                                        {% endif %} ({{ application.job.salary_mode }})
                                                     </div>
                                                 </div>
                                                 <div class="text-muted small">
@@ -543,10 +645,28 @@
                                                         {% endif %}
                                                     </div>
                                                     <div class="d-flex align-items-center">
+                                                         {% if application.job.salary_display_type == 'fixed' %}
                                                         <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                                         </svg>
-                                                        ₱ {{ application.job.salary_min }} - ₱ {{ application.job.salary_max }} ({{ application.job.salary_mode }})
+                                                        {{ application.job.currency }} {{ application.job.salary_fixed|intcomma }} {{application.job.salary_mode|title}}
+                                                        
+                                                    {% elif application.job.salary_display_type == 'range' %}
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        {{ application.job.currency }} {{ application.job.salary_min|intcomma }} - {{ application.job.currency }} {{ application.job.salary_max|intcomma }} {{application.job.salary_mode|title}}
+                                                    {% elif application.job.salary_display_type == 'hidden' %}
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        No Salary Information Available
+                                                    {% else %}
+                                                        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        <p>No Salary Information Available</p>
+                                                    {% endif %} ({{ application.job.salary_mode }})
                                                     </div>
                                                 </div>
                                                 <div class="text-muted small">

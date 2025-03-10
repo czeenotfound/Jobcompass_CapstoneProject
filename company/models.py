@@ -10,6 +10,7 @@ from django.core.files import File
 import os
 from uuid import uuid4
 from cloudinary.models import CloudinaryField
+import cloudinary.uploader
 
 # Create your models here.
 class Company(models.Model):
@@ -68,6 +69,8 @@ class Company(models.Model):
 
     def __str__(self):
          return f'{self.company_name}'
+
+
 
 class Employer(models.Model):
     employer_status_choices = (

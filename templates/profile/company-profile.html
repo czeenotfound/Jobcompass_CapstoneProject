@@ -17,25 +17,15 @@
                 </div>
                 <div class="col-md-12 col-lg-6 mb-3">
                     <h1 class="mb-3 text-white">{{user.company.company_name}}</h1>
-                    <span class="skillbadge fw-bold">{{user.company.industry}}</span>
-                    <p class="text-white mt-4">
+                    <span class="skillbadge fw-bold text-nowrap">{{user.company.industry}}</span>
+                    <p class="text-white mt-3">
                         <i class="fas fa-map-marker-alt me-2"></i>
-                          
-                        {% if user.company.address.barangay and user.company.address.city and user.company.address.street %}
-                            <!-- Display Philippine address if available -->
-                            {{ user.company.address.street }}{% if user.company.address.barangay %}, {{ user.company.address.barangay }}{% endif %}{% if user.company.address.city %}, {{ user.company.address.city }}{% endif %}
-                        {% else %}
-                            <!-- Display international address if Philippine address is empty -->
-                            {{ user.company.address.street }}{% if user.company.address.street %}, {% endif %}{{ user.company.address.countrycity }}{% if user.company.address.countrycity %}, {% endif %}{{ user.company.address.country }}
-                        {% endif %}
+                        {{ user.company.address }}
                     </p>
-                    <span class="text-white">Founded: {{user.company.dateFounded|date:'F d, Y' }}</span>
-                    <br>
-                    <br>
                     {% if user.company.verification_status == 'Pending' %}
                         <span class="pendingbadge bg-info text-white fw-bold">Pending</span>
                     {% elif user.company.verification_status == 'Verified' %}
-                        <span class="verifiedbadge fw-bold">Verified</span>
+                        <span class="verifiedbadge fw-bold text-dark">Verified</span>
                     {% elif user.company.verification_status == 'Rejected' %}
                         <span class="rejectedbadge fw-bold">Rejected</span>
                     {% endif %}
@@ -51,44 +41,66 @@
             <div class="row">
                 <div class="col-md-8">
                     <div class="mb-4">
-                        <h4>About Us</h4>
+                        <h3>About Us</h3>
                         <p>{{user.company.about_us}}</p>
+                        <span class="fs-5">Founded: {{user.company.dateFounded|date:'F d, Y' }}</span>
                     </div>
 
-                    <div class="mb-3">
-                        <h5>Employee Count</h5>
-                        <div class="contact-info mb-2 p-3">
-                            <i class="fa-solid fa-people-group fs-3 me-3"></i>
-                            <span class="fs-5">{{user.company.employee_count}}</span>
-                        </div>
-                    </div>
+                    <hr>
 
-                    <div class="mb-3">
-                        <h5>Company Website</h5>
-                        <div class="contact-info mb-2 p-3">
-                            <span class="fs-5">{{user.company.website_url}}</span>
+                    <div class="row">
+                         <div class="col-md-6">
+                            <h5>Employee Count</h5>
+                            {% if user.company.employee_count.exists %}
+                            <div class="contact-info mb-2 p-3">
+                                <i class="fa-solid fa-people-group fs-3 me-3"></i>
+                                <span class="fs-5">{{user.company.employee_count}}</span>
+                            </div>
+                            {% else %}
+                                <span class="fs-5">No count provided.</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <h5>Company Website</h5>
+                            {% if user.ccompany.website_url.exists %}
+                            <div class="contact-info mt-2 mb-2 p-3">
+                                <span class="fs-5">{{user.company.website_url}}</span>
+                            </div>
+                            {% else %}
+                                <span class="fs-5">No website URL provided.</span>
+                            {% endif %}
                         </div>
                     </div>
+                   
                 </div>
                 
                 <div class="col-md-4">
                     {% if user.company.dti_file or user.company.bir_file %}
                     <div class="stats-card">
-                        <h5>Operational Information</h5>
-                        <div class="mt-3">
-                            {% if user.company.dti_file %}
-                                <p>Download your DTI file:</p>
-                                <a href="{{ user.company.dti_file.url }}" class="customButton btn btn-outline-secondary px-3 text-dark" target="_blank">View</a>
-                            {% else %}
-                                <p>No DTI file uploaded.</p>
-                            {% endif %}
+                        <h5 class="mb-3">Operational Information</h5>
+                        <label class="d-flex flex-column fs-5 mb-3"> TIN Number: 
+                            <span class="fw-bold">{{user.company.tin_number}}</span></span>
+                        </label>
+                        <div class="mt-3 row">
+                            <div class="col-md-6">
+                                {% if user.company.dti_file %}
+                                    <p>View your DTI file:</p>
+                                    <a href="{{ user.company.dti_file.url }}" class="customButton btn btn-outline-secondary px-3 text-dark w-100" target="_blank">View</a>
+                                {% else %}
+                                    <p>No DTI file uploaded.</p>
+                                {% endif %} 
+                            </div>
                             
-                            {% if user.company.bir_file %}
-                                <p>Download your BIR file:</p>
-                                <a href="{{ user.company.bir_file.url }}" class="customButton btn btn-outline-secondary px-3 text-dark" target="_blank">View</a>
-                            {% else %}
+                            
+                            <div class="col-md-6">
+                                {% if user.company.bir_file %}
+                                    <p>View your BIR file:</p>
+                                    <a href="{{ user.company.bir_file.url }}" class="customButton btn btn-outline-secondary px-3 text-dark w-100" target="_blank">View</a>
+                                {% else %}
                                 <p>No BIR file uploaded.</p>
-                            {% endif %}
+                                {% endif %}
+                            </div>
                         </div>
                     </div> 
                     {% endif %}

@@ -7,7 +7,6 @@ from job.filter import Jobfilter
 from resume.models import Resume
 from company.models import Company, Employer
 from .forms import UserRegistrationForm, OTPForm, PasswordResetRequestForm, SetNewPasswordForm
-from job.filter import get_salary_range_choices
 
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
@@ -30,8 +29,7 @@ def home(request):
         .order_by('-posted_date_time'))
     
     context = {
-        'job_filter': job_filter,
-        'salary_range_choices': get_salary_range_choices(),  # Pass to template
+        'job_filter': job_filter
     }
     return render(request, 'index.html', context)
 
@@ -49,32 +47,28 @@ def register(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.username = user.email
-            user.is_active = False  # Email verification required
+            user.is_active = False
 
-            # Assign user role before saving to avoid multiple DB writes
             role = form.cleaned_data.get('role')
             if role == 'applicant':
                 user.is_applicant = True
             elif role == 'employer':
                 user.is_employer = True
 
-            user.save()  # Save user after assigning role
+            user.save()
 
-            # Create related objects based on role
             if user.is_applicant:
                 Resume.objects.get_or_create(user=user)
             elif user.is_employer:
                 Company.objects.get_or_create(user=user)
                 Employer.objects.get_or_create(user=user)
 
-            # Generate email verification link
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             verification_link = request.build_absolute_uri(
                 reverse('verify_email', kwargs={'uidb64': uid, 'token': token})
             )
 
-            # Send verification email
             subject = "Verify Your Job Compass Account"
             context = {"user": user, "verification_link": verification_link}
             html_message = render_to_string("emails/verification_email.html", context)
@@ -83,7 +77,7 @@ def register(request):
             email = EmailMultiAlternatives(
                 subject=subject,
                 body=plain_message,
-                from_email="Job Compass <no-reply@jobcompass.com>",  # ✅ Improved sender format
+                from_email="Job Compass <no-reply@jobcompass.com>", 
                 to=[user.email],
             )
             email.attach_alternative(html_message, "text/html")
@@ -93,7 +87,6 @@ def register(request):
             return redirect('login')
 
         else:
-            # Display all validation errors
             for field in form:
                 for error in field.errors:
                     messages.error(request, error)
@@ -143,20 +136,17 @@ def resend_verification_link(request):
             messages.info(request, "Your account is already verified. You can log in.")
             return redirect('login')
 
-        # Generate email verification link
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         verification_link = request.build_absolute_uri(
             reverse('verify_email', kwargs={'uidb64': uid, 'token': token})
         )
 
-        # Email content
         subject = "Verify Your Job Compass Account"
         context = {"user": user, "verification_link": verification_link}
         html_message = render_to_string("emails/verification_email.html", context)
         plain_message = render_to_string("emails/verification_email.txt", context)
 
-        # Send email with both HTML & plain-text versions
         email_message = EmailMultiAlternatives(
             subject=subject,
             body=plain_message,
@@ -182,7 +172,6 @@ def login_user(request):
         
         user = authenticate(request, username=email, password=password)
         
-        # Check if the user exists and is active
         if user is not None and user.is_active:
             if not user.is_active:
                 messages.error(request, 'Your account has been deactivated. Please contact support for assistance.')
@@ -219,20 +208,17 @@ def password_reset_request(request):
                 messages.error(request, "No account found with that email.")
                 return redirect('password_reset_request')
 
-            # Generate secure password reset link
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             reset_link = request.build_absolute_uri(
                 reverse('reset_password', kwargs={'uidb64': uid, 'token': token})
             )
 
-            # Email content
             subject = "Reset Your Password - Job Compass"
             context = {"user": user, "reset_link": reset_link}
             html_message = render_to_string("emails/password_reset_email.html", context)
             plain_message = render_to_string("emails/password_reset_email.txt", context)
 
-            # Send email with both HTML & plain-text versions
             email_message = EmailMultiAlternatives(
                 subject=subject,
                 body=plain_message,

@@ -8,6 +8,7 @@ from cloudinary.models import CloudinaryField
 import os
 import json
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 # Load currency data from JSON
 CURRENCY_FILE = os.path.join(settings.BASE_DIR, 'static/JS/Common-Currency.json')
@@ -58,7 +59,6 @@ class Job(models.Model):
     )
 
     job_description = models.TextField(null=True, blank=True)
-    ideal_candidate = models.TextField(null=True, blank=True)
     industry = models.ForeignKey(Industry, on_delete=models.DO_NOTHING, null=True, blank=True)
     
     location = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
@@ -104,16 +104,67 @@ class Job_Responsibilities(models.Model):
     def __str__(self):
         return f"responsibilites for {self.job}"
     
-class Job_Experience(models.Model):
+class Job_IdealCandidates(models.Model):
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    ideal_name = models.CharField(max_length=300, blank=True)
+
+    def __str__(self):
+        return f"ideal candidates for {self.job}"
+    
+class Job_Benefits(models.Model):
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    bene_name = models.CharField(max_length=300, blank=True)
+
+    def __str__(self):
+        return f"benefits for {self.job}"
+    from django.db import models
+
+class Job_Experience(models.Model):
+    EXPERIENCE_TYPE_CHOICES = [
+        ('fixed', 'Fixed'),
+        ('range', 'Range'),
+    ]
+
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    exp_type = models.CharField(
+        max_length=10, choices=EXPERIENCE_TYPE_CHOICES, default='fixed'
+    )
     exp_name = models.CharField(max_length=300, blank=True)
-    exp_years = models.IntegerField(null=True, blank=True)
+    exp_years = models.IntegerField(null=True, blank=True)  # Fixed experience
+    min_exp_years = models.IntegerField(null=True, blank=True)  # Experience range (min)
+    max_exp_years = models.IntegerField(null=True, blank=True)  # Experience range (max)
     exp_description = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.exp_name} - {self.exp_years} years"
+        if self.exp_type == 'fixed':
+            return f"{self.exp_name} - {self.exp_years} years"
+        else:
+            return f"{self.exp_name} - {self.min_exp_years}-{self.max_exp_years} years"
 
 
+
+
+
+class Job_Education(models.Model):
+    EDUCATION_LEVEL_CHOICES = [
+        ('high_school', 'High School'),
+        ('associate', 'Associate Degree'),
+        ('bachelor', 'Bachelor’s Degree'),
+        ('master', 'Master’s Degree'),
+        ('doctorate', 'Doctorate (Ph.D.)'),
+        ('vocational', 'Vocational/Technical'),
+        ('other', 'Other'),
+    ]
+
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    education_level = models.CharField(
+        max_length=20, choices=EDUCATION_LEVEL_CHOICES, null=True, blank=True
+    )
+    degree = models.CharField(max_length=100, blank=True)
+
+    
+    def __str__(self):
+        return f"{self.get_education_level_display()} - {self.degree}"
 
 class Application(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -178,14 +229,16 @@ class Interview(models.Model):
     ]
 
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
-    interview_date = models.DateTimeField()
+    interview_date = models.DateTimeField(null=True, blank=True)
     interview_type = models.CharField(
         max_length=50,
         choices=INTERVIEW_TYPE_CHOICES,
-        default='VIRTUAL'
+        default='VIRTUAL',
+        null=True,
+        blank=True
     )
-    interviewer = models.CharField(max_length=100)
-    notes = models.TextField(blank=True)
+    interviewer = models.CharField(max_length=100, blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"Interview for {self.application} on {self.interview_date}"
@@ -199,16 +252,33 @@ class Notification(models.Model):
     def __str__(self):
         return f"Notification for {self.application} sent on {self.sent_date}"
 
-
 class Offer(models.Model):
     application = models.OneToOneField(Application, on_delete=models.CASCADE)
-    salary = models.DecimalField(max_digits=10, decimal_places=2)
-    benefits = models.TextField()
-    offer_date = models.DateField()
-    expiration_date = models.DateField()
+
+    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='PHP')
+    salary_fixed = models.PositiveIntegerField(null=True, blank=True, help_text="Enter a fixed salary.")
+    salary_min = models.PositiveIntegerField(null=True, blank=True, help_text="Enter minimum salary for range.")
+    salary_max = models.PositiveIntegerField(null=True, blank=True, help_text="Enter maximum salary for range.")
+    salary_mode = models.CharField(
+        max_length=10,
+        choices=(
+            ('Hourly', 'Hourly'),
+            ('Daily', 'Daily'),
+            ('Weekly', 'Weekly'),
+            ('Monthly', 'Monthly'),
+            ('Yearly', 'Yearly')
+        ),
+        null=True,
+        blank=True
+    )
+
+    benefits = models.TextField(blank=True, null=True)
+    offer_date = models.DateField(blank=True, null=True)
+    expiration_date = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return f"Offer for {self.application}"
+
 
 class Feedback(models.Model):
     FEEDBACK_TYPES = [

@@ -23,16 +23,79 @@
             </div>
         {% endif %}
         <div class="row">
-            <h4 class="mt-4 mb-4 col-lg-2"><a href="{{request.META.HTTP_REFERER}}" class="text-decoration-none text-dark"><i class="fa-solid fa-chevron-left"></i> Back</a></h4>
+            <div class="mt-4 mb-4 col-lg-2"> 
+                
+                <style>
+                    #navMenu {
+                        position: sticky;
+                        top: 120px;
+                        z-index: 1000; 
+                        
+                    }
+
+                    #navMenu .nav-link{
+                        color: #000000;
+                        opacity: 0.8;
+                    }
+                    #navMenu .nav-link:hover {
+                        color: #000000;
+                        opacity: 1;
+                        padding: 0.9em 2em;
+                        border-bottom: 2px solid #474747;
+
+                    }
+
+                    #navMenu .nav{
+                        background-color: #ffffff;
+                        border-left: 5px solid #474747;
+                    }
+                </style>
+                <!-- Navigation Menu -->
+                <nav id="navMenu">
+                    <h4 >
+                        <a href="{% url 'dashboard' %}" class="text-decoration-none text-dark">
+                        <i class="fa-solid fa-chevron-left"></i> Back</a>
+                    </h4>
+                    <ul class="nav me-auto text-left d-lg-block mt-5 p-2">
+                        <li class="nav-item"> 
+                            <a href="#jobinfo" class="nav-link px-2">Job Info</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#jobidealcandidates" class="nav-link px-2">Ideal Candidate</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#jobbenefits" class="nav-link px-2">Benefit</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#jobresponsibilities" class="nav-link px-2">Responsibility</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#requiredskills" class="nav-link px-2">Skill</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#requiredexp" class="nav-link px-2">Experience</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#joblocation" class="nav-link px-2">Location</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#jobvisibility" class="nav-link px-2">Visibility</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            
+            
             <form class="col-lg-10 card p-5 mb-5" method="POST">
                 {% csrf_token %}
                 <h1 class="mb-4">Update Job</h1>
-                <hr>
-                <h4 for="employerSocials" class="form-label mb-3">Job Information</h4>
+                
+                <h4 id="jobinfo" class="form-label mb-3">Job Information</h4>
+
 
                 <div class="mb-3">
                     <label for="jotitle" class="form-label">Job Title</label>
-                    {% render_field form.title class="form-control" %}
+                    {% render_field form.title class="form-control fs-4 p-3" %}
                 </div>
                 <div class="mb-3">
                     <label for="jobIndustry" class="form-label">Company's Industry</label>
@@ -64,7 +127,7 @@
                     </div>    
                     
                     <!-- Salary Range Fields -->
-                    <div id="salaryRangeFields" class="col-md-5 col-sm-6 mb-3">
+                    <div id="salaryRangeFields" class="col-md-4 col-sm-6 mb-3">
                         <label for="salaryRange" class="form-label">Salary Range</label>
                         <div class="input-group">
                            
@@ -74,15 +137,15 @@
                         </div>
                     </div>
                     <!-- Fixed Salary Field -->
-                    <div id="fixedSalaryField" class="col-md-5 col-sm-6 mb-3 d-none">
+                    <div id="fixedSalaryField" class="col-md-4 col-sm-6 mb-3 d-none">
                         <label for="fixedSalary" class="form-label">Fixed Salary</label>
                         <div class="input-group">
                             {% render_field form.salary_fixed class="form-control" placeholder="Enter amount" %}
                         </div>
                     </div>
-                    <div id="salaryModeField" class="col-md-2 col-sm-6 mb-3">
+                    <div id="salaryModeField" class="col-md-3 col-sm-6 mb-3">
                         <label for="salary_mode" class="form-label">Salary Mode</label>
-                        {% render_field form.salary_mode class="form-select" required=True %}
+                        {% render_field form.salary_mode class="form-select" %}
                     </div>
                 </div>
 
@@ -90,24 +153,136 @@
                     <label for="jobdescription" class="form-label">Job Description</label>
                     {% render_field form.job_description class="form-control" rows="4" %}
                 </div>
-                <div class="mb-3">
-                    <label for="jobidealcandidate" class="form-label">Ideal Candidate</label>
-                    {% render_field form.ideal_candidate class="form-control" rows="4" %}
+
+                <hr>
+                
+                <div id="education" class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="fs-2 mb-0">
+                            Educational Attainment
+                        </label>
+                    </div>
+                    <div id="education-container">
+                        {{ education_formset.management_form }}
+                        {% for form in education_formset %}
+                            <div class="formset-form education-form row mb-3">
+                                <div class="col-md-10 employerform-card bg-light">
+                                    <div class="d-none">
+                                        {{ form.as_p }}
+                                    </div> 
+                                    <p>
+                                        <label class="mb-0 text-dark">Education Level </label>
+                                        {{ form.education_level }}
+                                        <label class="mb-0 text-dark">Degree </label>
+                                        {{ form.degree }}
+                                    </p>
+                                    
+                                </div>
+                                <div class="col-md-2 remove-form-container">
+                                    <!-- Regular DELETE field but hidden with CSS -->
+                                    <div style="display: none;">
+                                        {{ form.DELETE }}
+                                    </div>
+                                    
+                                    <!-- Remove button -->
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-form-btn">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <hr>
+
+                
+                <!-- Ideal Candidates Section -->
+                <div id="jobidealcandidates" class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="fs-2 mb-0">
+                            Job Ideal Candidate
+                        </label>
+                    </div>
+                    <div id="idealCandidates-container">
+                        {{ idealcandidate_formset.management_form }}
+                        {% for form in idealcandidate_formset %}
+                            <div class="formset-form idealcandidates-form row align-items-center mb-2">
+                                <div class="col-md-10">
+                                    <div class="d-none">
+                                        {{ form.as_p }}
+                                    </div> 
+                                    <p>
+                                        {{ form.ideal_name }}
+                                    </p>
+                                </div>
+                                <div class="col-md-2 remove-form-container">
+                                    <!-- Regular DELETE field but hidden with CSS -->
+                                    <div style="display: none;">
+                                        {{ form.DELETE }}
+                                    </div>
+                                    
+                                    <!-- Remove button -->
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-form-btn">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+
+                <hr>
+
+                <!-- Benefits Section -->
+                <div id="jobbenefits" class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="fs-2 mb-0">
+                            Job Benefits
+                        </label>
+                    </div>
+                    <div id="benefits-container">
+                        {{ benefits_formset.management_form }}
+                        {% for form in benefits_formset %}
+                            <div class="formset-form benefits-form row mb-2">
+                                <div class="col-md-10">
+                                    <div class="d-none">
+                                        {{ form.as_p }}
+                                    </div> 
+                                    <p>
+                                        {{ form.bene_name }}
+                                    </p>
+                                </div>
+                                <div class="col-md-2 remove-form-container">
+                                    <!-- Regular DELETE field but hidden with CSS -->
+                                    <div style="display: none;">
+                                        {{ form.DELETE }}
+                                    </div>
+                                    
+                                    <!-- Remove button -->
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-form-btn">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
 
                 <hr>
 
                 <!-- Responsibilities Section -->
-                <div class="mb-3">
-                    <div class="text-white d-flex justify-content-between align-items-center mb-3">
-                        <label class="mb-0 text-dark">
-                            Job responsibilities
+                <div id="jobresponsibilities" class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="fs-2 mb-0">
+                            Job Responsibilities
                         </label>
                     </div>
                     <div id="responsibilities-container">
                         {{ responsibility_formset.management_form }}
                         {% for form in responsibility_formset %}
-                            <div class="formset-form responsibility-form row align-items-center mb-2">
+                            <div class="formset-form responsibility-form row mb-2">
                                 <div class="col-md-10">
                                     <div class="d-none">
                                         {{ form.as_p }}
@@ -121,9 +296,8 @@
                                         {{ form.DELETE }}
                                     </div>
                                     
-                                    <button type="button" 
-                                            class="btn btn-danger btn-sm remove-form-btn">
-                                        Remove
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-form-btn">
+                                        <i class="fa-solid fa-xmark"></i>
                                     </button>
                                 </div>
                             </div>
@@ -133,33 +307,82 @@
 
                 <hr>
 
+                <style>
+                    .formset-form {
+                        transition: opacity 0.3s ease;
+                    }
+                    
+                    .to-be-deleted {
+                        background-color: #f8f9fa;
+                    }
+                    
+                    .remove-form-btn {
+                        min-width: 80px;
+                    }
+                     /* ... existing styles ... */
+                    .skill-input-container {
+                        position: relative;
+                    }
+
+                    .skill-results {
+                        position: absolute;
+                        top: 100%;
+                        left: 0;
+                        right: 0;
+                        max-height: 300px;
+                        overflow-y: auto;
+                        z-index: 1000;
+                        background-color: white;
+                        border: 1px solid rgba(0,0,0,.15);
+                        border-radius: 0.25rem;
+                        margin-top: 2px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,.1);
+                    }
+
+                    .dropdown-item {
+                        padding: 0.5rem 1rem;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                    }
+
+                    .dropdown-item:hover {
+                        background-color: #f8f9fa;
+                    }
+
+                    .skill-input {
+                        border-radius: 0.25rem !important;
+                    }
+                </style>
+
                 <!-- Skills Formset -->
-                <div class="mb-4">
-                    <div class="text-white d-flex justify-content-between align-items-center mb-3">
-                        <label class="mb-0 text-dark">
+                <div id="requiredskills" class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="fs-2 mb-0">
                             Required Skills
                         </label>
                     </div>
                     <div id="skills-container">
                         {{ skill_formset.management_form }}
                         {% for form in skill_formset %}
-                            <div class="formset-form skill-form row align-items-center">
+                            <div class="formset-form skill-form row mb-2">
                                 <div class="col-md-10">
                                     <div class="d-none">
                                         {{ form.as_p }}
                                     </div> 
-                                    <p>
-                                        {{ form.skill_name }}
-                                    </p>
+                                    <div class="input-group mb-2">
+                                        {% render_field form.skill_name class="form-control skill-input p-3" placeholder="Enter or select a skill..." %}
+                                        <div class="skill-results dropdown-menu w-100"></div>
+                                    </div>
                                 </div>
                                 <div class="col-md-2 remove-form-container">
                                     <div style="display: none;">
                                         {{ form.DELETE }}
                                     </div>
                                     
-                                    <button type="button" 
-                                            class="btn btn-danger btn-sm remove-form-btn">
-                                        Remove
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-form-btn">
+                                        <i class="fa-solid fa-xmark"></i>
                                     </button>
                                 </div>
                             </div>
@@ -170,43 +393,67 @@
                 <hr>
 
                 <!-- Experience Section -->
-                <div class="mb-3">
-                    <div class="text-white d-flex justify-content-between align-items-center mb-3">
-                        <label class="mb-0 text-dark">
-                            Experience required
+                <div id="requiredexp" class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="fs-2 mb-0">
+                            Required Experience 
                         </label>
                     </div>
                     <div id="experiences-container">
                         {{ experience_formset.management_form }}
                         {% for form in experience_formset %}
-                            <div class="formset-form experience-form row align-items-center mb-2">
-                                <div class="col-md-10">
+                            <div class="formset-form experience-form row mb-2">
+                                <div class="col-md-10 employerform-card bg-light">
                                     <div class="d-none">
                                         {{ form.as_p }}
                                     </div> 
                                     <p>
+                                        <label class="mb-0 text-dark">Job Title </label>
                                         {{ form.exp_name }}
-                                        {{ form.exp_years }}
+
+                                        <label class="mb-0 text-dark mt-2">Experience Type</label>
+                                        {% render_field form.exp_type class="form-select mb-3 exp-type-selector" onchange="toggleExpFields(this)" %}
+                                        
+                                        <div class="exp-fixed-field mt-2">
+                                            <label class="mb-0 text-dark">Number of years </label>
+                                            {{ form.exp_years }}
+                                        </div>
+                                        
+                                        <div class="exp-range-field mt-2" style="display: none;">
+                                            <label class="mb-0 text-dark">Years Range </label>
+                                            <div class="input-group mb-2">
+                                                {{ form.min_exp_years }}
+                                                <span class="input-group-text">to</span>
+                                                {{ form.max_exp_years }}
+                                            </div>
+                                        </div>
+                                        
+                                        <label class="mb-0 text-dark">Job Description </label>
                                         {{ form.exp_description }}
                                     </p>
-                                    
                                 </div>
                                 <div class="col-md-2 remove-form-container">
                                     <div style="display: none;">
                                         {{ form.DELETE }}
                                     </div>
 
-                                    <button type="button" 
-                                            class="btn btn-danger btn-sm remove-form-btn">
-                                        Remove
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-form-btn">
+                                        <i class="fa-solid fa-xmark"></i>
                                     </button>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
                 </div>
+
                 <hr>
-                <h4>Job Location</h4>
+
+                <div id="joblocation" class="d-flex justify-content-between align-items-center mb-3">
+                    <label class="fs-2 mb-0">
+                        Job Location
+                    </label>
+                </div>
+
                 <br>
 
                 <div class="mb-3 row">
@@ -223,8 +470,6 @@
                 <div id="company-address-fields" class="card bg-light p-5">
                     <h4><i class="fa-solid fa-location-dot me-2"></i> Company Address</h4>
                     <br>
-                    <h4 for="joblocation" class="form-label mb-3">Job Location</h4>
-                    <span class="fw-bold">Local Address</span>
                     <p id="company-address">
                         {{ user.company.address }}
                     </p>
@@ -260,7 +505,12 @@
                 <hr>
 
                 
-                <h4>Job Visibility</h4>
+                <div id="jobvisibility" class="d-flex justify-content-between align-items-center mb-3">
+                    <label class="fs-2 mb-0">
+                        Job Visibility
+                    </label>
+                </div>
+
                 <br>
                 <div class="mb-3">
                     <div class="btn-group d-flex" role="group" aria-label="Job Availability">
@@ -291,190 +541,325 @@
         </div>
     </div>
 
-    
-<script>
-    const companyAddressFields = document.getElementById('company-address-fields');
-    const customAddressFields = document.getElementById('custom-address-fields');
+{% block scripts %}
+    <script>
+        const companyAddressFields = document.getElementById('company-address-fields');
+        const customAddressFields = document.getElementById('custom-address-fields');
 
-    const companyAddressRadio = document.getElementById('use_company_address');
-    const customAddressRadio = document.getElementById('use_custom_address');
+        const companyAddressRadio = document.getElementById('use_company_address');
+        const customAddressRadio = document.getElementById('use_custom_address');
 
-    function toggleAddressFields() {
-        if (companyAddressRadio.checked) {
-            companyAddressFields.style.display = 'block';
-            customAddressFields.style.display = 'none';
-        } else if (customAddressRadio.checked) {
-            companyAddressFields.style.display = 'none';
-            customAddressFields.style.display = 'block';
+        function toggleAddressFields() {
+            if (companyAddressRadio.checked) {
+                companyAddressFields.style.display = 'block';
+                customAddressFields.style.display = 'none';
+            } else if (customAddressRadio.checked) {
+                companyAddressFields.style.display = 'none';
+                customAddressFields.style.display = 'block';
+            }
         }
-    }
 
-    // Add event listeners to the radio buttons
-    companyAddressRadio.addEventListener('change', toggleAddressFields);
-    customAddressRadio.addEventListener('change', toggleAddressFields);
+        // Add event listeners to the radio buttons
+        companyAddressRadio.addEventListener('change', toggleAddressFields);
+        customAddressRadio.addEventListener('change', toggleAddressFields);
 
-    // Initialize the display based on the default selected radio button
-    toggleAddressFields();
+        // Initialize the display based on the default selected radio button
+        toggleAddressFields();
 
-    function toggleSalaryFields() {
-        const salaryType = document.getElementById("salaryType").value;
-        const salaryRangeFields = document.getElementById("salaryRangeFields");
-        const fixedSalaryField = document.getElementById("fixedSalaryField");
-        const salaryModeField = document.getElementById("salaryModeField");
-        const currencyField = document.getElementById("currencyField");
+        function toggleSalaryFields() {
+            const salaryType = document.getElementById("salaryType").value;
+            const salaryRangeFields = document.getElementById("salaryRangeFields");
+            const fixedSalaryField = document.getElementById("fixedSalaryField");
+            const salaryModeField = document.getElementById("salaryModeField");
+            const currencyField = document.getElementById("currencyField");
 
-        if (salaryType === "range") {
-            salaryRangeFields.classList.remove("d-none");
-            fixedSalaryField.classList.add("d-none");
-            salaryModeField.classList.remove("d-none");
-            currencyField.classList.remove("d-none");
-        } else if (salaryType === "fixed") {
-            fixedSalaryField.classList.remove("d-none");
-            salaryRangeFields.classList.add("d-none");
-            salaryModeField.classList.remove("d-none");
-            currencyField.classList.remove("d-none");
-        } else {
-            salaryRangeFields.classList.add("d-none");
-            fixedSalaryField.classList.add("d-none");
-            salaryModeField.classList.add("d-none");
-            currencyField.classList.add("d-none");
+            if (salaryType === "range") {
+                salaryRangeFields.classList.remove("d-none");
+                fixedSalaryField.classList.add("d-none");
+                salaryModeField.classList.remove("d-none");
+                currencyField.classList.remove("d-none");
+            } else if (salaryType === "fixed") {
+                fixedSalaryField.classList.remove("d-none");
+                salaryRangeFields.classList.add("d-none");
+                salaryModeField.classList.remove("d-none");
+                currencyField.classList.remove("d-none");
+            } else {
+                salaryRangeFields.classList.add("d-none");
+                fixedSalaryField.classList.add("d-none");
+                salaryModeField.classList.add("d-none");
+                currencyField.classList.add("d-none");
+            }
         }
-    }
 
-    // Initialize visibility on page load
-    window.onload = function() {
-        toggleSalaryFields();
-    };
+        // Initialize visibility on page load
+        window.onload = function() {
+            toggleSalaryFields();
+        };
 
-    function initializeFormsetManager(prefix, containerSelector, maxForms) {
-        const container = document.querySelector(containerSelector);
-        const totalFormsInput = document.querySelector(`#id_${prefix}-TOTAL_FORMS`);
-        
-        function updateFormIndexes() {
-            const forms = container.querySelectorAll('.formset-form');
-            forms.forEach((form, index) => {
-                form.querySelectorAll('[name*="-"]').forEach(element => {
-                    element.name = element.name.replace(/-\d+-/, `-${index}-`);
-                    element.id = element.id.replace(/-\d+-/, `-${index}-`);
+        document.addEventListener('DOMContentLoaded', function () {
+            function initializeSkillSearch(inputElement) {
+                let searchTimeout;
+                let resultsDropdown = inputElement.parentElement.querySelector('.skill-results');
+                
+                if (!resultsDropdown) {
+                    resultsDropdown = document.createElement('div');
+                    resultsDropdown.className = 'skill-results dropdown-menu';
+                    inputElement.parentElement.appendChild(resultsDropdown);
+                }
+
+                inputElement.addEventListener('input', function (e) {
+                    clearTimeout(searchTimeout);
+                    const query = e.target.value.trim();
+                    
+                    if (query.length < 2) {
+                        resultsDropdown.style.display = 'none';
+                        return;
+                    }
+
+                    searchTimeout = setTimeout(() => {
+                        fetch(`/api/skills/search/?q=${encodeURIComponent(query)}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                resultsDropdown.innerHTML = '';
+                                resultsDropdown.style.display = 'block';
+
+                                data.results.forEach(skill => {
+                                    const a = document.createElement('a');
+                                    a.className = 'dropdown-item';
+                                    a.href = '#';
+
+                                    if (skill.is_validated) {
+                                        a.innerHTML = `<i class="fas fa-check-circle text-success"></i> ${skill.name}`;
+                                    } else if (skill.create_option) {
+                                        a.innerHTML = `<i class="fas fa-plus-circle text-primary"></i> Add "${skill.name}"`;
+                                    } else {
+                                        a.textContent = skill.name;
+                                    }
+
+                                    a.addEventListener('click', (e) => {
+                                        e.preventDefault();
+                                        inputElement.value = skill.name;
+                                        resultsDropdown.style.display = 'none';
+                                    });
+
+                                    resultsDropdown.appendChild(a);
+                                });
+
+                                if (data.results.length === 0) {
+                                    resultsDropdown.style.display = 'none';
+                                }
+                            })
+                            .catch(() => {
+                                resultsDropdown.style.display = 'none';
+                            });
+                    }, 300);
+                });
+
+                // Hide dropdown when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!inputElement.contains(e.target) && !resultsDropdown.contains(e.target)) {
+                        resultsDropdown.style.display = 'none';
+                    }
+                });
+            }
+
+            function initializeFormsetManager(prefix, containerSelector, maxForms) {
+                const container = document.querySelector(containerSelector);
+                const totalFormsInput = document.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+
+                function updateFormIndexes() {
+                    const forms = container.querySelectorAll('.formset-form');
+                    forms.forEach((form, index) => {
+                        form.querySelectorAll('[name*="-"]').forEach(element => {
+                            element.name = element.name.replace(/-\d+-/, `-${index}-`);
+                            element.id = element.id.replace(/-\d+-/, `-${index}-`);
+                        });
+
+                        form.querySelectorAll('label[for*="-"]').forEach(label => {
+                            label.setAttribute('for', label.getAttribute('for').replace(/-\d+-/, `-${index}-`));
+                        });
+                    });
+
+                    totalFormsInput.value = forms.length;
+
+                    const addButton = document.querySelector(`#add-${prefix}`);
+                    if (addButton) {
+                        addButton.style.display = forms.length >= maxForms ? 'none' : 'block';
+                    }
+                }
+
+                function addForm() {
+                    const forms = container.querySelectorAll('.formset-form');
+                    if (forms.length >= maxForms) {
+                        alert(`You can only add up to ${maxForms} forms at a time.`);
+                        return;
+                    }
+
+                    const lastForm = forms[forms.length - 1];
+                    const newForm = lastForm.cloneNode(true);
+
+                    // Clear input values
+                    newForm.querySelectorAll('input:not([type="checkbox"])').forEach(input => input.value = '');
+                    newForm.querySelectorAll('textarea').forEach(textarea => textarea.value = '');
+                    newForm.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+
+                    // Uncheck DELETE checkbox
+                    const deleteCheckbox = newForm.querySelector('input[name$="-DELETE"]');
+                    if (deleteCheckbox) deleteCheckbox.checked = false;
+
+                    // Show remove button
+                    const removeContainer = newForm.querySelector('.remove-form-container');
+                    if (removeContainer) removeContainer.style.display = 'block';
+
+                    // Initialize remove button
+                    const removeButton = newForm.querySelector('.remove-form-btn');
+                    if (removeButton) {
+                        removeButton.onclick = (e) => removeForm(e, newForm);
+                        removeButton.style.display = 'block';
+                    }
+
+                    lastForm.after(newForm);
+                    updateFormIndexes();
+
+                    // Initialize skill search for new form if it's a skill form
+                    if (prefix === 'skills') {
+                        const newSkillInput = newForm.querySelector('.skill-input');
+                        if (newSkillInput) initializeSkillSearch(newSkillInput);
+                    }
+                }
+
+                function removeForm(event, formElement) {
+                    event.preventDefault();
+                    const form = formElement || event.target.closest('.formset-form');
+                    const deleteCheckbox = form.querySelector('input[name$="-DELETE"]');
+                    const removeButton = form.querySelector('.remove-form-btn');
+
+                    if (deleteCheckbox) {
+                        if (deleteCheckbox.checked) {
+                            deleteCheckbox.checked = false;
+                            form.style.opacity = '1';
+                            form.classList.remove('to-be-deleted');
+                            removeButton.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                            removeButton.classList.remove('btn-secondary');
+                            removeButton.classList.add('btn-outline-danger');
+                        } else {
+                            deleteCheckbox.checked = true;
+                            form.style.opacity = '0.5';
+                            form.classList.add('to-be-deleted');
+                            removeButton.textContent = 'Undo Remove';
+                            removeButton.classList.remove('btn-danger');
+                            removeButton.classList.add('btn-secondary');
+                        }
+                    }
+                }
+
+                let addButton = document.querySelector(`#add-${prefix}`);
+                if (!addButton) {
+                    addButton = document.createElement('button');
+                    addButton.type = 'button';
+                    addButton.className = 'btn btn-success mt-2 d-flex align-items-center gap-2';
+                    addButton.id = `add-${prefix}`;
+
+                    // Create the icon element
+                    const icon = document.createElement('i');
+                    icon.className = 'fa-solid fa-plus'; // Font Awesome plus icon
+
+                    // Add text to the button
+                    const buttonText = document.createTextNode('Add More');
+
+                    // Append icon and text to the button
+                    addButton.appendChild(icon);
+                    addButton.appendChild(buttonText);
+
+                    container.after(addButton);
+                }
+
+                addButton.onclick = addForm;
+
+
+                container.querySelectorAll('.remove-form-btn').forEach(button => {
+                    button.onclick = (e) => removeForm(e);
+                });
+
+                updateFormIndexes();
+            }
+
+            const formsetConfigs = [
+                { prefix: 'responsibilities', selector: '#responsibilities-container', maxForms: 15 },
+                { prefix: 'benefits', selector: '#benefits-container', maxForms: 15 },
+                { prefix: 'idealcandidates', selector: '#idealCandidates-container', maxForms: 15 },
+                { prefix: 'skills', selector: '#skills-container', maxForms: 15 },
+                { prefix: 'experiences', selector: '#experiences-container', maxForms: 15 }
+            ];
+            
+            formsetConfigs.forEach(config => initializeFormsetManager(config.prefix, config.selector, config.maxForms));
+
+            // Initialize skill search for existing inputs
+            document.querySelectorAll('.skill-input').forEach(input => initializeSkillSearch(input));
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll("nav a[href^='#']").forEach(anchor => {
+                anchor.addEventListener("click", function (event) {
+                    event.preventDefault(); // Prevent default anchor behavior
+
+                    const targetId = this.getAttribute("href").substring(1); // Get the target ID (without '#')
+                    const targetSection = document.getElementById(targetId);
+
+                    if (targetSection) {
+                        // Get original scroll position of the section
+                        const originalOffset = targetSection.getBoundingClientRect().top + window.scrollY;
+                        
+                        // Add margin only when the link is clicked
+                        const extraMargin = 100; // Adjust margin based on navbar height
+                        
+                        window.scrollTo({
+                            top: originalOffset - extraMargin,
+                            behavior: "smooth"
+                        });
+                    }
+                });
+            });
+        });
+
+        function toggleExpFields(selector) {
+            const form = selector.closest('.experience-form');
+            const fixedField = form.querySelector('.exp-fixed-field');
+            const rangeField = form.querySelector('.exp-range-field');
+            
+            if (selector.value === 'fixed') {
+                fixedField.style.display = 'block';
+                rangeField.style.display = 'none';
+            } else if (selector.value === 'range') {
+                fixedField.style.display = 'none';
+                rangeField.style.display = 'block';
+            }
+        }
+
+        // Initialize experience fields when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.exp-type-selector').forEach(function(selector) {
+                toggleExpFields(selector);
+            });
+            
+            // Also initialize experience fields for new forms
+            const experiencesContainer = document.querySelector('#experiences-container');
+            if (experiencesContainer) {
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                            mutation.addedNodes.forEach(function(node) {
+                                if (node.nodeType === 1 && node.classList.contains('experience-form')) {
+                                    const selector = node.querySelector('.exp-type-selector');
+                                    if (selector) toggleExpFields(selector);
+                                }
+                            });
+                        }
+                    });
                 });
                 
-                form.querySelectorAll('label[for*="-"]').forEach(label => {
-                    label.setAttribute('for', label.getAttribute('for').replace(/-\d+-/, `-${index}-`));
-                });
-            });
-            
-            totalFormsInput.value = forms.length;
-            
-            const addButton = document.querySelector(`#add-${prefix}`);
-            if (addButton) {
-                addButton.style.display = forms.length >= maxForms ? 'none' : 'block';
+                observer.observe(experiencesContainer, { childList: true });
             }
-        }
-        
-        function addForm() {
-            const forms = container.querySelectorAll('.formset-form');
-            if (forms.length >= maxForms) {
-                alert(`You can only add up to ${maxForms} forms at a time.`);
-                return;
-            }
-            
-            const lastForm = forms[forms.length - 1];
-            const newForm = lastForm.cloneNode(true);
-            
-            // Clear input values
-            newForm.querySelectorAll('input:not([type="checkbox"])').forEach(input => {
-                input.value = '';
-            });
-            newForm.querySelectorAll('textarea').forEach(textarea => {
-                textarea.value = '';
-            });
-            newForm.querySelectorAll('select').forEach(select => {
-                select.selectedIndex = 0;
-            });
-            
-            // Uncheck DELETE checkbox
-            const deleteCheckbox = newForm.querySelector('input[name$="-DELETE"]');
-            if (deleteCheckbox) {
-                deleteCheckbox.checked = false;
-            }
-            
-            // Show remove button
-            const removeContainer = newForm.querySelector('.remove-form-container');
-            if (removeContainer) {
-                removeContainer.style.display = 'block';
-            }
-            
-            // Initialize remove button
-            const removeButton = newForm.querySelector('.remove-form-btn');
-            if (removeButton) {
-                removeButton.onclick = (e) => removeForm(e, newForm);
-                removeButton.style.display = 'block';
-            }
-            
-            lastForm.after(newForm);
-            updateFormIndexes();
-        }
-        
-        function removeForm(event, formElement) {
-            event.preventDefault();
-            const form = formElement || event.target.closest('.formset-form');
-            const deleteCheckbox = form.querySelector('input[name$="-DELETE"]');
-            const removeButton = form.querySelector('.remove-form-btn');
-            
-            if (deleteCheckbox) {
-                if (deleteCheckbox.checked) {
-                    // Unmark for deletion
-                    deleteCheckbox.checked = false;
-                    form.style.opacity = '1';
-                    form.classList.remove('to-be-deleted');
-                    removeButton.textContent = 'Remove';
-                    removeButton.classList.remove('btn-secondary');
-                    removeButton.classList.add('btn-danger');
-                } else {
-                    // Mark for deletion
-                    deleteCheckbox.checked = true;
-                    form.style.opacity = '0.5';
-                    form.classList.add('to-be-deleted');
-                    removeButton.textContent = 'Undo Remove';
-                    removeButton.classList.remove('btn-danger');
-                    removeButton.classList.add('btn-secondary');
-                }
-            }
-        }
-        
-        // Initialize add button
-        let addButton = document.querySelector(`#add-${prefix}`);
-        if (!addButton) {
-            addButton = document.createElement('button');
-            addButton.type = 'button';
-            addButton.className = 'btn btn-success mt-2';
-            addButton.id = `add-${prefix}`;
-            addButton.textContent = 'Add More';
-            container.after(addButton);
-        }
-        addButton.onclick = addForm;
-        
-        // Initialize remove buttons
-        container.querySelectorAll('.remove-form-btn').forEach(button => {
-            button.onclick = (e) => removeForm(e);
         });
-        
-        // Initial update
-        updateFormIndexes();
-    }
-
-    // Initialize all formset managers
-    document.addEventListener('DOMContentLoaded', function() {
-        const formsetConfigs = [
-            { prefix: 'responsibilities', selector: '#responsibilities-container', maxForms: 15 },
-            { prefix: 'skills', selector: '#skills-container', maxForms: 15 },
-            { prefix: 'experiences', selector: '#experiences-container', maxForms: 15 }
-        ];
-        
-        formsetConfigs.forEach(config => {
-            initializeFormsetManager(config.prefix, config.selector, config.maxForms);
-        });
-    });
-
-</script>
+    </script>
+{% endblock scripts %}
 {% endblock content %}

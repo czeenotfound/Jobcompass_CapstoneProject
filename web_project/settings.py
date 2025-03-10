@@ -70,7 +70,7 @@ INSTALLED_APPS = [
     'company',
     'job',
     'industry',
-
+    'skill',
     'dashboard',
     
     'django_otp',
@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'django_filters',
     'django_extensions',
+    'rest_framework',
 
     'cloudinary',
 
@@ -251,3 +252,8 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}

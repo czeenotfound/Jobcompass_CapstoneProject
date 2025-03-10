@@ -1,7 +1,6 @@
 {% extends 'users/base.html' %}
 {% load humanize %}
 {% load widget_tweaks %}
-
 {% load static %}
 
 {% block scripts %}
@@ -74,43 +73,42 @@
                                             {% endif %}
                                         </td>
                                         <td class="action-buttons">
-                                            <form method="POST" class="d-inline">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="application_id" value="{{ applicant.pk }}">
-                                                
-                                                <div class="btn-group" role="group" aria-label="Status Update">
-                                                    {% for value, display in applicant.applicationstatus.STATUS_CHOICES %}
-                                                        <button type="submit" name="status" value="{{ value }}" 
-                                                                class="btn btn-sm 
-                                                                       {% if applicant.applicationstatus.status == value %}
-                                                                           {% if value == 'SUBMITTED' %}btn-info
-                                                                           {% elif value == 'UNDER_REVIEW' %}btn-warning
-                                                                           {% elif value == 'INTERVIEW' %}btn-primary
-                                                                           {% elif value == 'OFFERED' %}btn-success
-                                                                           {% elif value == 'REJECTED' %}btn-danger
-                                                                           {% elif value == 'ACCEPTED' %}btn-success
-                                                                           {% endif %}
-                                                                       {% else %}
-                                                                           btn-outline-secondary
-                                                                       {% endif %}" 
-                                                                title="{{ display }}">
-                                                            {% if value == 'SUBMITTED' %}
-                                                                <i class="fa-solid fa-file-circle-plus"></i>
-                                                            {% elif value == 'UNDER_REVIEW' %}
-                                                                <i class="fa-solid fa-eye"></i>
-                                                            {% elif value == 'INTERVIEW' %}
-                                                                <i class="fa-solid fa-calendar-check"></i>
-                                                            {% elif value == 'OFFERED' %}
-                                                                <i class="fa-solid fa-handshake"></i>
-                                                            {% elif value == 'REJECTED' %}
-                                                                <i class="fa-solid fa-times-circle"></i>
-                                                            {% elif value == 'ACCEPTED' %}
-                                                                <i class="fa-solid fa-thumbs-up"></i>
-                                                            {% endif %}
-                                                        </button>
-                                                    {% endfor %}
-                                                </div>
-                                            </form>
+                                            <div class="btn-group" role="group" aria-label="Status Update">
+                                                {% for value, display in applicant.applicationstatus.STATUS_CHOICES %}
+                                                    <button type="button" 
+                                                            class="btn btn-sm 
+                                                                   {% if applicant.applicationstatus.status == value %}
+                                                                       {% if value == 'SUBMITTED' %}btn-info
+                                                                       {% elif value == 'UNDER_REVIEW' %}btn-warning
+                                                                       {% elif value == 'INTERVIEW' %}btn-primary
+                                                                       {% elif value == 'OFFERED' %}btn-success
+                                                                       {% elif value == 'REJECTED' %}btn-danger
+                                                                       {% elif value == 'ACCEPTED' %}btn-success
+                                                                       {% endif %}
+                                                                   {% else %}
+                                                                       btn-outline-secondary
+                                                                   {% endif %}" 
+                                                            title="{{ display }}"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#statusModal"
+                                                            data-application-id="{{ applicant.pk }}"
+                                                            data-status="{{ value }}">
+                                                        {% if value == 'SUBMITTED' %}
+                                                            <i class="fa-solid fa-file-circle-plus"></i>
+                                                        {% elif value == 'UNDER_REVIEW' %}
+                                                            <i class="fa-solid fa-eye"></i>
+                                                        {% elif value == 'INTERVIEW' %}
+                                                            <i class="fa-solid fa-calendar-check"></i>
+                                                        {% elif value == 'OFFERED' %}
+                                                            <i class="fa-solid fa-handshake"></i>
+                                                        {% elif value == 'REJECTED' %}
+                                                            <i class="fa-solid fa-times-circle"></i>
+                                                        {% elif value == 'ACCEPTED' %}
+                                                            <i class="fa-solid fa-thumbs-up"></i>
+                                                        {% endif %}
+                                                    </button>
+                                                {% endfor %}
+                                            </div>
                                             <a href="{% url 'view-resume-profile' applicant.pk %}" class="btn btn-view" title="View Profile">
                                                 <i class="fa-solid fa-eye"></i>
                                             </a>
@@ -125,4 +123,167 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal for Status Update -->
+    <div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="statusModalLabel">Update Application Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{% url 'job-applicants' job.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="application_id" id="statusApplicationId">
+                        <input type="hidden" name="status" id="statusValue">
+                        
+                        <!-- Additional fields for Interview -->
+                        <div id="interviewFields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="interview_date" class="form-label">Interview Date</label>
+                                <input type="datetime-local" class="form-control" id="interview_date" name="interview_date" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="interview_type" class="form-label">Interview Type</label>
+                                <select class="form-select" id="interview_type" name="interview_type">
+                                    <option value="VIRTUAL">Virtual</option>
+                                    <option value="ONSITE">Onsite</option>
+                                    <option value="PHONE">Phone</option>
+                                    <option value="GROUP">Group</option>
+                                    <option value="PANEL">Panel</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="interviewer" class="form-label">Interviewer</label>
+                                <input type="text" class="form-control" id="interviewer" name="interviewer">
+                            </div>
+                            <div class="mb-3">
+                                <label for="notes" class="form-label">Notes</label>
+                                <textarea class="form-control" id="notes" name="notes"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Additional fields for Offer -->
+                        <div id="offerFields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="salaryType" class="form-label">Salary Display Type</label>
+                                {% render_field form.salary_display_type class="form-select" id="salaryType" onchange="toggleSalaryFields()" required=True %}
+                            </div>
+                        
+                            <div id="currencyField" class="mb-3">
+                                <label for="currency" class="form-label">Currency</label>
+                                <div class="input-group">
+                                    {% render_field form.currency class="form-select" %}
+                                </div>
+                            </div>
+                        
+                            <!-- Fixed Salary Field -->
+                            <div id="fixedSalaryField" class="mb-3 d-none">
+                                <label for="fixedSalary" class="form-label">Fixed Salary</label>
+                                <div class="input-group">
+                                    {% render_field form.salary_fixed class="form-control" placeholder="Enter fixed salary" %}
+                                </div>
+                            </div>
+                        
+                            <!-- Salary Range Fields -->
+                            <div id="salaryRangeFields" class="mb-3 d-none">
+                                <label for="salaryRange" class="form-label">Salary Range</label>
+                                <div class="input-group">
+                                    {% render_field form.salary_min class="form-control" placeholder="Min Salary" %}
+                                    <span class="input-group-text">to</span>
+                                    {% render_field form.salary_max class="form-control" placeholder="Max Salary" %}
+                                </div>
+                            </div>
+                        
+                            <div id="salaryModeField" class="mb-3">
+                                <label for="salary_mode" class="form-label">Salary Mode</label>
+                                {% render_field form.salary_mode class="form-select" %}
+                            </div>
+                        
+                            <div class="mb-3">
+                                <label for="benefits" class="form-label">Benefits</label>
+                                <textarea class="form-control" id="benefits" name="benefits"></textarea>
+                            </div>
+                        
+                            <div class="mb-3">
+                                <label for="offer_date" class="form-label">Offer Date</label>
+                                <input type="date" class="form-control" id="offer_date" name="offer_date">
+                            </div>
+                        
+                            <div class="mb-3">
+                                <label for="expiration_date" class="form-label">Expiration Date</label>
+                                <input type="date" class="form-control" id="expiration_date" name="expiration_date">
+                            </div>
+                        </div>
+
+                        <!-- Additional fields for Feedback -->
+                        <div id="feedbackFields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="feedback_content" class="form-label">Feedback</label>
+                                <textarea class="form-control" id="feedback_content" name="feedback_content"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rating" class="form-label">Rating</label>
+                                <input type="number" class="form-control" id="rating" name="rating" min="1" max="5">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Update Status</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Ensure correct state on page load
+        toggleSalaryFields();
+        
+        // Attach event listener to salary type dropdown
+        const salaryTypeDropdown = document.getElementById("salaryType");
+        if (salaryTypeDropdown) {
+            salaryTypeDropdown.addEventListener("change", toggleSalaryFields);
+        }
+
+        // Handle opening of status modal
+        document.querySelectorAll('[data-bs-target="#statusModal"]').forEach(button => {
+            button.addEventListener("click", function () {
+                const applicationId = this.dataset.applicationId;
+                const status = this.dataset.status;
+                const statusInput = document.getElementById("statusApplicationId");
+                const statusValue = document.getElementById("statusValue");
+
+                if (statusInput) statusInput.value = applicationId;
+                if (statusValue) statusValue.value = status;
+
+                // Show/hide additional fields based on status
+                toggleField("interviewFields", status === "INTERVIEW");
+                toggleField("offerFields", status === "OFFERED");
+                toggleField("feedbackFields", status === "REJECTED" || status === "ACCEPTED");
+            });
+        });
+    });
+
+    // Function to toggle salary fields
+    function toggleSalaryFields() {
+        const salaryType = document.getElementById("salaryType")?.value;
+        toggleField("salaryRangeFields", salaryType === "range");
+        toggleField("fixedSalaryField", salaryType === "fixed");
+        toggleField("salaryModeField", salaryType === "range" || salaryType === "fixed");
+        toggleField("currencyField", salaryType === "range" || salaryType === "fixed");
+    }
+
+    // Utility function to show/hide elements
+    function toggleField(fieldId, condition) {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.style.display = condition ? "block" : "none";
+        }
+    }
+
+</script>
+
 {% endblock content %}
