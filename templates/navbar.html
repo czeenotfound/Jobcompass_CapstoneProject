@@ -4,17 +4,17 @@
     <nav class="py-2 bg-body-tertiary border-bottom">
         <div class="container d-flex flex-wrap">
             <ul class="nav me-auto">
-                <li class="nav-item"><a href="{% url 'home' %}" class="nav-link link-body-emphasis px-2 active" aria-current="page">Home</a></li>
-                <li class="nav-item"><a href="{% url 'home' %}#faqs" class="nav-link link-body-emphasis px-2">FAQs</a></li>
-                <li class="nav-item"><a href="{% url 'home' %}#aboutus" class="nav-link link-body-emphasis px-2">About</a></li>
+                <li class="nav-item"><a href="{% url 'home' %}" class="nav-link text-danger link-body-emphasis px-2 active" aria-current="page">Home</a></li>
+                <li class="nav-item"><a href="{% url 'home' %}#faqs" class="nav-link text-danger link-body-emphasis px-2">FAQs</a></li>
+                <li class="nav-item"><a href="{% url 'home' %}#aboutus" class="nav-link text-danger link-body-emphasis px-2">About</a></li>
             </ul>
             <ul class="nav">
                 {% if request.resolver_match.url_name not in "login register" %}
                     <li class="nav-item">
-                        <a href="{% url 'login' %}" class="nav-link link-body-emphasis px-2">Login</a>
+                        <a href="{% url 'login' %}" class="nav-link text-danger link-body-emphasis px-2">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a href="{% url 'register' %}" class="nav-link link-body-emphasis px-2">Sign up</a>
+                        <a href="{% url 'register' %}" class="nav-link text-danger link-body-emphasis px-2">Sign up</a>
                     </li>
                 {% endif %}
             </ul>
@@ -191,6 +191,7 @@
                                 <!-- <li><a class="dropdown-item" href="#">Manage Users</a></li> -->
                                 <li><a class="dropdown-item custom-dropdown-item" href="{% url 'manage-jobs' %}">Manage Jobs</a></li>
                                 <li><a class="dropdown-item custom-dropdown-item" href="{% url 'manage-job-fairs' %}">Manage Job Fairs</a></li>
+                                <li><a class="dropdown-item custom-dropdown-item" href="{% url 'job-analytics' %}">Job Analytics</a></li>
                                 <hr class="dropdown-divider">
                                 {% endif %}
                                 <!-- Personal Account Dropdown -->

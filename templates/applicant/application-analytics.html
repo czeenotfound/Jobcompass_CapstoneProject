@@ -9,14 +9,14 @@
     <link rel="stylesheet" href="{% static 'CSS/datatables/dataTables.bootstrap5.css' %}">
 
     <script src="{% static 'JS/datatables/dataTables.js' %}"></script>
-
     <script src="{% static 'JS/exportDatatables/dataTables.buttons.js' %}"></script>
     <script src="{% static 'JS/exportDatatables/jszip.min.js' %}"></script>
     <script src="{% static 'JS/exportDatatables/pdfmake.min.js' %}"></script>
     <script src="{% static 'JS/exportDatatables/vfs_fonts.js' %}"></script>
     <script src="{% static 'JS/exportDatatables/buttons.html5.min.js' %}"></script>
     <script src="{% static 'JS/exportDatatables/buttons.print.min.js' %}"></script>
-    
+    <!-- Add Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock scripts %}
 
 {% block content %}
@@ -32,6 +32,7 @@
         <div class="d-flex align-items-center">
             <section class="applicantbanner w-100 h-100 p-5 bg-light rounded-start mb-4">
                 <h1 class="hero-heading">Application Analytics</h1>
+                <p class="lead text-white">Track your job search progress and insights</p>
             </section>
         </div>
         <div class="row flex-column flex-lg-row">
@@ -39,43 +40,154 @@
             {% include 'sidebar.html' %}
             <!-- Main Content -->
             <div class="mainTableContent col-12 col-lg-9">
-                <div class="custom-container mb-3">
-                    <div class="row g-2">
-                        <div class="col-md-4">
-                            <div class="card shadow-sm ">
-                                <div class="card-body">
+                <!-- Key Metrics -->
+                <div class="custom-container mb-4">
+                    <h4 class="mb-3">Key Metrics</h4>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body text-center">
                                     <h3 class="h6 fw-semibold mb-2">Total Applications</h3>
-                                    <p class="display-6 fw-bold py-4" id="totalApplications">{{ total_jobs }}</p>
+                                    <p class="display-6 fw-bold py-2" id="totalApplications">{{ total_jobs }}</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <h3 class="h6 fw-semibold mb-2">Accepted Applications</h3>
-                                    <p class="display-6 fw-bold py-4" id="totalAccepted">{{ accepted_count }}</p>
+                        <div class="col-md-3">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <h3 class="h6 fw-semibold mb-2">Accepted Offers</h3>
+                                    <p class="display-6 fw-bold py-2 text-success" id="totalAccepted">{{ accepted_count }}</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <h3 class="h6 fw-semibold mb-2">Rejected Applications</h3>
-                                    <p class="display-6 fw-bold py-4" id="totalRejected">{{ rejected_count }}</p>
+                        <div class="col-md-3">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <h3 class="h6 fw-semibold mb-2">Interviews</h3>
+                                    <p class="display-6 fw-bold py-2 text-primary" id="totalInterviews">{{ interview_count }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <h3 class="h6 fw-semibold mb-2">Offers Received</h3>
+                                    <p class="display-6 fw-bold py-2 text-info" id="totalOffers">{{ offered_count }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="custom-container bg-light p-3 shadow-sm">
+
+                <!-- Success Rates -->
+                <div class="custom-container mb-4">
+                    <h4 class="mb-3">Application Success Rates</h4>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title text-center">Response Rate</h5>
+                                    <div class="d-flex align-items-center justify-content-center mt-3">
+                                        <div class="metric-circle">
+                                            <span class="metric-value">{{ response_rate }}%</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-center text-muted mt-2">Percentage of applications that received a response</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title text-center">Interview Rate</h5>
+                                    <div class="d-flex align-items-center justify-content-center mt-3">
+                                        <div class="metric-circle">
+                                            <span class="metric-value">{{ interview_success_rate }}%</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-center text-muted mt-2">Percentage of applications that led to an interview</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title text-center">Offer Rate</h5>
+                                    <div class="d-flex align-items-center justify-content-center mt-3">
+                                        <div class="metric-circle">
+                                            <span class="metric-value">{{ offer_success_rate }}%</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-center text-muted mt-2">Percentage of applications that resulted in a job offer</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Application Pipeline -->
+                <div class="custom-container mb-4">
+                    <h4 class="mb-3">Application Pipeline</h4>
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col pipeline-stage">
+                                    <div class="pipeline-count" id="submittedCount">
+                                        {{ status_values.0|default:"0" }}
+                                    </div>
+                                    <div class="pipeline-label">Submitted</div>
+                                </div>
+                                <div class="col pipeline-stage">
+                                    <div class="pipeline-arrow">→</div>
+                                </div>
+                                <div class="col pipeline-stage">
+                                    <div class="pipeline-count" id="reviewCount">
+                                        {{ status_values.1|default:"0" }}
+                                    </div>
+                                    <div class="pipeline-label">Under Review</div>
+                                </div>
+                                <div class="col pipeline-stage">
+                                    <div class="pipeline-arrow">→</div>
+                                </div>
+                                <div class="col pipeline-stage">
+                                    <div class="pipeline-count" id="interviewCount">
+                                        {{ interview_count }}
+                                    </div>
+                                    <div class="pipeline-label">Interview</div>
+                                </div>
+                                <div class="col pipeline-stage">
+                                    <div class="pipeline-arrow">→</div>
+                                </div>
+                                <div class="col pipeline-stage">
+                                    <div class="pipeline-count" id="offerCount">
+                                        {{ offered_count }}
+                                    </div>
+                                    <div class="pipeline-label">Offered</div>
+                                </div>
+                                <div class="col pipeline-stage">
+                                    <div class="pipeline-arrow">→</div>
+                                </div>
+                                <div class="col pipeline-stage">
+                                    <div class="pipeline-count" id="acceptedCount">
+                                        {{ accepted_count }}
+                                    </div>
+                                    <div class="pipeline-label">Accepted</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Applications Table -->
+                <div class="custom-container bg-light p-3 shadow-sm mb-4">
+                    <h4 class="mb-3">Application History</h4>
                     <div class="tableBg">
                         <table id="applicationAnalyticsTable" class="table w-100">
                             <thead>
                                 <tr>
-                                    <th>Application Title</th>
-                                    <th>Application Type</th>
-                                    <th>Application Date</th>
+                                    <th>Job Title</th>
+                                    <th>Company</th>
+                                    <th>Status</th>
+                                    <th>Applied Date</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -83,28 +195,32 @@
                                 {% for application in applications %}
                                     <tr>
                                         <td class="fw-semibold">
-                                            <h1 style="font-size: 1.5rem;">{{ application.job.title }}</h1>
-                                            <div class="location-badge">
-                                                <i class="fas fa-location-dot"></i>
-                                                {% if application.job.location.barangay and application.job.location.city and application.job.location.street %}
-                                                    <!-- Display Philippine address if available -->
-                                                    {{ application.job.location.street }}{% if application.job.location.barangay %}, {{ application.job.location.barangay }}{% endif %}{% if application.job.location.city %}, {{ application.job.location.city }}{% endif %}
-                                                {% else %}
-                                                    <!-- Display international address if Philippine address is empty -->
-                                                    {{ application.job.location.countrystreet }}{% if application.job.location.countrystreet %}, {% endif %}{{ application.job.location.countrycity }}{% if application.job.location.countrycity %}, {% endif %}{{ application.job.location.country }}
-                                                {% endif %}
-                                            </div>
+                                            <h6 class="mb-0">{{ application.job.title }}</h6>
+                                            <div class="small text-muted">{{ application.job.employment_job_type }}</div>
                                         </td>
-                                        <td>{{ application.job.employment_job_type }}</td>
-                                        <td>{{ application.job.posted_date_time|date:'F d, Y h:m A' }}</td>
+                                        <td>{{ application.job.company.company_name }}</td>
                                         <td>
-                                            <div class="action-buttons">
-                                                <a href="{% url 'view_job_application' application.id %}" class="btn btn-view"><i class="fa-solid fa-eye"></i></a>
-                                                <a href="|" class="deleteButton btn btn-outline-danger" 
-                                                onclick="return confirm('Are you sure you want to unsave this job?')">
-                                                <i class="fa-solid fa-trash"></i>
-                                                </a>
-                                            </div>
+                                            {% if application.applicationstatus.status == 'SUBMITTED' %}
+                                                <span class="badge bg-secondary">Submitted</span>
+                                            {% elif application.applicationstatus.status == 'UNDER_REVIEW' %}
+                                                <span class="badge bg-warning text-dark">Under Review</span>
+                                            {% elif application.applicationstatus.status == 'INTERVIEW' %}
+                                                <span class="badge bg-primary">Interview</span>
+                                            {% elif application.applicationstatus.status == 'OFFERED' %}
+                                                <span class="badge bg-info">Offered</span>
+                                            {% elif application.applicationstatus.status == 'ACCEPTED' %}
+                                                <span class="badge bg-success">Accepted</span>
+                                            {% elif application.applicationstatus.status == 'REJECTED' %}
+                                                <span class="badge bg-danger">Rejected</span>
+                                            {% else %}
+                                                <span class="badge bg-light text-dark">Unknown</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ application.submit_date|date:'M d, Y' }}</td>
+                                        <td>
+                                            <a href="{% url 'view_job_application' application.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fa-solid fa-eye"></i> View
+                                            </a>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -112,143 +228,288 @@
                         </table>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="custom-container p-3">
-            <!-- Row 1 -->
-            <div class="mb-3">
-                <div class="bg-white p-4 shadow-sm">
-                    <h5 class="text-center mb-3">Status Distribution</h5>
-                    <canvas id="statusChart" class="chart-container"></canvas>
+                <!-- Charts Section -->
+                <div class="custom-container mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Application Status Distribution</h5>
+                                    <div class="chart-container" style="position: relative; height:300px;">
+                                        <canvas id="statusChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Applications Over Time</h5>
+                                    <div class="chart-container" style="position: relative; height:300px;">
+                                        <canvas id="timelineChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="mb-3">
-                <div class="bg-white p-4 shadow-sm">
-                    <h5 class="text-center mb-3">Salary Ranges</h5>
-                    <canvas id="salaryChart" class="chart-container"></canvas>
+
+                <div class="custom-container mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Industry Breakdown</h5>
+                                    <div class="chart-container" style="position: relative; height:300px;">
+                                        <canvas id="industryChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Job Type Distribution</h5>
+                                    <div class="chart-container" style="position: relative; height:300px;">
+                                        <canvas id="jobTypeChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class=" b-3">
-                <div class="bg-white p-4 shadow-sm">
-                    <h5 class="text-center mb-3">Industry Breakdown</h5>
-                    <canvas id="industryChart" class="chart-container"></canvas>
+
+                <!-- Salary Range Chart -->
+                <div class="custom-container mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Salary Range Analysis</h5>
+                            <div class="chart-container" style="position: relative; height:250px;">
+                                <canvas id="salaryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                
             </div>
         </div>
     </div>
-    
 
+    <style>
+        .pipeline-stage {
+            padding: 10px;
+            text-align: center;
+        }
+        .pipeline-count {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .pipeline-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        .pipeline-arrow {
+            font-size: 1.5rem;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        .metric-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            border: 3px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        .metric-value {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+    </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        
-        const statusLabels = {{ status_labels|safe }};
-        const statusValues = {{ status_values|safe }};
-        
-        const ctx = document.getElementById('statusChart').getContext('2d');
-        const statusChart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: statusLabels,
-                datasets: [{
-                    label: 'Application Status',
-                    data: statusValues,
-                    backgroundColor: [
-                        'rgba(75, 192, 192, 0.2)', 
-                        'rgba(255, 99, 132, 0.2)', 
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                    ],
-                    borderColor: [
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(153, 102, 255, 1)',
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'left' },
-                    tooltip: { 
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                return tooltipItem.label + ': ' + tooltipItem.raw + ' applications';
+        document.addEventListener('DOMContentLoaded', function() {
+            // Status chart
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            const statusChart = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: {{ status_labels|safe }},
+                    datasets: [{
+                        data: {{ status_values|safe }},
+                        backgroundColor: [
+                            '#6c757d', // Submitted - gray
+                            '#ffc107', // Under Review - yellow
+                            '#0d6efd', // Interview - blue
+                            '#20c997', // Offered - teal
+                            '#198754', // Accepted - green
+                            '#dc3545'  // Rejected - red
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
-        // Prepare the Industry Data
-        const industryLabels = {{ industry_names|safe }};
-        const industryData = {{ industry_values|safe }};
+            });
 
-        // Industry chart
-        const ctxIndustry = document.getElementById('industryChart').getContext('2d');
-        const industryChart = new Chart(ctxIndustry, {
-            type: 'bar',
-            data: {
-                labels: industryLabels,
-                datasets: [{
-                    label: 'Applications per Industry',
-                    data: industryData,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top'
+            // Timeline chart
+            const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+            const timelineChart = new Chart(timelineCtx, {
+                type: 'line',
+                data: {
+                    labels: {{ months|safe }},
+                    datasets: [{
+                        label: 'Applications',
+                        data: {{ monthly_counts|safe }},
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Industry chart
+            const industryCtx = document.getElementById('industryChart').getContext('2d');
+            const industryChart = new Chart(industryCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{ industry_names|safe }},
+                    datasets: [{
+                        label: 'Applications',
+                        data: {{ industry_values|safe }},
+                        backgroundColor: 'rgba(13, 110, 253, 0.7)',
+                        borderColor: '#0d6efd',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                return tooltipItem.label + ': ' + tooltipItem.raw + ' applications';
-                            }
+                    plugins: {
+                        legend: {
+                            display: false
                         }
                     }
                 }
-            }
-        });
+            });
 
-        // Prepare the Salary Data
-        const salaryData = {{ salary_averages|safe }};
+            // Job Type chart
+            const jobTypeCtx = document.getElementById('jobTypeChart').getContext('2d');
+            const jobTypeChart = new Chart(jobTypeCtx, {
+                type: 'pie',
+                data: {
+                    labels: {{ job_types|safe }},
+                    datasets: [{
+                        data: {{ job_type_values|safe }},
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)',
+                            'rgba(255, 159, 64, 0.7)',
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
 
-        // Salary chart
-        const ctxSalary = document.getElementById('salaryChart').getContext('2d');
-        const salaryChart = new Chart(ctxSalary, {
-            type: 'line', // Can be 'bar' or 'line' depending on the preference
-            data: {
-                labels: Array.from({ length: salaryData.length }, (_, i) => i + 1), // X-axis as sequential application numbers
-                datasets: [{
-                    label: 'Average Salary',
-                    data: salaryData,
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
+            // Salary chart
+            const salaryCtx = document.getElementById('salaryChart').getContext('2d');
+            const salaryData = {{ salary_averages|safe }};
+            
+            // Create labels for each application (1 to n)
+            const appLabels = Array.from({ length: salaryData.length }, (_, i) => `Job ${i+1}`);
+            
+            const salaryChart = new Chart(salaryCtx, {
+                type: 'bar',
+                data: {
+                    labels: appLabels,
+                    datasets: [{
+                        label: 'Average Salary',
+                        data: salaryData,
+                        backgroundColor: 'rgba(32, 201, 151, 0.7)',
+                        borderColor: '#20c997',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Salary'
+                            }
+                        }
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                return 'Salary: ' + tooltipItem.raw;
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Salary: ${context.raw.toLocaleString()}`;
+                                }
                             }
                         }
                     }
                 }
-            }
+            });
         });
     </script>
 {% endblock content %}

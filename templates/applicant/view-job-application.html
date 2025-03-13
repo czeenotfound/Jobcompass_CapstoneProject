@@ -36,12 +36,14 @@
                         {% endif %}
                     {% endwith %}
                     <div class="mt-3 ">
-                        {% if application.applicationstatus.status in "INTERVIEW, OFFERED" %}
+                        {% if application.applicationstatus.status in "INTERVIEW, OFFERED, ACCEPTED, REJECTED" %}
                         <button class="btn btn-secondary customButton px-3" data-bs-toggle="modal" data-bs-target="#detailsModal">
                             <i class="fa-solid fa-info-circle"></i> View Details
                         </button> 
                         {% endif %}
-
+                        <button class="btn btn-info customButton px-3" data-bs-toggle="modal" data-bs-target="#historyModal">
+                            <i class="fa-solid fa-history"></i> View Application History
+                        </button>
                         <a href="{% url 'inbox' %}" class="btn btn-outline-light customButton px-3">
                             <i class="fa-solid fa-mail"></i> View Inbox
                         </a>
@@ -222,42 +224,375 @@
         </div>
     </div>      
             
-    <!-- Modal -->
-<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content rounded-4 shadow-lg">
-            <div class="modal-header bg-primary text-white rounded-top">
-                <h5 class="modal-title" id="detailsModalLabel">Application Details</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                {% if application.applicationstatus.status == "INTERVIEW" %}
-                    <h4 class="mb-3">📅 Interview Details</h4>
-                    {% for interview in application.interview_set.all %}
-                        <div class="card shadow-sm border-0 mb-3 rounded-3">
-                            <div class="card-body p-4">
-                                <h5 class="card-title fw-bold">{{ interview.interview_type|title }} Interview</h5>
-                                <p class="mb-2"><strong>📆 Date:</strong> {{ interview.interview_date|date:"F j, Y, g:i a" }}</p>
-                                <p class="mb-2"><strong>👤 Interviewer:</strong> {{ interview.interviewer }}</p>
-                                <p class="mb-0"><strong>📝 Notes:</strong> {{ interview.notes }}</p>
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% elif application.applicationstatus.status == "OFFERED" %}
-                    <h4 class="mb-3">🎉 Job Offer Details</h4>
-                    <div class="card shadow-sm border-0 rounded-3">
-                        <div class="card-body p-4">
-                            <p class="mb-2"><strong>💰 Salary:</strong> ₱ {{ application.offer.salary }}</p>
-                            <p class="mb-2"><strong>🎁 Benefits:</strong> {{ application.offer.benefits }}</p>
-                            <p class="mb-2"><strong>📅 Offer Date:</strong> {{ application.offer.offer_date|date:"F j, Y" }}</p>
-                            <p class="mb-0"><strong>⏳ Expiration Date:</strong> {{ application.offer.expiration_date|date:"F j, Y" }}</p>
+  <!-- Improved Details Modal -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 shadow-lg" style="border-radius: 1rem;">
+                <div class="modal-header rounded-top-4" style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                    <h5 class="modal-title" id="detailsModalLabel">
+                        <i class="fa-solid fa-clipboard-list me-2"></i>Application Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Current Status Section -->
+                    <div class="current-status mb-4 p-3 rounded-3" style="background-color: #f8f9fa;">
+                        <h5 class="mb-2"><i class="fa-solid fa-flag me-2"></i>Current Status</h5>
+                        <div class="d-flex align-items-center">
+                            {% with status=application.applicationstatus.status %}
+                                {% if status == 'SUBMITTED' %}
+                                    <span class="status-badge status-submitted">Submitted</span>
+                                {% elif status == 'UNDER_REVIEW' %}
+                                    <span class="status-badge status-review">Under Review</span>
+                                {% elif status == 'INTERVIEW' %}
+                                    <span class="status-badge status-interview">Interview Scheduled</span>
+                                {% elif status == 'OFFERED' %}
+                                    <span class="status-badge status-offered">Offered</span>
+                                {% elif status == 'ACCEPTED' %}
+                                    <span class="status-badge status-accepted">Accepted</span>
+                                {% elif status == 'REJECTED' %}
+                                    <span class="status-badge status-rejected">Rejected</span>
+                                {% endif %}
+                            {% endwith %}
+                            <span class="ms-2 text-muted">Last updated: {{ application.applicationstatus.status_date|date:"F j, Y, g:i a" }}</span>
                         </div>
                     </div>
-                {% endif %}
+
+                    <!-- Interview Details Section -->
+                    {% if application.applicationstatus.status == "INTERVIEW" %}
+                        <div class="mb-4">
+                            <h5 class="mb-3"><i class="fa-solid fa-calendar-check me-2"></i>Interview Details</h5>
+                            {% for interview in interviews %}
+                                <div class="card shadow-sm border-0 mb-3 rounded-3">
+                                    <div class="card-body p-4">
+                                        <h5 class="card-title fw-bold">{{ interview.interview_type|title }} Interview</h5>
+                                        <div class="row mt-3">
+                                            <div class="col-md-6">
+                                                <p class="mb-2">
+                                                    <i class="fa-solid fa-calendar me-2 text-primary"></i>
+                                                    <strong>Date:</strong> {{ interview.interview_date|date:"F j, Y" }}
+                                                </p>
+                                                <p class="mb-2">
+                                                    <i class="fa-solid fa-clock me-2 text-primary"></i>
+                                                    <strong>Time:</strong> {{ interview.interview_date|date:"g:i a" }}
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p class="mb-2">
+                                                    <i class="fa-solid fa-user me-2 text-primary"></i>
+                                                    <strong>Interviewer:</strong> {{ interview.interviewer }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3 p-3 bg-light rounded-3">
+                                            <p class="mb-0">
+                                                <i class="fa-solid fa-comment me-2 text-primary"></i>
+                                                <strong>Notes:</strong> {{ interview.notes|default:"No additional notes provided." }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    
+                    <!-- Job Offer Details Section -->
+                    {% elif application.applicationstatus.status == "OFFERED" %}
+                        <div class="mb-4">
+                            <h5 class="mb-3"><i class="fa-solid fa-handshake me-2"></i>Job Offer Details</h5>
+                            {% for offer in offers %}
+                            <div class="card shadow-sm border-0 rounded-3">
+                                <div class="card-body p-4">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary">Compensation</h6>
+                                            
+                                            {% if offer.salary_display_type == 'fixed' %}
+                                                <p class="mb-2">
+                                                    <i class="fa-solid fa-money-bill me-2 text-success"></i>
+                                                    <strong>Salary:</strong> {{ offer.currency }} {{ offer.salary_fixed|intcomma }} {{ offer.salary_mode }}
+                                                </p>
+                                            {% elif offer.salary_display_type == 'range' %}
+                                                <p class="mb-2">
+                                                    <i class="fa-solid fa-money-bill me-2 text-success"></i>
+                                                    <strong>Salary Range:</strong> {{ offer.currency }} {{ offer.salary_min|intcomma }} - {{ offer.salary_max|intcomma }} {{ offer.salary_mode }}
+                                                </p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary">Important Dates</h6>
+                                            <p class="mb-2">
+                                                <i class="fa-solid fa-calendar-plus me-2 text-info"></i>
+                                                <strong>Offer Date:</strong> {{ offer.offer_date|date:"F j, Y" }}
+                                            </p>
+                                            <p class="mb-2">
+                                                <i class="fa-solid fa-hourglass-end me-2 text-warning"></i>
+                                                <strong>Respond By:</strong> {{ offer.expiration_date|date:"F j, Y" }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <h6 class="text-primary">Benefits</h6>
+                                        <div class="p-3 bg-light rounded-3">
+                                            {% if offer.benefits %}
+                                                {{ offer.benefits|linebreaks }}
+                                            {% else %}
+                                                <p class="text-muted mb-0">No specific benefits listed</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor%}
+                        </div>
+                    {% endif %}
+
+                    <!-- Feedback Section - For Accepted or Rejected status -->
+                    {% if application.applicationstatus.status in "ACCEPTED,REJECTED" and application.feedback_set.exists %}
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                {% if application.applicationstatus.status == "ACCEPTED" %}
+                                    <i class="fa-solid fa-thumbs-up me-2 text-success"></i>Acceptance Feedback
+                                {% else %}
+                                    <i class="fa-solid fa-comment-dots me-2 text-danger"></i>Feedback on Your Application
+                                {% endif %}
+                            </h5>
+                            {% for feedback in feedbacks %}
+                                <div class="card shadow-sm border-0 rounded-3">
+                                    <div class="card-body p-4">
+                                        {% if feedback.feedback_type == 'APPLICANT' %}
+                                            <div class="mb-3 p-3 bg-light rounded-3">
+                                                <p class="mb-0">{{ feedback.content }}</p>
+                                            </div>
+                                            <p class="text-muted mb-0 text-end">
+                                                <small>Provided on {{ feedback.feedback_date|date:"F j, Y" }}</small>
+                                            </p>
+                                        {% elif feedback.feedback_type == 'INTERVIEWER' %}
+                                            <div class="mb-3 p-3 bg-light rounded-3">
+                                                <p class="mb-0">{{ feedback.content }}</p>
+                                            </div>
+                                            <p class="text-muted mb-0 text-end">
+                                                <small>Provided on {{ feedback.feedback_date|date:"F j, Y" }}</small>
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary customButton" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
+    <!-- Application History Modal -->
+    <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow-lg"  style="border-radius: 1rem;">
+                <div class="modal-header rounded-top-4" style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                    <h5 class="modal-title" id="historyModalLabel">
+                        <i class="fa-solid fa-history me-2"></i>Application History
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="timeline">
+                        <!-- Submitted is always the first status -->
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6 class="fw-bold mb-0">Submitted</h6>
+                                <small class="text-muted">{{ application.submit_date|date:"F j, Y, g:i a" }}</small>
+                                <p>Application submitted for {{ application.job.title }}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Identify current status outside of submitted -->
+                        {% if application.applicationstatus.status != 'SUBMITTED' %}
+                            <div class="timeline-item">
+                                {% with status=application.applicationstatus.status %}
+                                    {% if status == 'UNDER_REVIEW' %}
+                                        <div class="timeline-marker bg-warning"></div>
+                                        <div class="timeline-content">
+                                            <h6 class="fw-bold mb-0">Under Review</h6>
+                                            <small class="text-muted">{{ application.applicationstatus.status_date|date:"F j, Y, g:i a" }}</small>
+                                            <p>Your application is currently being reviewed by the employer.</p>
+                                        </div>
+                                    {% elif status == 'INTERVIEW' %}
+                                        <div class="timeline-marker bg-primary"></div>
+                                        <div class="timeline-content">
+                                            <h6 class="fw-bold mb-0">Interview Scheduled</h6>
+                                            <small class="text-muted">{{ application.applicationstatus.status_date|date:"F j, Y, g:i a" }}</small>
+                                            <p>You've been selected for an interview. Check the details in the application details.</p>
+                                        </div>
+                                    {% elif status == 'OFFERED' %}
+                                        <div class="timeline-marker bg-success"></div>
+                                        <div class="timeline-content">
+                                            <h6 class="fw-bold mb-0">Job Offer</h6>
+                                            <small class="text-muted">{{ application.applicationstatus.status_date|date:"F j, Y, g:i a" }}</small>
+                                            <p>Congratulations! You've received a job offer. Check the details in the application details.</p>
+                                        </div>
+                                    {% elif status == 'REJECTED' %}
+                                        <div class="timeline-marker bg-danger"></div>
+                                        <div class="timeline-content">
+                                            <h6 class="fw-bold mb-0">Application Rejected</h6>
+                                            <small class="text-muted">{{ application.applicationstatus.status_date|date:"F j, Y, g:i a" }}</small>
+                                            <p>Your application was not selected for this position.</p>
+                                        </div>
+                                    {% elif status == 'ACCEPTED' %}
+                                        <div class="timeline-marker bg-success"></div>
+                                        <div class="timeline-content">
+                                            <h6 class="fw-bold mb-0">Application Accepted</h6>
+                                            <small class="text-muted">{{ application.applicationstatus.status_date|date:"F j, Y, g:i a" }}</small>
+                                            <p>Congratulations! Your application has been accepted.</p>
+                                        </div>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Load messages if they exist -->
+                        {% if application.conversation %}
+                            {% for message in application.conversation.messages.all %}
+                                {% if "status of your application" in message.content %}
+                                    <div class="timeline-item">
+                                        {% if "Under Review" in message.content %}
+                                            <div class="timeline-marker bg-warning"></div>
+                                        {% elif "Interview Scheduled" in message.content %}
+                                            <div class="timeline-marker bg-primary"></div>
+                                        {% elif "Offered" in message.content %}
+                                            <div class="timeline-marker bg-success"></div>
+                                        {% elif "Rejected" in message.content %}
+                                            <div class="timeline-marker bg-danger"></div>
+                                        {% elif "Accepted" in message.content %}
+                                            <div class="timeline-marker bg-success"></div>
+                                        {% else %}
+                                            <div class="timeline-marker bg-secondary"></div>
+                                        {% endif %}
+                                        
+                                        <div class="timeline-content">
+                                            {% if "Under Review" in message.content %}
+                                                <h6 class="fw-bold mb-0">Under Review</h6>
+                                            {% elif "Interview Scheduled" in message.content %}
+                                                <h6 class="fw-bold mb-0">Interview Scheduled</h6>
+                                            {% elif "Offered" in message.content %}
+                                                <h6 class="fw-bold mb-0">Job Offered</h6>
+                                            {% elif "Rejected" in message.content %}
+                                                <h6 class="fw-bold mb-0">Application Rejected</h6>
+                                            {% elif "Accepted" in message.content %}
+                                                <h6 class="fw-bold mb-0">Application Accepted</h6>
+                                            {% else %}
+                                                <h6 class="fw-bold mb-0">Status Update</h6>
+                                            {% endif %}
+                                            
+                                            <small class="text-muted">{{ message.timestamp|date:"F j, Y, g:i a" }}</small>
+                                            <p>{{ message.content }}</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                        
+                        {% for interview in interviews %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="fw-bold mb-0">Interview Scheduled</h6>
+                                    <small class="text-muted">{{ interview.interview_date|date:"F j, Y, g:i a" }}</small>
+                                    <p>{{ interview.interview_type|title }} interview with {{ interview.interviewer }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        
+                        {% for offer in offers %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-success"></div>
+                                <div class="timeline-content">
+                                    <h6 class="fw-bold mb-0">Job Offer</h6>
+                                    <small class="text-muted">{{ offer.offer_date|date:"F j, Y" }}</small>
+                                    <p>You received a job offer that expires on {{ offer.expiration_date|date:"F j, Y" }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        
+                        {% for feedback in feedbacks %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker {% if feedback.feedback_type == 'APPLICANT' %}bg-danger{% else %}bg-success{% endif %}"></div>
+                                <div class="timeline-content">
+                                    <h6 class="fw-bold mb-0">
+                                        {% if feedback.feedback_type == 'APPLICANT' %}
+                                            Rejection Feedback
+                                        {% else %}
+                                            Acceptance Feedback
+                                        {% endif %}
+                                    </h6>
+                                    <small class="text-muted">{{ feedback.feedback_date|date:"F j, Y" }}</small>
+                                    <p>{{ feedback.content|truncatechars:100 }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary customButton" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <style>
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        .timeline:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 18px;
+            height: 100%;
+            width: 4px;
+            background: #e9ecef;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        .timeline-marker {
+            position: absolute;
+            left: 15px;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 4px #e9ecef;
+        }
+        .timeline-content {
+            margin-left: 40px;
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            font-size: 0.85em;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+        }
+        .status-submitted { background-color: #6c757d; color: white; }
+        .status-review { background-color: #ffc107; color: black; }
+        .status-interview { background-color: #0d6efd; color: white; }
+        .status-offered { background-color: #20c997; color: white; }
+        .status-accepted { background-color: #198754; color: white; }
+        .status-rejected { background-color: #dc3545; color: white; }
+    </style>
 {% endblock %}

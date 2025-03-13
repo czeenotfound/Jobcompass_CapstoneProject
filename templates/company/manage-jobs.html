@@ -78,13 +78,7 @@
                                                 <h1 style="font-size: 1.5rem;">{{job.title}}</h1>
                                                 <div class="location-badge">
                                                     <i class="fas fa-location-dot"></i>
-                                                    {% if job.location.barangay and job.location.city and job.location.street %}
-                                                        <!-- Display Philippine address if available -->
-                                                        {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
-                                                    {% else %}
-                                                        <!-- Display international address if Philippine address is empty -->
-                                                        {{ job.location.countrystreet }}{% if job.location.countrystreet %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
-                                                    {% endif %}
+                                                    {{ job.location.region }}, {{ job.location.city }}, {{ job.location.street }}
                                                 </div>
                                             </td>
                                             <td>{{job.employment_job_type}}</td>
@@ -97,19 +91,26 @@
                                             <td>{{job.posted_date_time|date:'F d, Y'}}</td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    <a href="{% url 'job-info' job.pk %}" class="btn btn-view"><i class="fa-solid fa-eye"></i></a>
-                                                    <a href="{% url 'update-job' job.pk %}" class="btn btn-edit"><i class="fa-regular fa-pen-to-square"></i></a>
+                                                    <a href="{% url 'job-info' job.pk %}" class="btn btn-view" title="View Job"><i class="fa-solid fa-eye"></i></a>
+                                                    <a href="{% url 'update-job' job.pk %}" class="btn btn-edit" title="Edit Job"><i class="fa-regular fa-pen-to-square"></i></a>
                                                     {% if job.is_available %}
-                                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmModal" 
-                                                            data-action-url="{% url 'deactivate-job' job.pk %}">
-                                                            <i class="fa-solid fa-times"></i> Disable
-                                                        </button>
+                                                        <a href="{% url 'deactivate-job' job.pk %}" class="btn btn-archive" title="Disable Job">
+                                                            <i class="fa-solid fa-eye-slash"></i>
+                                                        </a>
                                                     {% else %}
-                                                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmModal" 
-                                                            data-action-url="{% url 'activate-job' job.pk %}">
-                                                            <i class="fa-solid fa-check"></i> Enable
-                                                        </button>
+                                                        <a href="{% url 'activate-job' job.pk %}" class="btn btn-success" title="Enable Job">
+                                                            <i class="fa-solid fa-check"></i>
+                                                        </a>
                                                     {% endif %}
+                                                    <button type="button" class="btn btn-delete" onclick="showConfirmModal({
+                                                        title: 'Delete Job',
+                                                        message: 'Are you sure you want to delete this job? This action cannot be undone.',
+                                                        actionUrl: '{% url 'delete-job' job.pk %}',
+                                                        theme: 'danger'
+                                                    })" title="Delete Job">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                    
                                                 </div>
                                             </td>
                                         </tr>
@@ -124,18 +125,21 @@
     </div>
 
     <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content"  style="border-radius: 1rem;">
+                <div class="modal-header bg-dark text-white"  style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
                     <h5 class="modal-title" id="confirmModalLabel">Confirm Action</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    Are you sure you want to perform this action?
+                <div class="modal-body text-center">
+                    <div id="confirmIcon" class="mb-3">
+                        <i class="bi bi-exclamation-circle text-warning" style="font-size: 2rem;"></i>
+                    </div>
+                    <p id="confirmMessage">Are you sure you want to perform this action?</p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <a id="confirmActionButton" href="#" class="btn btn-primary">Confirm</a>
+                <div class="modal-footer justify-content-end">
+                    <button type="button" class="btn customButton btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a id="confirmActionButton" href="#" class="customButton">Confirm</a>
                 </div>
             </div>
         </div>
@@ -143,18 +147,33 @@
 
 
 <script>
-    const confirmModal = document.getElementById('confirmModal');
-    const confirmActionButton = document.getElementById('confirmActionButton');
+   function showConfirmModal({ title, message, actionUrl, theme = "primary", icon = "exclamation-circle" }) {
+        document.getElementById("confirmModalLabel").textContent = title;
+        document.getElementById("confirmMessage").textContent = message;
+        document.getElementById("confirmActionButton").href = actionUrl;
 
-    confirmModal.addEventListener('show.bs.modal', function (event) {
-        // Get the button that triggered the modal
-        const button = event.relatedTarget;
+        // Update icon dynamically
+        document.getElementById("confirmIcon").innerHTML = `<i class="bi bi-${icon} text-${theme}" style="font-size: 2rem;"></i>`;
 
-        // Extract the URL from the button's data-action-url attribute
-        const actionUrl = button.getAttribute('data-action-url');
+        // Update modal header background
+        document.querySelector("#confirmModal .modal-header").className = `modal-header bg-${theme} text-white`;
+        
+        // Update button color
+        document.getElementById("confirmActionButton").className = `btn customButton btn-${theme}`;
 
-        // Set the URL in the confirmation button
-        confirmActionButton.href = actionUrl;
+        // Show modal
+        new bootstrap.Modal(document.getElementById("confirmModal")).show();
+    }
+
+    // Example Usage
+    document.getElementById("deleteButton").addEventListener("click", function() {
+        showConfirmModal({
+            title: "Delete Item",
+            message: "Are you sure you want to delete this item? This action cannot be undone.",
+            actionUrl: "/delete-item-url/",
+            theme: "danger",
+            icon: "trash"
+        });
     });
 
 </script>

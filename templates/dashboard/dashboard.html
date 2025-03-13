@@ -28,51 +28,90 @@
                         <div class="bubbleformfilter d-flex gap-3 align-items-center">
                             <i class="fa-solid fa-magnifying-glass text-dark"></i>
                             {% render_field job_filter.form.title class="searchbar form-control form-control-lg border-0 p-0" placeholder="Search for jobs..." %}
-                            
                             <button class="searchbar btn btn-primary custom-button" type="submit">Search</button>
-                            <a href="{% url 'dashboard' %}" class="searchbar btn btn-outline-secondary custom-button" type="submit">Reset</a>
+                            <a href="{% url 'dashboard' %}" class="searchbar btn btn-outline-secondary custom-button">Reset</a>
                         </div>
                     </div>
                     
                     <div class="row g-3 mb-4 justify-content-center text-center input-group">
-                        <div class="col-xs-12 col-sm-6 col-md-3">
-                            <label for="jobtype">Location</label>
+                        <!-- Location Filter -->
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <label for="location">Location</label>
                             <div class="bubbleformfilter d-flex gap-3 align-items-center">
                                 <i class="fa-solid fa-location-dot text-dark"></i>
-                                <div class="input-group">
-                                    {% render_field job_filter.form.location class="form-control border-0 p-0" placeholder="barangay, city, or region" %}
-                                </div>
+                                {% render_field job_filter.form.location class="form-control border-0 p-0" placeholder="region, city, street" %}
                             </div>
                         </div>
-                        <div class="col-xs-12 col-sm-6 col-md-3">
+                        
+                        <!-- Job Type Filter -->
+                        <div class="col-xs-12 col-sm-6 col-md-4">
                             <label for="jobType">Job Type</label>
                             <div class="bubbleformfilter d-flex gap-3 align-items-center">
                                 <i class="fa-solid fa-briefcase text-dark"></i>
-                                <select class="form-control border-0 p-0" name="employment_job_type" id="employment_job_type">
-                                    <option value="" disabled selected>Select Job Type</option>
-                                    {% for choice in job_filter.form.employment_job_type.field.choices %}
-                                        <option value="{{ choice.0 }}" {% if form.employment_job_type.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% render_field job_filter.form.employment_job_type class="form-control border-0 p-0" %}
+                            </div>
+                        </div>
+                        
+                        <!-- Education Level Filter -->
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <label for="education">Education Level</label>
+                            <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                <i class="fa-solid fa-graduation-cap text-dark"></i>
+                                {% render_field job_filter.form.education_level class="form-control border-0 p-0" %}
+                            </div>
+                        </div>
+                        
+                        <!-- Experience Filter -->
+                        <div class="col-xs-12 col-sm-6 col-md-6">
+                            <label for="experience">Experience (Years)</label>
+                            <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                <i class="fa-solid fa-clock-rotate-left text-dark"></i>
+                                {% render_field job_filter.form.experience type="number" min="0" class="form-control border-0 p-0" placeholder="Enter years" %}
+                            </div>
+                        </div>
+                        <!-- Salary Type Filter -->
+                        <div class="col-xs-12 col-sm-6 col-md-6">
+                            <label for="salaryType">Salary Type</label>
+                            <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                <i class="fa-solid fa-money-bill-wave text-dark"></i>
+                                <select name="salary_display_type" class="form-control border-0 p-0" id="salaryType">
+                                    <option value="" selected>Select Salary Type</option>
+                                    {% for value, text in job_filter.form.salary_display_type.field.choices %}
+                                        {% if value %}
+                                            <option value="{{ value }}" {% if job_filter.form.salary_display_type.value == value %}selected{% endif %}>
+                                                {{ text }}
+                                            </option>
+                                        {% endif %}
                                     {% endfor %}
                                 </select>
                             </div>
                         </div>
-                        <div class=" col-sm-6 col-md-3">
-                            <label for="industry">Industry</label>
+
+                        <!-- Fixed Salary Input (Initially Hidden) -->
+                        <div class="col-xs-12 col-sm-6 col-md-6" id="fixedSalaryContainer" style="display: none;">
+                            <label for="minSalary">Fixed Salary</label>
                             <div class="bubbleformfilter d-flex gap-3 align-items-center">
-                                <i class="fa-solid fa-industry text-dark"></i>
-                                <select class="form-control border-0 p-0" name="industry" id="industry">
-                                    <option value="" disabled selected>Select Industry</option>
-                                    {% for choice in job_filter.form.industry.field.choices %}
-                                        <option value="{{ choice.0 }}" {% if form.industry.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
-                                    {% endfor %}
-                                </select>
+                                <i class="fa-solid fa-money-bill-1 text-dark"></i>
+                                {% render_field job_filter.form.min_salary type="number" class="form-control border-0 p-0" placeholder="Enter Fixed Salary" %}
                             </div>
                         </div>
-                        <div class="col-xs-12 col-sm-6 col-md-3">
-                            <label for="salaryrange">Salary Range</label>
-                            <div class="bubbleformfilter d-flex gap-3 align-items-center">
-                                <i class="fa-solid fa-money-bill-wave me-2 text-dark"></i>
-                                {% render_field job_filter.form.salary_range class="form-select border-0 p-0" id="salaryrange" %}
+
+                        <!-- Salary Range Inputs (Initially Hidden) -->
+                        <div id="salaryRangeContainer" class="row mt-2" style="display: none;">
+                            <div class="col-xs-12 col-sm-6 col-md-6">
+                                <label for="minSalary">Minimum Salary</label>
+                                <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                    <i class="fa-solid fa-money-bill-1 text-dark"></i>
+                                    {% render_field job_filter.form.min_salary type="number" class="form-control border-0 p-0" placeholder="Min Salary" %}
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-6 col-md-6">
+                                <label for="maxSalary">Maximum Salary</label>
+                                <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                    <i class="fa-solid fa-money-bill-1-wave text-dark"></i>
+                                    {% render_field job_filter.form.max_salary type="number" class="form-control border-0 p-0" placeholder="Max Salary" %}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -143,6 +182,7 @@
                     {% endfor %}
                     </div>
                 </div>
+                
                 <div class="col-md-7">
                     {% for job in recommended_jobs %}
                         <div id="job-{{ forloop.counter }}" class="job-details {% if forloop.first %} active {% endif %}">
@@ -165,9 +205,20 @@
                                             {% if job.not_suitable %}
                                                 <span class="badge bg-danger text-white">Not Suitable</span>
                                             {% endif %}
-                                            <p>Score: {{ job.total_score }}</p>
                                         </div>
                                     </div>
+                                    <style>
+                                        .circular-progress {
+                                            width: 50px;
+                                            height: 50px;
+                                            border-radius: 50%;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            color: white;
+                                            font-weight: bold;
+                                        }
+                                    </style>
                                     
                                     <div class="d-flex flex-column mb-4">
                                         <div class="d-flex align-items-center mb-1">
@@ -218,6 +269,306 @@
                                             <i class="fas fa-exclamation-triangle"></i> Your skills do not match the requirements for this job.
                                         </div>
                                     {% endif %}
+
+                                    
+
+                                    <!-- Detailed Match Card -->
+                                    <div class="card mb-3 border-primary shadow-sm">
+                                        <!-- Collapsible Header -->
+                                        <div class="card-header bg-primary bg-opacity-10 text-primary">
+                                            <div class="d-flex justify-content-between align-items-center" 
+                                                 data-bs-toggle="collapse" 
+                                                 data-bs-target="#matchDetailsCollapse{{ job.id }}" 
+                                                 aria-expanded="false" 
+                                                 aria-controls="matchDetailsCollapse{{ job.id }}"
+                                                 style="cursor: pointer;">
+                                                <div class="text-white">
+                                                    <i class="fas fa-chart-bar me-2"></i>Match Analysis
+                                                </div>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge bg-primary rounded-pill me-2">{{ job.total_score }}</span>
+                                                    <i class="fas fa-chevron-down collapse-icon"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Collapsed Content -->
+                                        <div class="collapse" id="matchDetailsCollapse{{ job.id }}">
+                                            <div class="card-body p-3">
+                                                <!-- Primary Matches -->
+                                                <div class="row mb-3">
+                                                    <div class="col-md-4">
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <div class="me-2">
+                                                                <div class="circular-progress {% if job.industry_match == 1 %}bg-success{% else %}bg-danger{% endif %} d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 50%;">
+                                                                    <i class="fas {% if job.industry_match == 1 %}fa-check{% else %}fa-times{% endif %} text-white small"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="fw-bold mb-0 small">Industry</h6>
+                                                                <p class="text-muted mb-0 small">
+                                                                    {% if job.industry_match == 1 %}
+                                                                        {{ resume.industry }}
+                                                                    {% else %}
+                                                                        Not matched
+                                                                    {% endif %}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <div class="me-2">
+                                                                <div class="circular-progress {% if job.employment_match == 1 %}bg-success{% else %}bg-danger{% endif %} d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 50%;">
+                                                                    <i class="fas {% if job.employment_match == 1 %}fa-check{% else %}fa-times{% endif %} text-white small"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="fw-bold mb-0 small">Employment Type</h6>
+                                                                <p class="text-muted mb-0 small">
+                                                                    {% if job.employment_match == 1 %}
+                                                                        {{ resume.employment_job_type }}
+                                                                    {% else %}
+                                                                        Not matched
+                                                                    {% endif %}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <div class="me-2">
+                                                                <div class="circular-progress {% if job.location_match == 1 %}bg-success{% else %}bg-danger{% endif %} d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 50%;">
+                                                                    <i class="fas {% if job.location_match == 1 %}fa-check{% else %}fa-times{% endif %} text-white small"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="fw-bold mb-0 small">Location Type</h6>
+                                                                <p class="text-muted mb-0 small">
+                                                                    {% if job.location_match == 1 %}
+                                                                        {{ resume.location_job_type }}
+                                                                    {% else %}
+                                                                        Not matched
+                                                                    {% endif %}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Secondary Matches -->
+                                                <div class="row mb-3">
+                                                    <div class="col-md-4">
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <div class="me-2">
+                                                                <div class="circular-progress {% if job.skill_match_count > 0 %}bg-success{% else %}bg-danger{% endif %} d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 50%;">
+                                                                    <span class="text-white fw-bold small">{{ job.skill_match_count }}</span>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="fw-bold mb-0 small">Skills</h6>
+                                                                <p class="text-muted mb-0 small">{{ job.skill_match_count }}/{{ job.requiredskill_set.count }} skills</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <div class="me-2">
+                                                                <div class="circular-progress {% if job.education_match == 1 %}bg-success{% else %}bg-danger{% endif %} d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 50%;">
+                                                                    <i class="fas {% if job.education_match == 1 %}fa-check{% else %}fa-times{% endif %} text-white small"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="fw-bold mb-0 small">Education</h6>
+                                                                <p class="text-muted mb-0 small">
+                                                                    {% if job.education_match == 1 %}
+                                                                        Qualified
+                                                                    {% else %}
+                                                                        Not matched
+                                                                    {% endif %}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <div class="me-2">
+                                                                <div class="circular-progress {% if job.experience_match == 1 %}bg-success{% else %}bg-danger{% endif %} d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 50%;">
+                                                                    <i class="fas {% if job.experience_match == 1 %}fa-check{% else %}fa-times{% endif %} text-white small"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="fw-bold mb-0 small">Experience</h6>
+                                                                <p class="text-muted mb-0 small">
+                                                                    {% if job.experience_match == 1 %}
+                                                                        Sufficient
+                                                                    {% else %}
+                                                                        Insufficient
+                                                                    {% endif %}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Detailed Breakdown -->
+                                                <div class="mb-3">
+                                                    <div class="accordion accordion-flush small" id="skillsAccordion{{ job.id }}">
+                                                        <div class="accordion-item">
+                                                            <h2 class="accordion-header" id="skillsHeading{{ job.id }}">
+                                                                <button class="accordion-button collapsed py-2 small fw-bold" type="button" 
+                                                                        data-bs-toggle="collapse" data-bs-target="#skillsContent{{ job.id }}" 
+                                                                        aria-expanded="false" aria-controls="skillsContent{{ job.id }}">
+                                                                    Detailed Breakdown
+                                                                </button>
+                                                            </h2>
+                                                            <div id="skillsContent{{ job.id }}" class="accordion-collapse collapse" 
+                                                                aria-labelledby="skillsHeading{{ job.id }}" data-bs-parent="#skillsAccordion{{ job.id }}">
+                                                                <div class="accordion-body p-2">
+                                                                    <div class="row">
+                                                                        <div class="col-md-6">
+                                                                            <h6 class="text-success small fw-bold">
+                                                                                <i class="fas fa-check-circle me-1"></i>Matching Skills
+                                                                            </h6>
+                                                                            <ul class="ps-3 small mb-3">
+                                                                                {% for match in job.matched_skills %}
+                                                                                    <li>
+                                                                                        <strong>{{ match.job_skill }}</strong>
+                                                                                        {% if match.match_type == 'fuzzy' %}
+                                                                                            <span class="text-muted">
+                                                                                                ({{ match.similarity }}% match with "{{ match.resume_skill }}")
+                                                                                            </span>
+                                                                                        {% endif %}
+                                                                                    </li>
+                                                                                {% empty %}
+                                                                                    <li class="text-muted">No matching skills</li>
+                                                                                {% endfor %}
+                                                                            </ul>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <h6 class="text-danger small fw-bold">
+                                                                                <i class="fas fa-times-circle me-1"></i>Missing Skills
+                                                                            </h6>
+                                                                            <ul class="ps-3 small mb-3">
+                                                                                {% for skill in job.unmatched_skills %}
+                                                                                    <li>{{ skill }}</li>
+                                                                                {% empty %}
+                                                                                    <li class="text-success">You have all required skills!</li>
+                                                                                {% endfor %}
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                    <!-- Education Match Details -->
+                                                                    <div class="mt-3">
+                                                                        <h6 class="text-primary small fw-bold">
+                                                                            <i class="fas fa-graduation-cap me-1"></i>Education Match
+                                                                        </h6>
+                                                                        {% if job.education_matches %}
+                                                                            <ul class="ps-3 small mb-3">
+                                                                                {% for match in job.education_matches %}
+                                                                                    <li>
+                                                                                        {% if match.type == 'level' %}
+                                                                                            <span class="text-success">
+                                                                                                <i class="fas fa-check-circle me-1"></i>
+                                                                                                Education level: {{ match.resume_value }}
+                                                                                            </span>
+                                                                                        {% elif match.type == 'degree' %}
+                                                                                            <span class="text-success">
+                                                                                                <i class="fas fa-check-circle me-1"></i>
+                                                                                                Degree: {{ match.resume_value }}
+                                                                                                {% if match.similarity < 100 %}
+                                                                                                    <span class="text-muted">({{ match.similarity }}% match with "{{ match.job_value }}")</span>
+                                                                                                {% endif %}
+                                                                                            </span>
+                                                                                        {% endif %}
+                                                                                    </li>
+                                                                                {% endfor %}
+                                                                            </ul>
+                                                                        {% else %}
+                                                                            <p class="text-muted small">Your education doesn't match the job requirements.</p>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                    
+                                                                                                                                        <!-- Experience Match Details -->
+                                                                    <div class="mt-3">
+                                                                        <h6 class="text-primary small fw-bold">
+                                                                            <i class="fas fa-briefcase me-1"></i>Experience Match
+                                                                        </h6>
+                                                                        {% if job.matched_experiences %}
+                                                                            <ul class="ps-3 small mb-3">
+                                                                                {% for match in job.matched_experiences %}
+                                                                                    <li>
+                                                                                        <div class="mb-2">
+                                                                                            <strong>{{ match.job_requirement }}</strong>
+                                                                                            <span class="text-success ms-2">({{ match.match_score }}% match)</span>
+                                                                                            <div class="text-muted">
+                                                                                                Matched with your experience: {{ match.best_match.title }} at {{ match.best_match.company }}
+                                                                                            </div>
+                                                                                            {% if match.years_match %}
+                                                                                                <div class="text-success">
+                                                                                                    <i class="fas fa-check-circle me-1"></i>
+                                                                                                    Required experience: {{ match.years_required }} (You have: {{ match.total_years }} years)
+                                                                                                </div>
+                                                                                            {% else %}
+                                                                                                <div class="text-danger">
+                                                                                                    <i class="fas fa-times-circle me-1"></i>
+                                                                                                    Required experience: {{ match.years_required }} (You have: {{ match.total_years }} years)
+                                                                                                </div>
+                                                                                            {% endif %}
+                                                                                        </div>
+                                                                                    </li>
+                                                                                {% endfor %}
+                                                                            </ul>
+                                                                        {% else %}
+                                                                            <p class="text-muted small">No matching experience found for the job requirements.</p>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer bg-light p-2">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-info-circle me-1"></i>Based on 6 compatibility factors
+                                                    </small>
+                                                    <a href="{% url 'create-resume' %}" class="btn btn-sm btn-outline-primary">Improve Match</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Non-collapsed summary (always visible) -->
+                                        <div class="d-flex align-items-center p-2 bg-light border-top">
+                                            <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                                <div class="progress-bar 
+                                                    {% if job.best_match %}bg-success
+                                                    {% elif job.good_match %}bg-warning
+                                                    {% elif job.not_suitable %}bg-danger
+                                                    {% else %}bg-info{% endif %}" 
+                                                    role="progressbar" 
+                                                    style="width: {% widthratio job.total_score job.max_score 100 %}%;" 
+                                                    aria-valuenow="{{ job.total_score }}" 
+                                                    aria-valuemin="0" 
+                                                    aria-valuemax="{{ job.max_score }}">
+                                                </div>
+                                            </div>
+                                            <span class="text-muted small">
+                                                {% if job.best_match %}
+                                                    <span class="text-success fw-bold">Best Match</span>
+                                                {% elif job.good_match %}
+                                                    <span class="text-warning fw-bold">Good Match</span>
+                                                {% elif job.not_suitable %}
+                                                    <span class="text-danger fw-bold">Not Suitable</span>
+                                                {% else %}
+                                                    <span class="text-info fw-bold">Possible Match</span>
+                                                {% endif %}
+                                                <span class="ms-1">({{ job.total_score }} out of {{ job.max_score }} points)</span>
+                                            </span>
+                                        </div>
+                                    </div>
 
                                     {% if user.is_authenticated and user.is_applicant %} 
                                         <div class="mb-4">
@@ -365,7 +716,10 @@
                                             </ul>
                                         </div>
                                     {% endif %}
-
+                                    
+                                    
+                                    
+                                    
                                 </div>
                             </div>
                         </div>
@@ -422,50 +776,68 @@
                         
                         <div class="row g-3 mb-4 justify-content-center text-center input-group">
                             <!-- Location Filter -->
-                            <div class="col-xs-12 col-sm-6 col-md-3">
+                            <div class="col-xs-12 col-sm-6 col-md-4">
                                 <label for="address">Location</label>
                                 <div class="bubbleformfilter d-flex gap-3 align-items-center">
                                     <i class="fa-solid fa-location-dot text-dark"></i>
                                     <div class="input-group">
-                                        {% render_field resume_filter.form.address class="form-control border-0 p-0" placeholder="barangay, city, or region" %}
+                                        {% render_field resume_filter.form.address class="form-control border-0 p-0" placeholder="region, city, street" %}
                                     </div>
                                 </div>
                             </div>
                             
                             <!-- Job Type Filter -->
-                            <div class="col-xs-12 col-sm-6 col-md-3">
+                            <div class="col-xs-12 col-sm-6 col-md-4">
                                 <label for="jobType">Employment Type</label>
                                 <div class="bubbleformfilter d-flex gap-3 align-items-center">
                                     <i class="fa-solid fa-briefcase text-dark"></i>
-                                    <select class="form-control border-0 p-0" name="employment_job_type" id="employment_job_type">
-                                        <option value="" disabled selected>Select Job Type</option>
-                                        {% for choice in resume_filter.form.employment_job_type.field.choices %}
-                                            <option value="{{ choice.0 }}" {% if form.employment_job_type.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                    {% render_field resume_filter.form.employment_job_type class="form-control border-0 p-0" %}
+                                </div>
+                            </div>
+                    
+                            <!-- Salary Type Filter -->
+                            <div class="col-sm-6 col-md-4">
+                                <label for="salaryType">Salary Type</label>
+                                <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                    <i class="fa-solid fa-money-bill-wave text-dark"></i>
+                                    <select name="salary_display_type" class="form-control border-0 p-0" id="salaryType">
+                                        <option value="" selected>Select Salary Type</option>
+                                        {% for value, text in resume_filter.form.salary_display_type.field.choices %}
+                                            {% if value %}
+                                                <option value="{{ value }}" {% if resume_filter.form.salary_display_type.value == value %}selected{% endif %}>
+                                                    {{ text }}
+                                                </option>
+                                            {% endif %}
                                         {% endfor %}
                                     </select>
                                 </div>
                             </div>
-                    
-                            <!-- Industry Filter -->
-                            <div class="col-sm-6 col-md-3">
-                                <label for="industry">Industry</label>
+
+                            <!-- Fixed Salary Input (Initially Hidden) -->
+                            <div class="col-xs-12 col-sm-6 col-md-6" id="fixedSalaryContainer" style="display: none;">
+                                <label for="minSalary">Fixed Salary</label>
                                 <div class="bubbleformfilter d-flex gap-3 align-items-center">
-                                    <i class="fa-solid fa-industry text-dark"></i>
-                                    <select class="form-control border-0 p-0" name="industry" id="industry">
-                                        <option value="" disabled selected>Select Industry</option>
-                                        {% for choice in resume_filter.form.industry.field.choices %}
-                                            <option value="{{ choice.0 }}" {% if form.industry.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
-                                        {% endfor %}
-                                    </select>
+                                    <i class="fa-solid fa-money-bill-1 text-dark"></i>
+                                    {% render_field resume_filter.form.min_salary type="number" class="form-control border-0 p-0" placeholder="Enter Fixed Salary" %}
                                 </div>
                             </div>
-                    
-                            <!-- Salary Range Filter -->
-                            <div class="col-xs-12 col-sm-6 col-md-3">
-                                <label for="salaryRange">Expected Salary</label>
-                                <div class="bubbleformfilter d-flex gap-3 align-items-center">
-                                    <i class="fa-solid fa-money-bill-wave me-2 text-dark"></i>
-                                    {% render_field resume_filter.form.expt_salary_range class="form-select border-0 p-0" id="salaryrange" %}
+
+                            <!-- Salary Range Inputs (Initially Hidden) -->
+                            <div id="salaryRangeContainer" class="row mt-2" style="display: none;">
+                                <div class="col-xs-12 col-sm-6 col-md-6">
+                                    <label for="minSalary">Minimum Salary</label>
+                                    <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                        <i class="fa-solid fa-money-bill-1 text-dark"></i>
+                                        {% render_field resume_filter.form.min_salary type="number" class="form-control border-0 p-0" placeholder="Min Salary" %}
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 col-sm-6 col-md-6">
+                                    <label for="maxSalary">Maximum Salary</label>
+                                    <div class="bubbleformfilter d-flex gap-3 align-items-center">
+                                        <i class="fa-solid fa-money-bill-1-wave text-dark"></i>
+                                        {% render_field resume_filter.form.max_salary type="number" class="form-control border-0 p-0" placeholder="Max Salary" %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -535,21 +907,46 @@
                                                 <label class="fw-bolder" for="skills">Experience</label>
                                                 <ul class="list-unstyled mb-0">
                                                     {% for exp in resume.experiences.all %}
-                                                    <li>
-                                                        <span>{{ exp.title|title}} </span> 
-                                                        <br> -<em>{{ exp.company }}</em> ({{ exp.start_date|date:"F, Y"  }} - {{ exp.end_date|date:"F, Y"  }})
-                                                    </li>
+                                                        <li>
+                                                            <h6 class="mb-1 fw-bold">{{ exp.title }}</h6>
+                                                            <p class="mb-1 text-muted">{{ exp.company }}</p>
+                                                            <p class="small text-muted">
+                                                                {{ exp.start_date|date:"F Y" }} – 
+                                                                {% if exp.end_date %}
+                                                                    {{ exp.end_date|date:"F Y" }}
+                                                                {% else %}
+                                                                    Present
+                                                                {% endif %}
+                                                            </p>
+                                                            {% if exp.description %}
+                                                                <ul class="mb-0 ps-3">
+                                                                    <li>{{ exp.description }}</li>
+                                                                </ul>
+                                                            {% endif %}
+                                                        </li>
                                                     {% empty %}
                                                         <li>No experience listed.</li>
                                                     {% endfor %}
                                                 </ul>
                                             </div>
+                                            
                                             <div class="col-md-6">
                                                 <label class="fw-bolder" for="skills">Education</label>
                                                 <ul class="list-unstyled mb-0">
                                                     {% for edu in resume.education.all %}
-                                                    <li>
-                                                        <span>{{ edu.degree }}</span>, {{ edu.institution }} ({{ edu.graduation_year }})
+                                                    <li class="d-flex align-items-start mb-2">
+                                                        <i class="fa-solid fa-graduation-cap mt-1 me-2"></i>
+                                                        {% if edu.degree %}
+                                                            <div class="d-flex flex-column">
+                                                                <span class="fw-semibold">
+                                                                    {{ edu.degree|title }}
+                                                                </span>
+                                                                <span class="text-muted">{{ edu.get_education_level_display }}</span>
+                                                            </div>
+                                                            
+                                                        {% endif %}
+                                                        
+                                                        
                                                     </li>
                                                     {% empty %}
                                                         <li>No education listed.</li>
@@ -561,15 +958,22 @@
                                         <div class="col-12 mb-3 row">
                                             <div class="col-md-6 mb-3">
                                                 <label class="fw-bolder" for="skills">Skills</label>
-                                                
+                                            
                                                 <div class="d-flex flex-wrap">
-                                                    {% for skill in resume.skills.all %}
-                                                    <span class="skillbadge me-2 mb-1">{{ skill.name }}</span>
-                                                    {% empty %}
-                                                    <span class="skillbadge me-2 mb-1">No skills listed.</span>
-                                                    {% endfor %}
+                                                    {% with resume.skills.all|slice:":3" as limited_skills %}
+                                                        {% for skill in limited_skills %}
+                                                            <span class="skillbadge me-2 mb-1">{{ skill.name }}</span>
+                                                        {% endfor %}
+                                                    {% endwith %}
+                                                    
+                                                    {% with resume.skills.all.count as total_skills %}
+                                                        {% if total_skills > 3 %}
+                                                            <span class="skillbadge me-2 mb-1">+{{ total_skills|add:"-3" }} more</span>
+                                                        {% endif %}
+                                                    {% endwith %}
                                                 </div>
                                             </div>
+                                            
                                             <div class="col-md-6">
                                                 <label class="fw-bolder" for="skills">Certifications</label>
                                                 <ul class="list-unstyled mb-0">
@@ -665,37 +1069,83 @@
     {% endif %}
 
     <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content"  style="border-radius: 1rem;">
+                <div class="modal-header bg-primary text-white"  style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
                     <h5 class="modal-title" id="confirmModalLabel">Confirm Action</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    Are you sure you want to perform this action?
+                <div class="modal-body text-center">
+                    <div id="confirmIcon" class="mb-3">
+                        <i class="bi bi-exclamation-circle text-warning" style="font-size: 2rem;"></i>
+                    </div>
+                    <p id="confirmMessage">Are you sure you want to perform this action?</p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <a id="confirmActionButton" href="#" class="btn btn-primary">Confirm</a>
+                <div class="modal-footer justify-content-end">
+                    <button type="button" class="btn customButton btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a id="confirmActionButton" href="#" class="btn customButton btn-primary">Confirm</a>
                 </div>
             </div>
         </div>
     </div>
+    
 
 <script>
-    const confirmModal = document.getElementById('confirmModal');
-    const confirmActionButton = document.getElementById('confirmActionButton');
 
-    confirmModal.addEventListener('show.bs.modal', function (event) {
-        // Get the button that triggered the modal
-        const button = event.relatedTarget;
+    document.addEventListener('DOMContentLoaded', function() {
+        const salaryTypeSelect = document.getElementById('salaryType');
+        const fixedSalaryContainer = document.getElementById('fixedSalaryContainer');
+        const salaryRangeContainer = document.getElementById('salaryRangeContainer');
+        const minSalaryInput = document.querySelector('input[name="min_salary"]');
+        const maxSalaryInput = document.querySelector('input[name="max_salary"]');
 
-        // Extract the URL from the button's data-action-url attribute
-        const actionUrl = button.getAttribute('data-action-url');
+        function updateSalaryInputs() {
+            const selectedType = salaryTypeSelect.value;
+            
+            // Hide all containers first
+            fixedSalaryContainer.style.display = 'none';
+            salaryRangeContainer.style.display = 'none';
+            
+            // Reset all inputs
+            minSalaryInput.value = '';
+            maxSalaryInput.value = '';
 
-        // Set the URL in the confirmation button
-        confirmActionButton.href = actionUrl;
+            // Show appropriate container based on selection
+            if (selectedType === 'fixed') {
+                fixedSalaryContainer.style.display = 'block';
+                minSalaryInput.placeholder = "Enter Fixed Salary";
+            } else if (selectedType === 'range') {
+                salaryRangeContainer.style.display = 'flex';
+                minSalaryInput.placeholder = "Min Salary";
+                maxSalaryInput.placeholder = "Max Salary";
+            }
+            // If 'hidden' or empty selection, all containers remain hidden
+        }
+
+        salaryTypeSelect.addEventListener('change', updateSalaryInputs);
+        
+        // Run on page load to handle pre-selected values
+        updateSalaryInputs();
     });
+
+    function showConfirmModal({ title, message, actionUrl, theme = "primary", icon = "exclamation-circle" }) {
+        document.getElementById("confirmModalLabel").textContent = title;
+        document.getElementById("confirmMessage").textContent = message;
+        document.getElementById("confirmActionButton").href = actionUrl;
+
+        // Update icon dynamically
+        document.getElementById("confirmIcon").innerHTML = `<i class="bi bi-${icon} text-${theme}" style="font-size: 2rem;"></i>`;
+
+        // Update modal header background
+        document.querySelector("#confirmModal .modal-header").className = `modal-header bg-${theme} text-white`;
+        
+        // Update button color
+        document.getElementById("confirmActionButton").className = `btn btn-${theme}`;
+
+        // Show modal
+        new bootstrap.Modal(document.getElementById("confirmModal")).show();
+    }
+    
 </script>
 
 {% endblock content %}

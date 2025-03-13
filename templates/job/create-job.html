@@ -388,13 +388,24 @@
                                 <div class="col-md-10 employerform-card bg-light">
                                     <label class="mb-0 text-dark">Job Title </label>
                                     {{ form.exp_name }}
-                                    <label class="mb-0 text-dark">Number of years </label>
-                                    {{ form.exp_years }}
-                                    <div class="input-group mb-2">
-                                        {{ form.min_exp_years }}
-                                        <span class="input-group-text">to</span>
-                                        {{ form.max_exp_years }}
+
+                                    <label class="mb-0 text-dark mt-2">Experience Type</label>
+                                    {% render_field form.exp_type class="form-select mb-3 exp-type-selector" onchange="toggleExpFields(this)" %}
+                                        
+                                    <div class="exp-fixed-field mt-2">
+                                        <label class="mb-0 text-dark">Number of years </label>
+                                        {{ form.exp_years }}
                                     </div>
+                                    
+                                    <div class="exp-range-field mt-2" style="display: none;">
+                                        <label class="mb-0 text-dark">Years Range </label>
+                                        <div class="input-group mb-2">
+                                            {{ form.min_exp_years }}
+                                            <span class="input-group-text">to</span>
+                                            {{ form.max_exp_years }}
+                                        </div>
+                                    </div>
+
                                     <label class="mb-0 text-dark">Job Description </label>
                                     {{ form.exp_description }}
                                     
@@ -453,8 +464,13 @@
                     <h4 for="employerAddress" class="form-label mb-3">Address</h4>
                     <div class="row">
                         <div class="col-sm-6 mb-3">
-                            <label for="country-text" class="form-label">Country</label>
-                            <input type="text" class="form-control" name="country" id="country-text" placeholder="Enter Country">
+                            <label for="country" class="form-label">Country</label>
+                            <select name="country" id="country" class="form-select">
+                                <option value="">Select Country</option>
+                                {% for code, name in country_choices %}
+                                    <option value="{{ code }}">{{ name }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                         <div class="col-sm-6 mb-3">
                             <label for="countrypostal-text" class="form-label">Postal Code</label>
@@ -473,7 +489,6 @@
                             <input type="text" class="form-control" name="street" id="street-text" placeholder="Enter Street">
                         </div>
                     </div>
-                    
                 </div>
 
                 <hr>
@@ -811,6 +826,46 @@
                     }
                 });
             });
+        });
+        
+        function toggleExpFields(selector) {
+            const form = selector.closest('.experience-form');
+            const fixedField = form.querySelector('.exp-fixed-field');
+            const rangeField = form.querySelector('.exp-range-field');
+            
+            if (selector.value === 'fixed') {
+                fixedField.style.display = 'block';
+                rangeField.style.display = 'none';
+            } else if (selector.value === 'range') {
+                fixedField.style.display = 'none';
+                rangeField.style.display = 'block';
+            }
+        }
+
+        // Initialize experience fields when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.exp-type-selector').forEach(function(selector) {
+                toggleExpFields(selector);
+            });
+            
+            // Also initialize experience fields for new forms
+            const experiencesContainer = document.querySelector('#experiences-container');
+            if (experiencesContainer) {
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                            mutation.addedNodes.forEach(function(node) {
+                                if (node.nodeType === 1 && node.classList.contains('experience-form')) {
+                                    const selector = node.querySelector('.exp-type-selector');
+                                    if (selector) toggleExpFields(selector);
+                                }
+                            });
+                        }
+                    });
+                });
+                
+                observer.observe(experiencesContainer, { childList: true });
+            }
         });
     </script>
 {% endblock scripts %}

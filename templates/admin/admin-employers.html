@@ -60,13 +60,7 @@
                                             <h1 style="font-size: 1.5rem;">{{ employer.get_full_name|title }}</h1>
                                             <div class="location-badge">
                                                 <i class="fas fa-location-dot"></i>
-                                                {% if employer.address.barangay and employer.address.city and employer.address.street %}
-                                                    <!-- Display Philippine location if available -->
-                                                    {{ employer.address.street }}{% if employer.address.barangay %}, {{ employer.address.barangay }}{% endif %}{% if employer.address.city %}, {{ employer.address.city }}{% endif %}
-                                                {% else %}
-                                                    <!-- Display international location if Philippine location is empty -->
-                                                    {{ employer.address.countrystreet }}{% if employer.address.countrystreet %}, {% endif %}{{ employer.address.countrycity }}{% if employer.address.countrycity %}, {% endif %}{{ employer.address.country }}
-                                                {% endif %}
+                                                {{ employer.address }}
                                             </div>
                                         </td>
                                         {% if employer.is_active %}

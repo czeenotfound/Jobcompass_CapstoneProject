@@ -155,7 +155,7 @@
                 <div class="employerform-card bg-light row">
                     <div class="col-sm-6 mb-3">
                         <label for="country-text" class="form-label">Country <span class="text-danger">*</span></label>
-                        {% render_field address_form.country class="form-control form-control-md" id="country-text" placeholder="Select country" %}
+                        {% render_field address_form.country id="country-text" placeholder="Select country" %}
                     </div>
                     <div class="col-sm-6 mb-3">
                         <label for="countrypostal-text" class="form-label">Postal Code <span class="text-danger">*</span></label>
@@ -238,7 +238,7 @@
                             </div>
                             
                     
-                            <input type="text" class="form-control" id="birfile-name" value="View Current File" readonly>
+                            <input type="text" class="form-control" id="birfile-name" value="No file chosen" readonly>
                         </div>
                     
                         {% if form.instance.bir_file %}

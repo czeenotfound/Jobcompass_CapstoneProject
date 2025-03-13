@@ -16,6 +16,9 @@
     <script src="{% static 'JS/exportDatatables/vfs_fonts.js' %}"></script>
     <script src="{% static 'JS/exportDatatables/buttons.html5.min.js' %}"></script>
     <script src="{% static 'JS/exportDatatables/buttons.print.min.js' %}"></script>
+    
+    <!-- Add Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock scripts %}
 
 {% block content %}
@@ -29,8 +32,9 @@
         
         <!-- Welcome  -->
         <div class="d-flex align-items-center">
-            <section class="employerbanner w-100  h-100 p-5 bg-light mb-4">
-                <h1 class="hero-heading">Job Analytics</h1>
+            <section class="employerbanner w-100 h-100 p-5 bg-light mb-4">
+                <h1 class="hero-heading">Job Analytics Dashboard</h1>
+                <p class="lead text-white">Track your recruitment metrics and optimize your hiring process</p>
             </section>
         </div>
         
@@ -41,42 +45,116 @@
 
             <!-- Main Content -->
             <div class="mainTableContent col-12 col-lg-9">
-                <div class="custom-container mb-3">
-                    <div class="row g-2">
-                        <div class="col-md-6">
-                            <div class="card shadow-sm ">
-                                <div class="card-body">
+                <!-- Key Metrics -->
+                <div class="custom-container mb-4">
+                    <h4 class="mb-3">Key Metrics</h4>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body text-center">
                                     <h3 class="h6 fw-semibold mb-2">Total Jobs</h3>
-                                    <p class="display-6 fw-bold py-4" id="totalApplications">{{ total_jobs }}</p>
+                                    <p class="display-6 fw-bold py-2" id="totalJobs">{{ total_jobs }}</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <h3 class="h6 fw-semibold mb-2">Job Fair Registration</h3>
-                                    <p class="display-6 fw-bold py-4" id="totalRejected">{{ registered_job_fairs }}</p>
+                        <div class="col-md-3">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <h3 class="h6 fw-semibold mb-2">Total Applications</h3>
+                                    <p class="display-6 fw-bold py-2" id="totalApplications">{{ total_applications }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <h3 class="h6 fw-semibold mb-2">Active Positions</h3>
+                                    <p class="display-6 fw-bold py-2" id="activePositions">{{ jobs|length }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <h3 class="h6 fw-semibold mb-2">Job Fair Registrations</h3>
+                                    <p class="display-6 fw-bold py-2" id="jobFairRegistrations">{{ registered_job_fairs }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row g-2 mt-3">
-                         {% for status, count in status_counts.items %}
-                        <div class="col-md-4">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <h3 class="h6 fw-semibold mb-2">{{ status|title }} Applicants</h3>
-                                    <p class="display-6 fw-bold py-4">{{ count }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                   
-
                 </div>
 
-                <!-- Main Section -->
+                <!-- Application Status Charts -->
+                <div class="custom-container mb-4">
+                    <h4 class="mb-3">Application Status Breakdown</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Application Status Distribution</h5>
+                                    <div class="chart-container" style="position: relative; height:300px;">
+                                        <canvas id="statusChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Application Timeline (Last 30 Days)</h5>
+                                    <div class="chart-container" style="position: relative; height:300px;">
+                                        <canvas id="timelineChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Application Pipeline -->
+                <div class="custom-container mb-4">
+                    <h4 class="mb-3">Application Pipeline</h4>
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col pipeline-stage">
+                                <div class="pipeline-count">{{ status_counts.SUBMITTED }}</div>
+                                <div class="pipeline-label">Submitted</div>
+                            </div>
+                            <div class="col pipeline-stage">
+                                <div class="pipeline-arrow">→</div>
+                            </div>
+                            <div class="col pipeline-stage">
+                                <div class="pipeline-count">{{ status_counts.UNDER_REVIEW }}</div>
+                                <div class="pipeline-label">Under Review</div>
+                            </div>
+                            <div class="col pipeline-stage">
+                                <div class="pipeline-arrow">→</div>
+                            </div>
+                            <div class="col pipeline-stage">
+                                <div class="pipeline-count">{{ status_counts.INTERVIEW }}</div>
+                                <div class="pipeline-label">Interview</div>
+                            </div>
+                            <div class="col pipeline-stage">
+                                <div class="pipeline-arrow">→</div>
+                            </div>
+                            <div class="col pipeline-stage">
+                                <div class="pipeline-count">{{ status_counts.OFFERED }}</div>
+                                <div class="pipeline-label">Offered</div>
+                            </div>
+                            <div class="col pipeline-stage">
+                                <div class="pipeline-arrow">→</div>
+                            </div>
+                            <div class="col pipeline-stage">
+                                <div class="pipeline-count">{{ status_counts.ACCEPTED }}</div>
+                                <div class="pipeline-label">Accepted</div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Table -->
                 <div class="custom-container bg-light p-3 shadow-sm">
                     <div class="btn-group float-end">
                         <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -93,7 +171,7 @@
                     </div> 
                     <div class="mb-5">
                         <div class="tableBg">
-                            <table id="jobAnalyticsTable" class="table w-100">
+                            <table id="jobPostingsTable" class="table w-100">
                                 <thead>
                                     <tr>
                                         <th>Job Title</th>
@@ -111,13 +189,7 @@
                                                 <h1 style="font-size: 1.5rem;">{{job.title}}</h1>
                                                 <div class="location-badge">
                                                     <i class="fas fa-location-dot"></i>
-                                                    {% if job.location.barangay and job.location.city and job.location.street %}
-                                                        <!-- Display Philippine address if available -->
-                                                        {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
-                                                    {% else %}
-                                                        <!-- Display international address if Philippine address is empty -->
-                                                        {{ job.location.countrystreet }}{% if job.location.countrystreet %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
-                                                    {% endif %}
+                                                    {{ job.location.region }}, {{ job.location.city }}, {{ job.location.street }}
                                                 </div>
                                             </td>
                                             <td>{{job.employment_job_type}}</td>
@@ -130,20 +202,26 @@
                                             <td>{{job.posted_date_time|date:'F d, Y'}}</td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    <a href="{% url 'job-info' job.pk %}" class="btn btn-view"><i class="fa-solid fa-eye"></i></a>
-                                                    <button class="btn btn-edit"><i class="fa-regular fa-pen-to-square"></i></button>
-                                                    
+                                                    <a href="{% url 'job-info' job.pk %}" class="btn btn-view" title="View Job"><i class="fa-solid fa-eye"></i></a>
+                                                    <a href="{% url 'update-job' job.pk %}" class="btn btn-edit" title="Edit Job"><i class="fa-regular fa-pen-to-square"></i></a>
                                                     {% if job.is_available %}
-                                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmModal" 
-                                                            data-action-url="{% url 'deactivate-job' job.pk %}">
-                                                            <i class="fa-solid fa-times"></i> Disable
-                                                        </button>
+                                                        <a href="{% url 'deactivate-job' job.pk %}" class="btn btn-archive" title="Disable Job">
+                                                            <i class="fa-solid fa-eye-slash"></i>
+                                                        </a>
                                                     {% else %}
-                                                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmModal" 
-                                                            data-action-url="{% url 'activate-job' job.pk %}">
-                                                            <i class="fa-solid fa-check"></i> Enable
-                                                        </button>
+                                                        <a href="{% url 'activate-job' job.pk %}" class="btn btn-success" title="Enable Job">
+                                                            <i class="fa-solid fa-check"></i>
+                                                        </a>
                                                     {% endif %}
+                                                    <button type="button" class="btn btn-delete" onclick="showConfirmModal({
+                                                        title: 'Delete Job',
+                                                        message: 'Are you sure you want to delete this job? This action cannot be undone.',
+                                                        actionUrl: '{% url 'delete-job' job.pk %}',
+                                                        theme: 'danger'
+                                                    })" title="Delete Job">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                    
                                                 </div>
                                             </td>
                                         </tr>
@@ -175,7 +253,126 @@
         </div>
     </div>
 
+    <style>
+        .pipeline-stage {
+            padding: 10px;
+            text-align: center;
+        }
+        .pipeline-count {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .pipeline-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        .pipeline-arrow {
+            font-size: 1.5rem;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        .metric-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+        .metric-value {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .metric-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+    </style>
+
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Initialize Charts
+        // Status pie chart
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        const statusChart = new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Submitted', 
+                    'Under Review', 
+                    'Interview', 
+                    'Offered', 
+                    'Rejected', 
+                    'Accepted'
+                ],
+                datasets: [{
+                    data: [
+                        {{ status_counts.SUBMITTED }}, 
+                        {{ status_counts.UNDER_REVIEW }}, 
+                        {{ status_counts.INTERVIEW }}, 
+                        {{ status_counts.OFFERED }}, 
+                        {{ status_counts.REJECTED }}, 
+                        {{ status_counts.ACCEPTED }}
+                    ],
+                    backgroundColor: [
+                        '#6c757d', // Submitted - gray
+                        '#ffc107', // Under Review - yellow
+                        '#0d6efd', // Interview - blue
+                        '#20c997', // Offered - teal
+                        '#dc3545', // Rejected - red
+                        '#198754'  // Accepted - green
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+
+        // Timeline chart 
+        const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+        const timelineChart = new Chart(timelineCtx, {
+            type: 'line',
+            data: {
+                labels: {{ dates|safe }},
+                datasets: [{
+                    label: 'Applications',
+                    data: {{ app_counts }},
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    });
+
     const confirmModal = document.getElementById('confirmModal');
     const confirmActionButton = document.getElementById('confirmActionButton');
 

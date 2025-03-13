@@ -4,16 +4,15 @@ from django.forms import inlineformset_factory, BaseInlineFormSet
 from django.core.exceptions import ValidationError
 from django import forms
 from django.contrib import messages
-from .models import Job, SaveJob, Application, ApplicationStatus, JobFair, RequiredSkill, Job_Responsibilities, Job_IdealCandidates, Job_Benefits, Job_Experience, Job_Education, JobFairRegistration
+from .models import Job, SaveJob, Application, ApplicationStatus, JobFair, RequiredSkill, Job_Responsibilities, Job_IdealCandidates, Job_Benefits, Job_Experience, Job_Education, JobFairRegistration, Interview, Offer, Feedback
 from address.forms import AddressForm
-from address.models import Address
+from address.models import Address, COUNTRY_CHOICES
 from django.db.models.functions import Coalesce
 from users.models import User
 from company.models import Company
 from .forms import CreateJobForm, UpdateJobForm, CreateJobFairForm, UpdateJobFairForm, RequiredSkillForm, JobResponsibilitiesForm, JobIdealCandidatesForm, JobBenefitsForm, JobExperienceForm, JobEducationForm
 from django.db.models import Count, Q, Exists, OuterRef, Subquery,  Value
 from job.filter import JobFairfilter
-
 
 @login_required(login_url='login')
 def job_info(request, pk):
@@ -110,15 +109,20 @@ def job_application(request):
 
 @login_required(login_url='login')
 def view_job_application(request, pk):
-    # Fetch the application by its primary key
     application = get_object_or_404(Application, pk=pk)
-    # Optional: Ensure only authorized users (employer or applicant) can access it
+   
     if request.user != application.job.company.user and request.user != application.user:
-        return redirect('dashboard')  # Redirect unauthorized users
+        return redirect('dashboard') 
 
-    # Pass the application details to the template
+    interviews = application.interview_set.all().order_by('interview_date')
+    offer = application.offer_set.all().order_by('offer_date')
+    feedback = application.feedback_set.all().order_by('feedback_date')
+
     context = {
         'application': application,
+        'interviews': interviews,  
+        'offers': offer,
+        'feedbacks': feedback,
     }
     return render(request, 'applicant/view-job-application.html', context)
 
@@ -139,7 +143,6 @@ def job_savedjobs(request):
     }
     return render(request, 'applicant/job-savedjobs.html', context)
 
-
 @login_required(login_url='login')
 def application_analytics(request):
     # Ensure the user is authenticated
@@ -148,25 +151,40 @@ def application_analytics(request):
 
     # Fetch all applications for the logged-in user
     applications = Application.objects.filter(user=request.user).select_related('job', 'job__company', 'applicationstatus', 'job__industry')
+    
     # Total number of applications
     total_jobs = applications.count()
 
     # Get the count of applications by status
     status_counts = applications.values('applicationstatus__status').annotate(count=Count('applicationstatus')).order_by('-count')
-    status_labels = [item['applicationstatus__status'] for item in status_counts]
-    status_values = [item['count'] for item in status_counts]
+    status_labels = [item['applicationstatus__status'] for item in status_counts if item['applicationstatus__status']]
+    status_values = [item['count'] for item in status_counts if item['applicationstatus__status']]
 
+    # Count specific status values
     accepted_count = next((item['count'] for item in status_counts if item['applicationstatus__status'] == 'ACCEPTED'), 0)
     rejected_count = next((item['count'] for item in status_counts if item['applicationstatus__status'] == 'REJECTED'), 0)
+    interview_count = next((item['count'] for item in status_counts if item['applicationstatus__status'] == 'INTERVIEW'), 0)
+    offered_count = next((item['count'] for item in status_counts if item['applicationstatus__status'] == 'OFFERED'), 0)
+    
+    # Calculate response rate (applications that moved beyond SUBMITTED)
+    total_responded = sum(item['count'] for item in status_counts 
+                          if item['applicationstatus__status'] and item['applicationstatus__status'] != 'SUBMITTED')
+    response_rate = (total_responded / total_jobs * 100) if total_jobs > 0 else 0
+    
+    # Calculate interview success rate
+    interview_success_rate = ((interview_count + offered_count + accepted_count) / total_jobs * 100) if total_jobs > 0 else 0
+    
+    # Calculate offer success rate
+    offer_success_rate = ((offered_count + accepted_count) / total_jobs * 100) if total_jobs > 0 else 0
 
-     # Count of applications per industry
+    # Count of applications per industry
     industry_counts = applications.values(
         'job__industry__name'
     ).annotate(count=Count('job__industry__name')).order_by('-count')
 
     # Collect industry names and counts
-    industry_names = [item['job__industry__name'] for item in industry_counts]
-    industry_values = [item['count'] for item in industry_counts]
+    industry_names = [item['job__industry__name'] for item in industry_counts if item['job__industry__name']]
+    industry_values = [item['count'] for item in industry_counts if item['job__industry__name']]
 
     # Salary data for jobs
     salary_data = applications.values(
@@ -178,24 +196,55 @@ def application_analytics(request):
         (item['job__salary_min'] + item['job__salary_max']) / 2 if item['job__salary_min'] and item['job__salary_max'] else 0
         for item in salary_data
     ]
-
+    
+    # Get applications over time (by month)
+    from django.db.models.functions import TruncMonth
+    apps_by_month = applications.annotate(
+        month=TruncMonth('submit_date')
+    ).values('month').annotate(count=Count('id')).order_by('month')
+    
+    # Format for chart
+    months = [item['month'].strftime('%b %Y') if item['month'] else 'Unknown' for item in apps_by_month]
+    monthly_counts = [item['count'] for item in apps_by_month]
+    
+    # Job type breakdown
+    job_type_counts = applications.values('job__employment_job_type').annotate(
+        count=Count('job__employment_job_type')
+    ).order_by('-count')
+    
+    job_types = [item['job__employment_job_type'] for item in job_type_counts if item['job__employment_job_type']]
+    job_type_values = [item['count'] for item in job_type_counts if item['job__employment_job_type']]
+    
+    # Response time analysis - get average days to first status change
+    from django.db.models import F
+    from django.db.models.functions import ExtractDay
+    
+    # Get applications with status changes
+    applications_with_status = applications.filter(applicationstatus__isnull=False)
+    
     # Pass the data to the template
     context = {
         'applications': applications,
         'total_jobs': total_jobs,
-        'status_labels': status_labels,  # For chart labels
-        'status_values': status_values,  # For chart data
-
+        'status_labels': status_labels,
+        'status_values': status_values,
         'accepted_count': accepted_count,
         'rejected_count': rejected_count,
-
+        'interview_count': interview_count,
+        'offered_count': offered_count,
+        'response_rate': round(response_rate, 1),
+        'interview_success_rate': round(interview_success_rate, 1),
+        'offer_success_rate': round(offer_success_rate, 1),
         'industry_names': industry_names,
         'industry_values': industry_values,
         'salary_averages': salary_averages,
+        'months': months,
+        'monthly_counts': monthly_counts,
+        'job_types': job_types,
+        'job_type_values': job_type_values,
     }
 
     return render(request, 'applicant/application-analytics.html', context)
-
 
 class RequiredSkillFormSet(BaseInlineFormSet):
     def clean(self):
@@ -416,6 +465,7 @@ def create_job(request):
                 'benefits_formset': benefits_formset,
                 'experience_formset': experience_formset,
                 'education_formset' : education_formset,
+                'country_choices': COUNTRY_CHOICES, 
                 'form_errors': form_errors
             }
             return render(request, 'job/create-job.html', context)
@@ -438,12 +488,31 @@ def create_job(request):
                 'benefits_formset': benefits_formset,
                 'experience_formset': experience_formset,
                 'education_formset' : education_formset,
+                'country_choices': COUNTRY_CHOICES, 
             }
             return render(request, 'job/create-job.html', context)
     else:
         messages.info(request, 'Permission Denied!')
         return redirect('dashboard')
-
+    
+@login_required(login_url='login')
+def delete_job(request, pk):
+    if request.user.is_employer and request.user.has_company:
+        job = get_object_or_404(Job, pk=pk)
+        
+        # Ensure the user owns this job
+        if job.user != request.user:
+            messages.error(request, "You don't have permission to delete this job.")
+            return redirect('manage-jobs')
+        
+        job_title = job.title
+        job.delete()
+        messages.success(request, f"Job '{job_title}' has been deleted successfully.")
+        return redirect('manage-jobs')
+    else:
+        messages.info(request, 'Permission Denied!')
+        return redirect('dashboard')
+    
 @login_required(login_url='login')
 def update_job(request, pk):
     job = Job.objects.get(pk=pk)
@@ -830,7 +899,11 @@ def create_job_fair(request):
                 return redirect('create-job-fair')
         else:
             form = CreateJobFairForm
-            context = {'form': form,}
+            
+            context = {
+                'form': form,
+                'country_choices': COUNTRY_CHOICES, 
+            }
             return render(request, 'job/create-job-fair.html', context) 
     else:
         messages.info(request,'Permission Denied!')
@@ -912,4 +985,21 @@ def deactivate_job_fair(request, pk):
         return redirect('manage-job-fairs') 
     else:
         messages.info(request,'Permission Denied!')
+        return redirect('dashboard')
+    
+def delete_job_fair(request, pk):
+    if request.user.is_employer and request.user.has_company:
+        jobfair = get_object_or_404(JobFair, pk=pk)
+        
+        # Ensure the user owns this job
+        if jobfair.user != request.user:
+            messages.error(request, "You don't have permission to delete this job.")
+            return redirect('manage-jobs')
+        
+        jobfair_title = jobfair.title
+        jobfair.delete()
+        messages.success(request, f"Job Fair '{jobfair_title}' has been deleted successfully.")
+        return redirect('manage-job-fairs')
+    else:
+        messages.info(request, 'Permission Denied!')
         return redirect('dashboard')

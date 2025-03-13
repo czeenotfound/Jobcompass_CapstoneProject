@@ -60,13 +60,7 @@
                                             <h1 style="font-size: 1.5rem;">{{ jobfair.title }}</h1>
                                             <div class="location-badge">
                                                 <i class="fas fa-location-dot"></i>
-                                                {% if jobfair.location.barangay and jobfair.location.city and jobfair.location.street %}
-                                                    <!-- Display Philippine location if available -->
-                                                    {{ jobfair.location.street }}{% if jobfair.location.barangay %}, {{ jobfair.location.barangay }}{% endif %}{% if jobfair.location.city %}, {{ jobfair.location.city }}{% endif %}
-                                                {% else %}
-                                                    <!-- Display international location if Philippine location is empty -->
-                                                    {{ jobfair.location.countrystreet }}{% if jobfair.location.countrystreet %}, {% endif %}{{ jobfair.location.countrycity }}{% if jobfair.location.countrycity %}, {% endif %}{{ jobfair.location.country }}
-                                                {% endif %}
+                                                {{ jobfair.location }}
                                             </div>
                                             <hr>
                                             <div class="mt-3">

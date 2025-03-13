@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
+from django.utils import timezone
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -11,7 +12,7 @@ from company.models import Company, Employer
 from users.models import User
 from resume.models import Resume
 from users.forms import UserRegistrationForm
-from job.models import Job, Application, JobFair
+from job.models import Job, Application, JobFair, ApplicationStatus
 
 def login_admin(request):
     logout(request)
@@ -63,30 +64,91 @@ def admin_profile(request, pk):
     }
     return render(request, 'admin/admin-profile.html', context)
 
-
 @login_required(login_url='admin-login')
 def admin_dashboard(request):
     if not request.user.is_superuser:
         return redirect('admin-login')
     
-    # Get counts
-    total_applicants = User.objects.filter(is_applicant=True).count()
-    total_companies = Company.objects.count()
-    total_applications = Application.objects.count()
+    # User Statistics
     total_users_active = User.objects.filter(is_active=True).count()
     total_users_inactive = User.objects.filter(is_active=False).count()
+    
+    # Applicant Statistics
+    total_applicants = User.objects.filter(is_applicant=True).count()
+    applicants_with_resume = User.objects.filter(is_applicant=True, has_resume=True).count()
+    applicants_without_resume = total_applicants - applicants_with_resume
+    
+    # Employer Statistics
+    total_employers = User.objects.filter(is_employer=True).count()
+    verified_employers = User.objects.filter(is_employer=True, is_verified=True).count()
+    pending_employers = total_employers - verified_employers
+    
+    # Company Statistics
+    total_companies = Company.objects.count()
+    verified_companies = Company.objects.filter(is_verified=True).count()
+    pending_companies = Company.objects.filter(verification_status='Pending').count()
+    
+    # Job Statistics
     jobs_open = Job.objects.filter(is_available=True).count()
     jobs_closed = Job.objects.filter(is_available=False).count()
+    
+    # Application Statistics
+    total_applications = Application.objects.count()
+    pending_applications = ApplicationStatus.objects.filter(
+        status__in=['SUBMITTED', 'UNDER_REVIEW']
+    ).count()
+    processed_applications = total_applications - pending_applications
+    
+    # Job Fair Statistics
+    total_job_fairs = JobFair.objects.count()
+    active_job_fairs = JobFair.objects.filter(is_active=True).count()
+    upcoming_job_fairs = JobFair.objects.filter(
+        start_date__gt=timezone.now().date()
+    ).count()
+    
+    # Application Status Breakdown
+    submitted_applications = ApplicationStatus.objects.filter(status='SUBMITTED').count()
+    under_review_applications = ApplicationStatus.objects.filter(status='UNDER_REVIEW').count()
+    interview_applications = ApplicationStatus.objects.filter(status='INTERVIEW').count()
+    offered_applications = ApplicationStatus.objects.filter(status='OFFERED').count()
+    accepted_applications = ApplicationStatus.objects.filter(status='ACCEPTED').count()
+    rejected_applications = ApplicationStatus.objects.filter(status='REJECTED').count()
 
     context = {
-        'total_applicants': total_applicants,
-        'total_companies': total_companies,
-        'total_applications': total_applications,
+        # User Statistics
         'total_users_active': total_users_active,
         'total_users_inactive': total_users_inactive,
-
+        'total_applicants': total_applicants,
+        'applicants_with_resume': applicants_with_resume,
+        'applicants_without_resume': applicants_without_resume,
+        'total_employers': total_employers,
+        'verified_employers': verified_employers,
+        'pending_employers': pending_employers,
+        
+        # Company Statistics
+        'total_companies': total_companies,
+        'verified_companies': verified_companies,
+        'pending_companies': pending_companies,
+        
+        # Job Statistics
         'jobs_open': jobs_open,
         'jobs_closed': jobs_closed,
+        'total_applications': total_applications,
+        'pending_applications': pending_applications,
+        'processed_applications': processed_applications,
+        
+        # Job Fair Statistics
+        'total_job_fairs': total_job_fairs,
+        'active_job_fairs': active_job_fairs,
+        'upcoming_job_fairs': upcoming_job_fairs,
+        
+        # Application Status Statistics
+        'submitted_applications': submitted_applications,
+        'under_review_applications': under_review_applications,
+        'interview_applications': interview_applications,
+        'offered_applications': offered_applications,
+        'accepted_applications': accepted_applications,
+        'rejected_applications': rejected_applications,
     }
     
     return render(request, 'admin/admin-dashboard.html', context)

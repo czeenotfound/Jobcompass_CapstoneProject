@@ -29,7 +29,7 @@
 
     {% include 'navbar.html' %}
     
-    <div style="margin-top: 100px;">
+    <div {% if request.resolver_match.view_name != 'jobfair' %}style="margin-top: 100px;"{% endif %}>
         {% block content %}
 
         {% endblock content %} 

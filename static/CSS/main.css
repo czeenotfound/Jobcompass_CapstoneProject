@@ -543,7 +543,7 @@ body{
     color: white;
     padding: 2rem;
     border-radius: 10px;
-    background-image: radial-gradient(circle at 100% 100%,  #4a90e2, #6a11cb);
+    background: linear-gradient(to right, var(--color-gradient-secondary), var(--color-gradient-primary));
 }
 
 
@@ -552,7 +552,7 @@ body{
     color: white;
     padding: 2rem;
     border-radius: 10px;
-    background-image: radial-gradient(circle at 100% 100%, #6a11cb,#4a90e2);
+    background: linear-gradient(to right, var(--color-gradient-secondary), var(--color-gradient-primary));
 }
 
 
@@ -786,7 +786,7 @@ background: linear-gradient(0deg, rgba(39,116,237,1) 0%, rgba(70,195,208,1) 100%
 /* LOGIN */
 
 #loginBG{
-    background: linear-gradient(to right, #4a90e2, #6a11cb);
+    background: linear-gradient(to right, var(--color-gradient-secondary), var(--color-gradient-primary));
 }
 
 #loginSection{
@@ -795,10 +795,13 @@ background: linear-gradient(0deg, rgba(39,116,237,1) 0%, rgba(70,195,208,1) 100%
 }
 
 #signupBG{
-    /* background: linear-gradient(to right, #4a90e2, #6a11cb); */
-    background-color: #4a8ee1;
-    background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #4a8ee1 40px ), repeating-linear-gradient( #671fcd55, #671fcd );
+    background-color: #da1515;
+    opacity: 0.8;
+    background-image: radial-gradient(circle at center center, #ad1a1a, #da1515), repeating-radial-gradient(circle at center center, #ad1a1a, #ad1a1a, 40px, transparent 80px, transparent 40px);
+    background-blend-mode: multiply;
 }
+
+
 
 #signupSection{
     width: 75vw;
@@ -897,7 +900,7 @@ background: linear-gradient(0deg, rgba(39,116,237,1) 0%, rgba(70,195,208,1) 100%
     background-color: #4070f4;
     color: white;
     padding: 4rem 0;
-    background-image: radial-gradient(circle at 100% 100%, #5584ff, #4070f4);
+    background: linear-gradient(to right, var(--color-gradient-secondary), var(--color-gradient-primary));
 }
 .event-card {
     transition: transform 0.3s ease;
@@ -963,7 +966,7 @@ c
     color: white;
     padding: 2rem;
     border-radius: 10px;
-    background-image: radial-gradient(circle at 100% 100%, #6a11cb,#4a90e2);
+    background: linear-gradient(to right, var(--color-gradient-secondary), var(--color-gradient-primary));
 }
 
 
@@ -978,7 +981,7 @@ c
     padding: 3rem 2rem;
     border-radius: 1.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    background-image: radial-gradient(circle at 100% 100%,  #6a11cb,#4a90e2);
+    background: linear-gradient(to right, var(--color-gradient-secondary), var(--color-gradient-primary));
 }
 
 .applicantProfile-card .row{
@@ -1130,7 +1133,7 @@ c
     color: white;
     padding: 2rem;
     border-radius: 10px;
-    background-image: radial-gradient(circle at 100% 100%, #6a11cb,#4a90e2);
+    background: linear-gradient(to right, var(--color-gradient-secondary), var(--color-gradient-primary));
 }
 
 .applicationjobbanner {
@@ -1642,6 +1645,30 @@ c
     background: #EFF6FF;
     color: #3B82F6;
     border: 2px solid  #3B82F6;
+}
+
+.action-buttons .btn-archive {
+    background: #EFF6FF;
+    color: #444444;
+    border: 2px solid  #444444;
+}
+
+.action-buttons .btn-delete {
+    background: #EFF6FF;
+    color: #ff0000;
+    border: 2px solid  #ff0000;
+}
+
+.action-buttons .btn-success {
+    background: #EFF6FF;
+    color: #008a2e;
+    border: 2px solid   #008a2e;
+}
+
+.action-buttons .btn- {
+    background: #EFF6FF;
+    color: #008a2e;
+    border: 2px solid   #008a2e;
 }
 
 .action-buttons .btn:hover {

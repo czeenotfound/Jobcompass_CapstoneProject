@@ -124,10 +124,6 @@ def create_resume(request):
                 address_instance = address_form.save(commit=False)
                 address_instance.user = user
 
-                address.country_name = request.POST.get('country_name', '')
-                address.state_name = request.POST.get('state_name', '')
-            
-
                 address_instance.save()
                 resume_instance.address = address_instance
                 resume_instance.save()

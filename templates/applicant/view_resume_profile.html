@@ -1,5 +1,7 @@
 {% extends 'users/base.html' %}
+{% block title %}Job Compass | Applicant Profile {% endblock %}
 {% load static %}
+{% load humanize %}
 
 {% block content %}
     <div aria-label="breadcrumb" class="custombreadcrumb container bg-light p-4 mb-3 shadow-sm">
@@ -20,7 +22,7 @@
                     <h1 class="mb-2 text-white">{{resume.user.resume.first_name|title}} {{resume.user.resume.middle_name|title}} {{resume.user.resume.last_name|title}}</h1>
                     <p class="text-white mt-0">
                         <i class="fas fa-map-marker-alt me-2"></i>
-                        {{resume.user.resume.address.barangay}}, {{resume.user.resume.address.city}}
+                        {{resume.user.resume.address}}
                     </p>
                     <span class="skillbadge fw-bold">Status: {{resume.user.resume.employment_job_type}}</span>
                 </div>
@@ -41,7 +43,27 @@
                     <div class="mb-4">
                         <h4>About Me</h4>
                         <p>{{resume.user.resume.about_me}}</p>
+
+                        <div id="salaryDisplay" class="col-sm-12 mt-3">
+                            {% if resume.user.resume.salary_display_type == 'fixed' %}
+                                <label class="d-flex flex-column fs-4 mb-3">Expected Salary Fixed:
+                                    <span class="fs-5">{{ resume.user.resume.currency }} {{ resume.user.resume.expt_salary_fixed|intcomma }} {{ resume.user.resume.expt_salary_mode|title}}  </span>
+                                </label>
+                            {% elif resume.user.resume.salary_display_type == 'range' %}
+                                <label class="d-flex flex-column fs-4 mb-3">Expected Salary Ranged:
+                                    <span class="fs-5">{{ resume.user.resume.currency }} {{ resume.user.resume.expt_salary_min|intcomma }} to {{ resume.user.resume.currency }}{{ resume.user.resume.expt_salary_max|intcomma }} {{ resume.user.resume.expt_salary_mode|title}} </span>
+                                </label>
+                            {% elif resume.user.resume.salary_display_type == 'hidden' %}
+                                <label class="d-flex flex-column fs-4 mb-3">Expected Salary:
+                                    <span>Salary Information Hidden</span>
+                                </label>
+                            {% else %}
+                                <p>No Salary Information Available</p>
+                            {% endif %}
+                        </div>
                     </div>
+
+                    <hr>
 
                     <div class="mb-4">
                         <h4>Skills</h4>
@@ -54,63 +76,94 @@
 
                     <div class="row mt-5">
                         <div class="col-md-6 mb-4">
-                            <h4>Experience</h4>
-                            {% for experience in user.resume.experiences.all %}
-                                <p class="card-text">
-                                    <strong>{{experience.title}}</strong> <br>
-                                    {{experience.company}} <br>
-                                    {{experience.start_date}} - {{experience.end_date}} <br>
-                                    <ul>
-                                        <li>{{experience.description}}</li>
-                                    </ul>
-                                </p>
-                            {% empty %}
-                                <p class="card-text">No Experience details available.</p>
-                            {% endfor %}
+                            <h4 class="mb-3">Experience</h4>
+                        
+                            {% with resume.user.resume.experiences.all|dictsortreversed:"start_date" as sorted_experiences %}
+                                {% if sorted_experiences %}
+                                    <div class="list-group">
+                                        {% for experience in sorted_experiences %}
+                                            <h6 class="mb-1 fw-bold">{{ experience.title }}</h6>
+                                            <p class="mb-1 text-muted">{{ experience.company }}</p>
+                                            <p class="small text-muted">
+                                                {{ experience.start_date|date:"F Y" }} – 
+                                                {% if experience.end_date %}
+                                                    {{ experience.end_date|date:"F Y" }}
+                                                {% else %}
+                                                    Present
+                                                {% endif %}
+                                            </p>
+                                            {% if experience.description %}
+                                                <ul class="mb-0 ps-3">
+                                                    <li>{{ experience.description }}</li>
+                                                </ul>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted">No experience details available.</p>
+                                {% endif %}
+                            {% endwith %}
                         </div>
 
                         <div class="col-md-6 mb-4">
-                            <h4>Education</h4>
-                            {% for education in resume.user.resume.education.all %}
-                                <p class="card-text">
-                                    <strong>{{ education.degree }}</strong> <br>
-                                    {{ education.institution }} <br>
-                                    Graduated: {{ education.graduation_year }}
-                                </p>
-                            {% empty %}
-                                <p class="card-text">No education details available.</p>
-                            {% endfor %}
+                            <h4 class="mb-3">Education</h4>
+                        
+                            {% with resume.user.resume.education.all|dictsortreversed:"graduation_date" as sorted_education %}
+                                {% if sorted_education %}
+                                    <div class="list-group">
+                                        {% for education in sorted_education %}
+                                            <h6 class="mb-1 fw-bold">{{ education.get_education_level_display }}</h6>
+                                            {% if education.degree %}
+                                                <p class="mb-1 fw-semibold">{{ education.degree }}</p>
+                                            {% endif %}
+                                            <p class="mb-1 text-muted">{{ education.institution }}</p>
+                                            {% if education.graduation_date %}
+                                                <p class="small text-muted">Graduated: {{ education.graduation_date|date:"F Y" }}</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted">No education details available.</p>
+                                {% endif %}
+                            {% endwith %}
                         </div>
 
-                        
-                        
                         <div class="col-md-6 mt-5 mb-4">
                             <h4>Certifications</h4>
-                            {% for certificate in resume.user.resume.certifications.all %}
-                                <ul>
-                                    <li>{{ certificate.name }}</li>
-                                </ul>
-                            {% empty %}
-                                <p class="card-text">No education details available.</p>
-                            {% endfor %}
+                            {% if resume.user.resume.certifications.exists %}
+                                {% for certificate in resume.user.resume.certifications.all %}
+                                    <ul>
+                                        <li>{{ certificate.name }}</li>
+                                    </ul>
+                                {% empty %}
+                                    <p class="card-text">No certification details available.</p>
+                                {% endfor %}
+
+                            {% else %}
+                                <p class="card-text">No Certification details available.</p>
+                            {% endif %}
                         </div>
 
                         <div class="col-md-6 mt-5 mb-4">
                             <h4>Project</h4>
-                            {% for project in resume.user.resume.projects.all %}
-                                <p class="card-text">
-                                    <strong>{{ project.title }}</strong>
-                                    <br> 
-                                    <small>{{ project.url }}</small>
-                                    <br>
-                                    <ul>
-                                        <li>{{project.description}}</li>
-                                    </ul>
-                                    
-                                </p>
-                            {% empty %}
-                                <p class="card-text">No education details available.</p>
-                            {% endfor %}
+                            {% if resume.user.resume.projects.exists %}
+                                    {% for project in resume.user.resume.projects.all %}
+                                        <p class="card-text">
+                                            <strong>{{ project.title }}</strong>
+                                            <br> 
+                                            <small>{{ project.url }}</small>
+                                            <br>
+                                            <ul>
+                                                <li>{{project.description}}</li>
+                                            </ul>
+                                            
+                                        </p>
+                                    {% empty %}
+                                        <p class="card-text">No project details available.</p>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="card-text">No project details available.</p>
+                                {% endif %}
                         </div>
                     </div>
                 </div>
@@ -131,7 +184,7 @@
 
                     <div class="stats-card">
                         <h5>Social Links</h5>
-                        {% for social in user.resume.social_links.all %}
+                        {% for social in resume.user.resume.social_links.all %}
                             <p class="card-text">
                                 <strong>{{ social.platform }}</strong>
                                 <br> 

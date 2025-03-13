@@ -1,6 +1,7 @@
 {% extends 'users/base.html' %}
 {% load humanize %}
 {% load widget_tweaks %}
+
 {% load static %}
 
 {% block scripts %}
@@ -29,7 +30,6 @@
                 <a href="{% url 'create-job' %}" class="btn btn-light customButton btn-md mt-3"><i class="fa-solid fa-plus"></i> Post a Job</a>
             </section>
         </div>
-    
         <!-- Main Section -->
         <div class="mainTableContent">
             <!-- Table to display applications -->
@@ -51,7 +51,27 @@
                                 {% for applicant in applicants %}
                                     <tr>
                                         <td class="fw-semibold">
-                                            <h1 style="font-size: 1.5rem;"> {{applicant.user.resume.last_name|title}}, {{applicant.user.resume.first_name|title}} {{applicant.user.resume.middle_name|title}}</h1>
+                                            
+                                            <h1 style="font-size: 1.5rem;">
+                                                <a href="{% url 'view-resume-profile' applicant.user.resume.pk %}" 
+                                                   class="viewprofile text-decoration-none text-dark" 
+                                                   title="View Profile">
+                                                   {{ applicant.user.resume.last_name|title }}, 
+                                                   {{ applicant.user.resume.first_name|title }} 
+                                                   {{ applicant.user.resume.middle_name|title }}
+                                                </a>
+                                            </h1>
+                                            
+                                            <style>
+                                                .viewprofile {
+                                                    transition: color 0.3s ease-in-out, text-decoration 0.3s ease-in-out;
+                                                }
+                                                .viewprofile:hover {
+                                                    color: #007bff !important; /* Change color on hover (Bootstrap primary color) */
+                                                    text-decoration: underline !important;
+                                                }
+                                            </style>
+
                                             <div class="location-badge">
                                                 <i class="fa-solid fa-at"></i>
                                                 {{applicant.user.email}}
@@ -60,8 +80,9 @@
                                                 <i class="fa-solid fa-phone"></i>
                                                 {{applicant.user.phone}}
                                             </div>
+                                            
                                         </td>
-                                        <td>{{applicant.applicationstatus.status}}</td>
+                                        <td>{{applicant.applicationstatus.get_status_display}}</td>
                                         <td>{{applicant.applicationstatus.status_date|date:'F m, Y h:m A'}}</td>
                                         
                                         <td>
@@ -73,49 +94,61 @@
                                             {% endif %}
                                         </td>
                                         <td class="action-buttons">
-                                            <div class="btn-group" role="group" aria-label="Status Update">
-                                                {% for value, display in applicant.applicationstatus.STATUS_CHOICES %}
-                                                    <button type="button" 
-                                                            class="btn btn-sm 
-                                                                   {% if applicant.applicationstatus.status == value %}
-                                                                       {% if value == 'SUBMITTED' %}btn-info
-                                                                       {% elif value == 'UNDER_REVIEW' %}btn-warning
-                                                                       {% elif value == 'INTERVIEW' %}btn-primary
-                                                                       {% elif value == 'OFFERED' %}btn-success
-                                                                       {% elif value == 'REJECTED' %}btn-danger
-                                                                       {% elif value == 'ACCEPTED' %}btn-success
-                                                                       {% endif %}
-                                                                   {% else %}
-                                                                       btn-outline-secondary
-                                                                   {% endif %}" 
-                                                            title="{{ display }}"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#statusModal"
-                                                            data-application-id="{{ applicant.pk }}"
-                                                            data-status="{{ value }}">
-                                                        {% if value == 'SUBMITTED' %}
-                                                            <i class="fa-solid fa-file-circle-plus"></i>
-                                                        {% elif value == 'UNDER_REVIEW' %}
-                                                            <i class="fa-solid fa-eye"></i>
-                                                        {% elif value == 'INTERVIEW' %}
-                                                            <i class="fa-solid fa-calendar-check"></i>
-                                                        {% elif value == 'OFFERED' %}
-                                                            <i class="fa-solid fa-handshake"></i>
-                                                        {% elif value == 'REJECTED' %}
-                                                            <i class="fa-solid fa-times-circle"></i>
-                                                        {% elif value == 'ACCEPTED' %}
-                                                            <i class="fa-solid fa-thumbs-up"></i>
+                                            <form method="POST" class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="application_id" value="{{ applicant.pk }}">
+                                                
+                                                <div class="btn-group" role="group" aria-label="Status Update">
+                                                    {% for value, display in applicant.applicationstatus.STATUS_CHOICES %}
+                                                        {% if value != 'SUBMITTED' %}
+                                                            <button type="{% if value == 'UNDER_REVIEW' %}button{% else %}submit{% endif %}" 
+                                                                    name="status" value="{{ value }}" class="btn btn-sm 
+                                                                    {% if applicant.applicationstatus.status == value %}
+                                                                        {% if value == 'UNDER_REVIEW' %}
+                                                                        btn-warning
+                                                                        {% elif value == 'INTERVIEW' %}
+                                                                        btn-primary
+                                                                        {% elif value == 'OFFERED' %}
+                                                                        btn-info
+                                                                        {% elif value == 'REJECTED' %}
+                                                                        btn-danger
+                                                                        {% elif value == 'ACCEPTED' %}
+                                                                        btn-primary
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        btn-outline-secondary
+                                                                    {% endif %}"
+                                                                    {% if value == 'UNDER_REVIEW' %}
+                                                                        onclick="showReviewModal('{{ applicant.pk }}')"
+                                                                    {% endif %}>
+                                                                {% if value == 'UNDER_REVIEW' %}
+                                                                    <i class="fa-solid fa-eye" title="View Application"></i>
+                                                                {% elif value == 'INTERVIEW' %}
+                                                                    <i class="fa-solid fa-calendar-check" title="Schedule Interview"></i>
+                                                                {% elif value == 'OFFERED' %}
+                                                                    <i class="fa-solid fa-handshake" title="Make Job Offer"></i>
+                                                                {% elif value == 'REJECTED' %}
+                                                                    <i class="fa-solid fa-times-circle" title="Provide Rejection Feedback"></i>
+                                                                {% elif value == 'ACCEPTED' %}
+                                                                    <i class="fa-solid fa-thumbs-up" title="Provide Acceptance Feedback"></i>
+                                                                {% endif %}
+                                                            </button>
                                                         {% endif %}
-                                                    </button>
-                                                {% endfor %}
-                                            </div>
-                                            <a href="{% url 'view-resume-profile' applicant.pk %}" class="btn btn-view" title="View Profile">
-                                                <i class="fa-solid fa-eye"></i>
-                                            </a>
+                                                    {% endfor %}
+                                                </div>
+                                            </form>
+                                            {% if applicant.applicationstatus.status in "INTERVIEW,OFFERED,ACCEPTED,REJECTED" %}
+                                                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#detailsModal{{ applicant.pk }}" title="View Application Details">
+                                                    <i class="fa-solid fa-info-circle"></i> Details
+                                                </button>
+                                            {% endif %}
+                                            
+                                            <button class="btn btn-sm btn-info ms-1" data-bs-toggle="modal" data-bs-target="#historyModal{{ applicant.pk }}" title="View Application History">
+                                                <i class="fa-solid fa-history"></i> History
+                                            </button>
                                         </td>
                                     </tr>
                                 {% endfor %}
-                                <!-- Repeat similar rows for each applicant -->
                             </tbody>
                         </table>
                     </div>
@@ -124,166 +157,685 @@
         </div>
     </div>
 
-    <!-- Modal for Status Update -->
-    <div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="statusModalLabel">Update Application Status</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" action="{% url 'job-applicants' job.pk %}">
+    {% for applicant in applicants %}
+        <div class="modal fade" id="reviewModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: 1rem;">
+                    <div class="modal-header bg-dark text-white" style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                        <h5 class="modal-title">Review Application</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form method="POST">
                         {% csrf_token %}
-                        <input type="hidden" name="application_id" id="statusApplicationId">
-                        <input type="hidden" name="status" id="statusValue">
-                        
-                        <!-- Additional fields for Interview -->
-                        <div id="interviewFields" style="display: none;">
-                            <div class="mb-3">
-                                <label for="interview_date" class="form-label">Interview Date</label>
-                                <input type="datetime-local" class="form-control" id="interview_date" name="interview_date" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="interview_type" class="form-label">Interview Type</label>
-                                <select class="form-select" id="interview_type" name="interview_type">
-                                    <option value="VIRTUAL">Virtual</option>
-                                    <option value="ONSITE">Onsite</option>
-                                    <option value="PHONE">Phone</option>
-                                    <option value="GROUP">Group</option>
-                                    <option value="PANEL">Panel</option>
-                                    <option value="OTHER">Other</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="interviewer" class="form-label">Interviewer</label>
-                                <input type="text" class="form-control" id="interviewer" name="interviewer">
-                            </div>
-                            <div class="mb-3">
-                                <label for="notes" class="form-label">Notes</label>
-                                <textarea class="form-control" id="notes" name="notes"></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Additional fields for Offer -->
-                        <div id="offerFields" style="display: none;">
-                            <div class="mb-3">
-                                <label for="salaryType" class="form-label">Salary Display Type</label>
-                                {% render_field form.salary_display_type class="form-select" id="salaryType" onchange="toggleSalaryFields()" required=True %}
-                            </div>
-                        
-                            <div id="currencyField" class="mb-3">
-                                <label for="currency" class="form-label">Currency</label>
-                                <div class="input-group">
-                                    {% render_field form.currency class="form-select" %}
+                        <div class="modal-body">
+                            <input type="hidden" name="application_id" id="review_application_id">
+                            <input type="hidden" name="status" value="UNDER_REVIEW">
+                            
+                            <div class="applicant-info mb-4" id="review_applicant_info">
+                                <h5 class="mb-3"><i class="fa-solid fa-user me-2"></i>Applicant Information</h5>
+                                <div class="card shadow-sm border-0 rounded-3">
+                                    <div class="card-body p-4">
+                                        <h5 class="mb-2">{{applicant.user.resume.last_name|title}}, {{applicant.user.resume.first_name|title}}</h5>
+                                        <p class="mb-2"><i class="fa-solid fa-envelope me-2 text-primary"></i>{{ applicant.user.email }}</p>
+                                        <p class="mb-2"><i class="fa-solid fa-phone me-2 text-primary"></i>{{ applicant.user.phone }}</p>
+                                        <div class="mt-3 text-end">
+                                            <a href="{% url 'view-resume-profile' applicant.user.resume.pk %}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                                <i class="fa-solid fa-external-link-alt"></i> View Full Profile
+                                            </a>
+                                            {% if applicant.user.resume.upload_resume %}
+                                                <a href="{{ applicant.user.resume.upload_resume.url }}" class="btn btn-sm btn-outline-secondary ms-2" target="_blank">
+                                                    <i class="fa-solid fa-file-pdf"></i> View Resume
+                                                </a>
+                                            {% else %}
+                                                <a class="btn btn-sm btn-outline-secondary ms-2">No resume uploaded</a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        
-                            <!-- Fixed Salary Field -->
-                            <div id="fixedSalaryField" class="mb-3 d-none">
-                                <label for="fixedSalary" class="form-label">Fixed Salary</label>
-                                <div class="input-group">
-                                    {% render_field form.salary_fixed class="form-control" placeholder="Enter fixed salary" %}
-                                </div>
-                            </div>
-                        
-                            <!-- Salary Range Fields -->
-                            <div id="salaryRangeFields" class="mb-3 d-none">
-                                <label for="salaryRange" class="form-label">Salary Range</label>
-                                <div class="input-group">
-                                    {% render_field form.salary_min class="form-control" placeholder="Min Salary" %}
-                                    <span class="input-group-text">to</span>
-                                    {% render_field form.salary_max class="form-control" placeholder="Max Salary" %}
-                                </div>
-                            </div>
-                        
-                            <div id="salaryModeField" class="mb-3">
-                                <label for="salary_mode" class="form-label">Salary Mode</label>
-                                {% render_field form.salary_mode class="form-select" %}
-                            </div>
-                        
-                            <div class="mb-3">
-                                <label for="benefits" class="form-label">Benefits</label>
-                                <textarea class="form-control" id="benefits" name="benefits"></textarea>
-                            </div>
-                        
-                            <div class="mb-3">
-                                <label for="offer_date" class="form-label">Offer Date</label>
-                                <input type="date" class="form-control" id="offer_date" name="offer_date">
-                            </div>
-                        
-                            <div class="mb-3">
-                                <label for="expiration_date" class="form-label">Expiration Date</label>
-                                <input type="date" class="form-control" id="expiration_date" name="expiration_date">
-                            </div>
                         </div>
-
-                        <!-- Additional fields for Feedback -->
-                        <div id="feedbackFields" style="display: none;">
-                            <div class="mb-3">
-                                <label for="feedback_content" class="form-label">Feedback</label>
-                                <textarea class="form-control" id="feedback_content" name="feedback_content"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="rating" class="form-label">Rating</label>
-                                <input type="number" class="form-control" id="rating" name="rating" min="1" max="5">
-                            </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary customButton" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-warning customButton">Set to Under Review</button>
                         </div>
-
-                        <button type="submit" class="btn btn-primary">Update Status</button>
                     </form>
                 </div>
             </div>
         </div>
+    {% endfor%}
+    
+    <div class="modal fade" id="interviewModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 1rem;">
+                <div class="modal-header bg-dark text-white" style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                    <h5 class="modal-title">Schedule Interview</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <input type="hidden" name="application_id" id="interview_application_id">
+                        <input type="hidden" name="status" value="INTERVIEW">
+                        
+                        <div class="col-md-12 mb-2">
+                            <label for="salaryType" class="form-label fw-bold">Interview Date</label>
+                            {% render_field interview_form.interview_date class="form-control" required=True %}
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <label for="interview_type" class="form-label fw-bold">Interview Type</label>
+                            {% render_field interview_form.interview_type class="form-select" %}
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <label for="interviewer" class="form-label fw-bold">Interviewer</label>
+                            {% render_field interview_form.interviewer class="form-control" %}
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <label for="notes" class="form-label fw-bold">Notes</label>
+                            {% render_field interview_form.notes class="form-control" %}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary customButton" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary customButton">Schedule Interview</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
+    
+    <!-- Offer Modal -->
+    <div class="modal fade" id="offerModal" tabindex="-1" aria-labelledby="offerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 1rem;">
+                <div class="modal-header bg-dark text-white"  style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                    <h5 class="modal-title" id="offerModalLabel"><i class="bi bi-briefcase-fill"></i> Make Job Offer</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <input type="hidden" name="application_id" id="offer_application_id">
+                        <input type="hidden" name="status" value="OFFERED">
+    
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label for="salaryType" class="form-label fw-bold">Salary Type</label>
+                                {% render_field offer_form.salary_display_type class="form-select" id="salaryType" onchange="toggleSalaryFields()" required=True %}
+                            </div>
+    
+                            <div id="currencyField" class="col-md-3">
+                                <label for="currency" class="form-label fw-bold">Currency</label>
+                                {% render_field offer_form.currency class="form-select" %}
+                            </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Ensure correct state on page load
-        toggleSalaryFields();
+                            <div id="salaryRangeFields" class="col-md-6">
+                                <label for="salaryRange" class="form-label fw-bold">Salary Range</label>
+                                <div class="input-group">
+                                    {% render_field offer_form.salary_min class="form-control" placeholder="Min" %}
+                                    <span class="input-group-text">to</span>
+                                    {% render_field offer_form.salary_max class="form-control" placeholder="Max" %}
+                                </div>
+                            </div>
+    
+                            <div id="fixedSalaryField" class="col-md-6 d-none">
+                                <label for="fixedSalary" class="form-label fw-bold">Fixed Salary</label>
+                                <div class="input-group">
+                                    {% render_field offer_form.salary_fixed class="form-control" placeholder="Enter amount" %}
+                                </div>
+                            </div>
+    
+                            <div id="salaryModeField" class="col-md-3">
+                                <label for="salary_mode" class="form-label fw-bold">Salary Mode</label>
+                                {% render_field offer_form.salary_mode class="form-select" %}
+                            </div>
+
+                            <div>
+                                <label for="notes" class="form-label fw-bold">Notes</label>
+                                {% render_field offer_form.notes class="form-control" placeholder="Enter notes" %}
+                            </div>
+
+                            <div>
+                                <label for="benefits" class="form-label fw-bold">Benefits</label>
+                                {% render_field offer_form.benefits class="form-control" %}
+                            </div>
+                            
+
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label for="offer_date" class="form-label fw-bold">Offer Date</label>
+                                    {% render_field offer_form.offer_date class="form-control" %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="expiration_date" class="form-label fw-bold">Expiration Date</label>
+                                    {% render_field offer_form.expiration_date class="form-control" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary customButton" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle"></i> Close
+                        </button>
+                        <button type="submit" class="btn btn-success customButton">
+                            <i class="bi bi-send-fill"></i> Make Offer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- Feedback Modal (for both Reject and Accept) -->
+    <div class="modal fade" id="feedbackModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 1rem;">
+                <div class="modal-header bg-dark text-white" style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                    <h5 class="modal-title">Provide Feedback</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <input type="hidden" name="application_id" id="feedback_application_id">
+                        <input type="hidden" name="status" id="feedback_status">
+                        
+                        <div class="col-md-12 mb-2">
+                            <label for="feedback" class="form-label fw-bold">Feedback</label>
+                            {% render_field feedback_form.content class="form-control" %}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary customButton" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-dark customButton">Submit Feedback</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <style>
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        .timeline:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 18px;
+            height: 100%;
+            width: 4px;
+            background: #e9ecef;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        .timeline-marker {
+            position: absolute;
+            left: 15px;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 4px #e9ecef;
+        }
+        .timeline-content {
+            margin-left: 40px;
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
         
-        // Attach event listener to salary type dropdown
-        const salaryTypeDropdown = document.getElementById("salaryType");
-        if (salaryTypeDropdown) {
-            salaryTypeDropdown.addEventListener("change", toggleSalaryFields);
+        /* Status badge styles */
+        .status-badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            font-size: 0.85em;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+        }
+        .status-submitted { background-color: #6c757d; color: white; }
+        .status-review { background-color: #ffc107; color: black; }
+        .status-interview { background-color: #0d6efd; color: white; }
+        .status-offered { background-color: #20c997; color: white; }
+        .status-accepted { background-color: #198754; color: white; }
+        .status-rejected { background-color: #dc3545; color: white; }
+    </style>
+    <!-- Details Modal for each application -->
+    {% for applicant in applicants %}
+        {% if applicant.applicationstatus.status in "INTERVIEW,OFFERED,ACCEPTED,REJECTED" %}
+            <div class="modal fade" id="detailsModal{{ applicant.pk }}" tabindex="-1" aria-labelledby="detailsModalLabel{{ applicant.pk }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content shadow-lg" style="border-radius: 1rem;">
+                        <div class="modal-header bg-dark text-white" style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                            <h5 class="modal-title" id="detailsModalLabel{{ applicant.pk }}">
+                                <i class="fa-solid fa-clipboard-list me-2"></i>Application Details
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <!-- Current Status Section -->
+                            <div class="current-status mb-4 p-3 rounded-3" style="background-color: #f8f9fa;">
+                                <h5 class="mb-2"><i class="fa-solid fa-flag me-2"></i>Current Status</h5>
+                                <div class="d-flex align-items-center">
+                                    {% with status=applicant.applicationstatus.status %}
+                                        {% if status == 'SUBMITTED' %}
+                                            <span class="status-badge status-submitted">Submitted</span>
+                                        {% elif status == 'UNDER_REVIEW' %}
+                                            <span class="status-badge status-review">Under Review</span>
+                                        {% elif status == 'INTERVIEW' %}
+                                            <span class="status-badge status-interview">Interview Scheduled</span>
+                                        {% elif status == 'OFFERED' %}
+                                            <span class="status-badge status-offered">Offered</span>
+                                        {% elif status == 'ACCEPTED' %}
+                                            <span class="status-badge status-accepted">Accepted</span>
+                                        {% elif status == 'REJECTED' %}
+                                            <span class="status-badge status-rejected">Rejected</span>
+                                        {% endif %}
+                                    {% endwith %}
+                                    <span class="ms-2 text-muted">Last updated: {{ applicant.applicationstatus.status_date|date:"F j, Y, g:i a" }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Applicant Information -->
+                            <div class="mb-4">
+                                <h5 class="mb-3"><i class="fa-solid fa-user me-2"></i>Applicant Information</h5>
+                                <div class="card shadow-sm border-0 mb-3 rounded-3">
+                                    <div class="card-body p-4">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p class="mb-2">
+                                                    <i class="fa-solid fa-user me-2 text-primary"></i>
+                                                    <strong>Name:</strong> {{ applicant.user.resume.first_name|title }} {{ applicant.user.resume.middle_name|title }} {{ applicant.user.resume.last_name|title }}
+                                                </p>
+                                                <p class="mb-2">
+                                                    <i class="fa-solid fa-envelope me-2 text-primary"></i>
+                                                    <strong>Email:</strong> {{ applicant.user.email }}
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p class="mb-2">
+                                                    <i class="fa-solid fa-phone me-2 text-primary"></i>
+                                                    <strong>Phone:</strong> {{ applicant.user.phone }}
+                                                </p>
+                                                <p class="mb-2">
+                                                    <i class="fa-solid fa-calendar me-2 text-primary"></i>
+                                                    <strong>Application Date:</strong> {{ applicant.submit_date|date:"F j, Y" }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Interview Details Section -->
+                            {% if applicant.applicationstatus.status == "INTERVIEW" %}
+                                <div class="mb-4">
+                                    <h5 class="mb-3"><i class="fa-solid fa-calendar-check me-2"></i>Interview Details</h5>
+                                    {% for interview in applicant.interview_set.all %}
+                                        <div class="card shadow-sm border-0 mb-3 rounded-3">
+                                            <div class="card-body p-4">
+                                                <h5 class="card-title fw-bold">{{ interview.interview_type|title }} Interview</h5>
+                                                <div class="row mt-3">
+                                                    <div class="col-md-6">
+                                                        <p class="mb-2">
+                                                            <i class="fa-solid fa-calendar me-2 text-primary"></i>
+                                                            <strong>Date:</strong> {{ interview.interview_date|date:"F j, Y" }}
+                                                        </p>
+                                                        <p class="mb-2">
+                                                            <i class="fa-solid fa-clock me-2 text-primary"></i>
+                                                            <strong>Time:</strong> {{ interview.interview_date|date:"g:i a" }}
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p class="mb-2">
+                                                            <i class="fa-solid fa-user me-2 text-primary"></i>
+                                                            <strong>Interviewer:</strong> {{ interview.interviewer }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-3 p-3 bg-light rounded-3">
+                                                    <p class="mb-0">
+                                                        <i class="fa-solid fa-comment me-2 text-primary"></i>
+                                                        <strong>Notes:</strong> {{ interview.notes|default:"No additional notes provided." }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            
+                            <!-- Job Offer Details Section -->
+                            {% elif applicant.applicationstatus.status == "OFFERED" %}
+                                <div class="mb-4">
+                                    <h5 class="mb-3"><i class="fa-solid fa-handshake me-2"></i>Job Offer Details</h5>
+                                    {% for offer in applicant.offer_set.all %}
+                                    <div class="card shadow-sm border-0 rounded-3">
+                                        <div class="card-body p-4">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h6 class="text-primary">Compensation</h6>
+                                                    
+                                                    {% if offer.salary_display_type == 'fixed' %}
+                                                        <p class="mb-2">
+                                                            <i class="fa-solid fa-money-bill me-2 text-success"></i>
+                                                            <strong>Salary:</strong> {{ offer.currency }} {{ offer.salary_fixed|intcomma }} {{ offer.salary_mode }}
+                                                        </p>
+                                                    {% elif offer.salary_display_type == 'range' %}
+                                                        <p class="mb-2">
+                                                            <i class="fa-solid fa-money-bill me-2 text-success"></i>
+                                                            <strong>Salary Range:</strong> {{ offer.currency }} {{ offer.salary_min|intcomma }} - {{ offer.salary_max|intcomma }} {{ offer.salary_mode }}
+                                                        </p>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h6 class="text-primary">Important Dates</h6>
+                                                    <p class="mb-2">
+                                                        <i class="fa-solid fa-calendar-plus me-2 text-info"></i>
+                                                        <strong>Offer Date:</strong> {{ offer.offer_date|date:"F j, Y" }}
+                                                    </p>
+                                                    <p class="mb-2">
+                                                        <i class="fa-solid fa-hourglass-end me-2 text-warning"></i>
+                                                        <strong>Respond By:</strong> {{ offer.expiration_date|date:"F j, Y" }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="mt-3">
+                                                <h6 class="text-primary">Notes</h6>
+                                                <div class="p-3 bg-light rounded-3">
+                                                    {% if offer.notes %}
+                                                        {{ offer.notes|linebreaks }}
+                                                    {% else %}
+                                                        <p class="text-muted mb-0">No specific notes listed</p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="mt-3">
+                                                <h6 class="text-primary">Benefits</h6>
+                                                <div class="p-3 bg-light rounded-3">
+                                                    {% if offer.benefits %}
+                                                        {{ offer.benefits|linebreaks }}
+                                                    {% else %}
+                                                        <p class="text-muted mb-0">No specific benefits listed</p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <!-- Feedback Section - For Accepted or Rejected status -->
+                            {% if applicant.applicationstatus.status in "ACCEPTED,REJECTED" and applicant.feedback_set.exists %}
+                                <div class="mb-4">
+                                    <h5 class="mb-3">
+                                        {% if applicant.applicationstatus.status == "ACCEPTED" %}
+                                            <i class="fa-solid fa-thumbs-up me-2 text-success"></i>Acceptance Feedback
+                                        {% else %}
+                                            <i class="fa-solid fa-comment-dots me-2 text-danger"></i>Rejection Feedback
+                                        {% endif %}
+                                    </h5>
+                                    {% for feedback in applicant.feedback_set.all %}
+                                        <div class="card shadow-sm border-0 rounded-3">
+                                            <div class="card-body p-4">
+                                                <div class="mb-3 p-3 bg-light rounded-3">
+                                                    <p class="mb-0">{{ feedback.content }}</p>
+                                                </div>
+                                                <p class="text-muted mb-0 text-end">
+                                                    <small>Provided on {{ feedback.feedback_date|date:"F j, Y" }}</small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary customButton" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor%}
+
+    {% for applicant in applicants %}
+    <!-- History Modal for each application -->
+    <div class="modal fade " id="historyModal{{ applicant.pk }}" tabindex="-1" aria-labelledby="historyModalLabel{{ applicant.pk }}" aria-hidden="true" >
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg" style="border-radius: 1rem;">
+                <div class="modal-header bg-dark text-white" style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                    <h5 class="modal-title" id="historyModalLabel{{ applicant.pk }}">
+                        <i class="fa-solid fa-history me-2"></i>Application History
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="timeline">
+                        <!-- Submitted is always the first status -->
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6 class="fw-bold mb-0">Submitted</h6>
+                                <small class="text-muted">{{ applicant.submit_date|date:"F j, Y, g:i a" }}</small>
+                                <p>Application submitted for {{ applicant.job.title }}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Identify current status outside of submitted -->
+                        {% if applicant.applicationstatus.status != 'SUBMITTED' %}
+                            <div class="timeline-item">
+                                {% with status=applicant.applicationstatus.status %}
+                                    {% if status == 'UNDER_REVIEW' %}
+                                        <div class="timeline-marker bg-warning"></div>
+                                        <div class="timeline-content">
+                                            <h6 class="fw-bold mb-0">Under Review</h6>
+                                            <small class="text-muted">{{ applicant.applicationstatus.status_date|date:"F j, Y, g:i a" }}</small>
+                                            <p>Application is currently under review.</p>
+                                        </div>
+                                    {% elif status == 'INTERVIEW' %}
+                                        <div class="timeline-marker bg-primary"></div>
+                                        <div class="timeline-content">
+                                            <h6 class="fw-bold mb-0">Interview Scheduled</h6>
+                                            <small class="text-muted">{{ applicant.applicationstatus.status_date|date:"F j, Y, g:i a" }}</small>
+                                            <p>Applicant was selected for an interview.</p>
+                                        </div>
+                                    {% elif status == 'OFFERED' %}
+                                        <div class="timeline-marker bg-success"></div>
+                                        <div class="timeline-content">
+                                            <h6 class="fw-bold mb-0">Job Offer</h6>
+                                            <small class="text-muted">{{ applicant.applicationstatus.status_date|date:"F j, Y, g:i a" }}</small>
+                                            <p>Job offer was made to applicant.</p>
+                                        </div>
+                                    {% elif status == 'REJECTED' %}
+                                        <div class="timeline-marker bg-danger"></div>
+                                        <div class="timeline-content">
+                                            <h6 class="fw-bold mb-0">Application Rejected</h6>
+                                            <small class="text-muted">{{ applicant.applicationstatus.status_date|date:"F j, Y, g:i a" }}</small>
+                                            <p>Application was rejected.</p>
+                                        </div>
+                                    {% elif status == 'ACCEPTED' %}
+                                        <div class="timeline-marker bg-success"></div>
+                                        <div class="timeline-content">
+                                            <h6 class="fw-bold mb-0">Application Accepted</h6>
+                                            <small class="text-muted">{{ applicant.applicationstatus.status_date|date:"F j, Y, g:i a" }}</small>
+                                            <p>Applicant has been accepted for the position.</p>
+                                        </div>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Show messages about status changes -->
+                        {% if applicant.conversation %}
+                            {% for message in applicant.conversation.messages.all %}
+                                {% if "status of your application" in message.content %}
+                                    <div class="timeline-item">
+                                        {% if "Under Review" in message.content %}
+                                            <div class="timeline-marker bg-warning"></div>
+                                        {% elif "Interview Scheduled" in message.content %}
+                                            <div class="timeline-marker bg-primary"></div>
+                                        {% elif "Offered" in message.content %}
+                                            <div class="timeline-marker bg-success"></div>
+                                        {% elif "Rejected" in message.content %}
+                                            <div class="timeline-marker bg-danger"></div>
+                                        {% elif "Accepted" in message.content %}
+                                            <div class="timeline-marker bg-success"></div>
+                                        {% else %}
+                                            <div class="timeline-marker bg-secondary"></div>
+                                        {% endif %}
+                                        
+                                        <div class="timeline-content">
+                                            {% if "Under Review" in message.content %}
+                                                <h6 class="fw-bold mb-0">Under Review</h6>
+                                            {% elif "Interview Scheduled" in message.content %}
+                                                <h6 class="fw-bold mb-0">Interview Scheduled</h6>
+                                            {% elif "Offered" in message.content %}
+                                                <h6 class="fw-bold mb-0">Job Offered</h6>
+                                            {% elif "Rejected" in message.content %}
+                                                <h6 class="fw-bold mb-0">Application Rejected</h6>
+                                            {% elif "Accepted" in message.content %}
+                                                <h6 class="fw-bold mb-0">Application Accepted</h6>
+                                            {% else %}
+                                                <h6 class="fw-bold mb-0">Status Update</h6>
+                                            {% endif %}
+                                            
+                                            <small class="text-muted">{{ message.timestamp|date:"F j, Y, g:i a" }}</small>
+                                            <p>{{ message.content }}</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                        
+                        <!-- Show interviews in timeline -->
+                        {% for interview in applicant.interview_set.all %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="fw-bold mb-0">Interview Scheduled</h6>
+                                    <small class="text-muted">{{ interview.interview_date|date:"F j, Y, g:i a" }}</small>
+                                    <p>{{ interview.interview_type|title }} interview scheduled with {{ interview.interviewer }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        
+                        <!-- Show offers in timeline -->
+                        {% for offer in applicant.offer_set.all %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-success"></div>
+                                <div class="timeline-content">
+                                    <h6 class="fw-bold mb-0">Job Offer</h6>
+                                    <small class="text-muted">{{ offer.offer_date|date:"F j, Y" }}</small>
+                                    <p>Job offer made that expires on {{ offer.expiration_date|date:"F j, Y" }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        
+                        <!-- Show feedback in timeline -->
+                        {% for feedback in applicant.feedback_set.all %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker {% if feedback.feedback_type == 'APPLICANT' %}bg-danger{% else %}bg-success{% endif %}"></div>
+                                <div class="timeline-content">
+                                    <h6 class="fw-bold mb-0">
+                                        {% if feedback.feedback_type == 'APPLICANT' %}
+                                            Rejection Feedback
+                                        {% else %}
+                                            Acceptance Feedback
+                                        {% endif %}
+                                    </h6>
+                                    <small class="text-muted">{{ feedback.feedback_date|date:"F j, Y" }}</small>
+                                    <p>{{ feedback.content|truncatechars:100 }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary customButton" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <script>
+        
+        function toggleSalaryFields() {
+            const salaryType = document.getElementById("salaryType").value;
+            const salaryRangeFields = document.getElementById("salaryRangeFields");
+            const fixedSalaryField = document.getElementById("fixedSalaryField");
+            const salaryModeField = document.getElementById("salaryModeField");
+            const currencyField = document.getElementById("currencyField");
+
+            if (salaryType === "range") {
+                salaryRangeFields.classList.remove("d-none");
+                fixedSalaryField.classList.add("d-none");
+                salaryModeField.classList.remove("d-none");
+                currencyField.classList.remove("d-none");
+            } else if (salaryType === "fixed") {
+                fixedSalaryField.classList.remove("d-none");
+                salaryRangeFields.classList.add("d-none");
+                salaryModeField.classList.remove("d-none");
+                currencyField.classList.remove("d-none");
+            } else {
+                salaryRangeFields.classList.add("d-none");
+                fixedSalaryField.classList.add("d-none");
+                salaryModeField.classList.add("d-none");
+                currencyField.classList.add("d-none");
+            }
         }
 
-        // Handle opening of status modal
-        document.querySelectorAll('[data-bs-target="#statusModal"]').forEach(button => {
-            button.addEventListener("click", function () {
-                const applicationId = this.dataset.applicationId;
-                const status = this.dataset.status;
-                const statusInput = document.getElementById("statusApplicationId");
-                const statusValue = document.getElementById("statusValue");
+        // Initialize visibility on page load
+        window.onload = function() {
+            toggleSalaryFields();
+        };
+        
+        document.addEventListener('DOMContentLoaded', function() { 
+            // Update your action buttons to include data attributes and modal triggers
+            const actionButtons = document.querySelectorAll('.action-buttons button');
 
-                if (statusInput) statusInput.value = applicationId;
-                if (statusValue) statusValue.value = status;
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const applicationId = this.closest('form').querySelector('[name="application_id"]').value;
+                    const status = this.value;
 
-                // Show/hide additional fields based on status
-                toggleField("interviewFields", status === "INTERVIEW");
-                toggleField("offerFields", status === "OFFERED");
-                toggleField("feedbackFields", status === "REJECTED" || status === "ACCEPTED");
+                    // Ignore "UNDER_REVIEW" so it submits the form directly
+                    if (status === 'UNDER_REVIEW') {
+                        document.getElementById('review_application_id').value = applicationId;
+
+
+                        new bootstrap.Modal(document.getElementById('reviewModal')).show();
+                    }
+                    else if (status === 'INTERVIEW') {
+                        document.getElementById('interview_application_id').value = applicationId;
+                        new bootstrap.Modal(document.getElementById('interviewModal')).show();
+                    }
+                    else if (status === 'OFFERED') {
+                        document.getElementById('offer_application_id').value = applicationId;
+                        new bootstrap.Modal(document.getElementById('offerModal')).show();
+                    }
+                    else if (status === 'REJECTED' || status === 'ACCEPTED') {
+                        document.getElementById('feedback_application_id').value = applicationId;
+                        document.getElementById('feedback_status').value = status;
+                        new bootstrap.Modal(document.getElementById('feedbackModal')).show();
+                    }
+                    else {
+                        // For other statuses, submit the form directly
+                        this.closest('form').submit();
+                    }
+                });
             });
         });
-    });
 
-    // Function to toggle salary fields
-    function toggleSalaryFields() {
-        const salaryType = document.getElementById("salaryType")?.value;
-        toggleField("salaryRangeFields", salaryType === "range");
-        toggleField("fixedSalaryField", salaryType === "fixed");
-        toggleField("salaryModeField", salaryType === "range" || salaryType === "fixed");
-        toggleField("currencyField", salaryType === "range" || salaryType === "fixed");
-    }
-
-    // Utility function to show/hide elements
-    function toggleField(fieldId, condition) {
-        const field = document.getElementById(fieldId);
-        if (field) {
-            field.style.display = condition ? "block" : "none";
-        }
-    }
-
-</script>
+    </script>
 
 {% endblock content %}

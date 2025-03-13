@@ -60,13 +60,7 @@
                                             <h1 style="font-size: 1.5rem;">{{ job.title }}</h1>
                                             <div class="location-badge">
                                                 <i class="fas fa-location-dot"></i>
-                                                {% if job.location.barangay and job.location.city and job.location.street %}
-                                                    <!-- Display Philippine location if available -->
-                                                    {{ job.location.street }}{% if job.location.barangay %}, {{ job.location.barangay }}{% endif %}{% if job.location.city %}, {{ job.location.city }}{% endif %}
-                                                {% else %}
-                                                    <!-- Display international location if Philippine location is empty -->
-                                                    {{ job.location.street }}{% if job.location.street %}, {% endif %}{{ job.location.countrycity }}{% if job.location.countrycity %}, {% endif %}{{ job.location.country }}
-                                                {% endif %}
+                                                {{ job.location }}
                                             </div>
                                             <hr>
                                             <div class="mt-3">

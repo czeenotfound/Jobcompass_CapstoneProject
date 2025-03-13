@@ -112,11 +112,44 @@
                         <h4>Job Experience</h4>
                         <ul class="list-unstyled">
                             {% for experience in job.job_experience_set.all %}
-                                <li>{{ experience.exp_name }} ({{ experience.exp_years }} years)
-                                    <p> • {{ experience.exp_description }}</p>
+                                <li class="d-flex align-items-start mb-3">
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold">
+                                            {{ experience.exp_name }}
+                                        </span>
+                                        
+                                        <!-- Display Fixed or Range Experience -->
+                                        {% if experience.exp_type == 'fixed' and experience.exp_years %}
+                                            <span class="text-muted">{{ experience.exp_years }} year/s of experience</span>
+                                        {% elif experience.exp_type == 'range' and experience.min_exp_years and experience.max_exp_years %}
+                                            <span class="text-muted">{{ experience.min_exp_years }} - {{ experience.max_exp_years }} year/s of experience</span>
+                                        {% endif %}
+                                        
+                                        {% if experience.exp_description %}
+                                            <span class="text-muted">{{ experience.exp_description }}</span>
+                                        {% endif %}
+                                    </div>
                                 </li>
                             {% empty %}
-                                <li>No experience required</li>
+                                <li class="text-muted">No experience required.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    {% if job.job_education_set.exists %}
+                    <hr>
+                    <div class="mb-5">
+                        <h4>Job Education</h4>
+                        <ul class="list-unstyled d-flex align-items-start">
+                            {% for education in job.job_education_set.all %}
+                                <i class="fa-solid fa-graduation-cap mt-1 me-2"></i>
+                                <div class="d-flex flex-column">
+                                    <li class="fw-bold">{{ education.get_education_level_display }}</li>
+                                    <li class="text-muted">{{ education.degree|title }}</li>
+                                </div>
+                            {% empty %}
+                                <li>No education required</li>
                             {% endfor %}
                         </ul>
                     </div>
@@ -178,7 +211,7 @@
                         </div>
                         <div class="contact-info mb-2">
                             <i class="fas fa-envelope me-2"></i>
-                            <span>{{user.email}}</span>
+                            <span>{{job.company.email}}</span>
                         </div>
                     </div>
                 </div>

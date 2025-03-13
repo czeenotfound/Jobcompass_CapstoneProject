@@ -59,13 +59,7 @@
                                             <h1 style="font-size: 1.5rem;">{{ applicant.get_full_name|title }}</h1>
                                             <div class="location-badge">
                                                 <i class="fas fa-location-dot"></i>
-                                                {% if applicant.address.barangay and applicant.address.city and applicant.address.street %}
-                                                    <!-- Display Philippine location if available -->
-                                                    {{ applicant.address.street }}{% if applicant.address.barangay %}, {{ applicant.address.barangay }}{% endif %}{% if applicant.address.city %}, {{ applicant.address.city }}{% endif %}
-                                                {% else %}
-                                                    <!-- Display international location if Philippine location is empty -->
-                                                    {{ applicant.address.countrystreet }}{% if applicant.address.countrystreet %}, {% endif %}{{ applicant.address.countrycity }}{% if applicant.address.countrycity %}, {% endif %}{{ applicant.address.country }}
-                                                {% endif %}
+                                                {{ applicant.address}}
                                             </div>
                                         </td>
                                         {% if applicant.is_active %}

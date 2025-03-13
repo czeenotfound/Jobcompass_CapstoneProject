@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from datetime import date
+from django.utils.dateformat import format
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.urls import reverse
 from django.db.models import Count, Avg, F
@@ -15,7 +16,7 @@ from resume.models import Resume
 
 from .forms import UpdateCompanyForm, UpdateEmployerForm
 from address.forms import AddressForm   
-from job.forms import ApplicationForm, ApplicationStatusForm
+from job.forms import ApplicationForm, ApplicationStatusForm, InterviewForm, OfferForm, FeedbackForm
 from users.forms import UpdateAvatarPhoneForm
 
 # Create your views here.
@@ -45,17 +46,15 @@ def manage_job_fair(request):
     else:
         messages.warning(request, 'Permission Denied')
         return redirect('dashboard')
-
 @login_required(login_url='login')
 def job_analytics(request):
     if not request.user.is_employer:
         return redirect('login')
     
     jobs = Job.objects.filter(company__user=request.user).select_related('company', 'industry')
-
     total_jobs = jobs.count()
     
-      # Get counts for all statuses
+    # Get counts for all statuses across all jobs
     status_counts = ApplicationStatus.objects.filter(application__job__in=jobs).values('status').annotate(
         count=Count('id')
     )
@@ -68,26 +67,93 @@ def job_analytics(request):
     for status in all_statuses:
         if status not in status_counts_dict:
             status_counts_dict[status] = 0
-
-
+    
+    # Calculate total applications
+    total_applications = sum(status_counts_dict.values())
+    
+    # Get per-job application stats
+    job_stats = []
+    for job in jobs:
+        job_apps = job.application_set.all()
+        job_app_count = job_apps.count()
+        
+        # Get status breakdown for this job
+        job_status_counts = {}
+        for status in all_statuses:
+            job_status_counts[status] = job_apps.filter(applicationstatus__status=status).count()
+        
+        # Calculate conversion rates
+        interview_rate = 0
+        offer_rate = 0
+        acceptance_rate = 0
+        
+        if job_status_counts['SUBMITTED'] + job_status_counts['UNDER_REVIEW'] > 0:
+            interview_rate = (job_status_counts['INTERVIEW'] / 
+                             (job_status_counts['SUBMITTED'] + job_status_counts['UNDER_REVIEW'] + 
+                              job_status_counts['INTERVIEW'])) * 100
+        
+        if job_status_counts['INTERVIEW'] > 0:
+            offer_rate = (job_status_counts['OFFERED'] / job_status_counts['INTERVIEW']) * 100
+        
+        if job_status_counts['OFFERED'] > 0:
+            acceptance_rate = (job_status_counts['ACCEPTED'] / job_status_counts['OFFERED']) * 100
+        
+        job_stats.append({
+            'job': job,
+            'application_count': job_app_count,
+            'status_counts': job_status_counts,
+            'interview_rate': round(interview_rate, 1),
+            'offer_rate': round(offer_rate, 1),
+            'acceptance_rate': round(acceptance_rate, 1)
+        })
+    
+    # Get applications over time (last 30 days)
+    from django.utils import timezone
+    from datetime import timedelta
+    
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+    recent_applications = Application.objects.filter(
+        job__in=jobs, 
+        submit_date__gte=thirty_days_ago
+    ).order_by('submit_date')
+    
+    # Group by date
+    from django.db.models.functions import TruncDate
+    applications_by_date = recent_applications.annotate(
+        date=TruncDate('submit_date')
+    ).values('date').annotate(count=Count('id')).order_by('date')
+    
+    # Format for chart
+    dates = [item['date'].strftime('%Y-%m-%d') for item in applications_by_date]
+    app_counts = [item['count'] for item in applications_by_date]
+    
     registered_job_fairs = JobFairRegistration.objects.filter(jobfair__company__user=request.user).count()
 
     context = {
         'jobs': jobs,
+        'job_stats': job_stats,
         'total_jobs': total_jobs,
+        'total_applications': total_applications,
         'status_counts': status_counts_dict,
         'registered_job_fairs': registered_job_fairs,
+        'dates': dates,
+        'app_counts': app_counts,
     }
 
     return render(request, 'company/job-analytics.html', context)
+    
 @login_required(login_url='login')
 def job_applicants(request, pk):
     if request.user.is_employer:
         job = get_object_or_404(Job, pk=pk)
         applicants = job.application_set.all().order_by('-submit_date')
+        interview_form = InterviewForm()
+        offer_form = OfferForm()
+        feedback_form = FeedbackForm()
         
         # Handle status updates
         if request.method == 'POST':
+            
             application_id = request.POST.get('application_id')
             new_status = request.POST.get('status')
             
@@ -98,8 +164,11 @@ def job_applicants(request, pk):
                 if request.user == application.job.company.user:
                     # Get or create ApplicationStatus
                     application_status, created = ApplicationStatus.objects.get_or_create(application=application)
+                    
                     application_status.status = new_status
                     application_status.save()
+
+                    status_display = dict(ApplicationStatus.STATUS_CHOICES)[new_status]
 
                     # Start a conversation if it doesn't exist
                     conversation, convo_created = Conversation.objects.get_or_create(application=application)
@@ -109,85 +178,74 @@ def job_applicants(request, pk):
                         Message.objects.create(
                             conversation=conversation,
                             sender=request.user,
-                            content=f"The status of your application for '{application.job.title}' has been updated to '{application_status.status}'."
+                            content=f"The status of your application for '{application.job.title}' has been updated to '{status_display}'."
                         )
                     else:
                         # Send a message notifying the status change
                         Message.objects.create(
                             conversation=conversation,
                             sender=request.user,
-                            content=f"The status of your application for '{application.job.title}' has been updated to '{application_status.status}'."
+                            content=f"The status of your application for '{application.job.title}' has been updated to '{status_display}'."
                         )
 
-                    # Handle Interview creation
-                    if new_status == 'INTERVIEW':
-                        interview_date = request.POST.get('interview_date')
-                        interview_type = request.POST.get('interview_type')
-                        interviewer = request.POST.get('interviewer')
-                        notes = request.POST.get('notes', '')
-
-                        Interview.objects.create(
-                            application=application,
-                            interview_date=interview_date,
-                            interview_type=interview_type,
-                            interviewer=interviewer,
-                            notes=notes
-                        )
-
-                        # Send notification for interview
+                    if new_status == 'UNDER_REVIEW':
                         Notification.objects.create(
                             application=application,
-                            message=f"An interview has been scheduled for your application for '{application.job.title}'."
+                            message=f"Your application for '{application.job.title}' is now under review."
                         )
+
+                    elif new_status == 'INTERVIEW':
+                        interview_form = InterviewForm(request.POST)
+                        if interview_form.is_valid():
+                            interview = interview_form.save(commit=False)
+                            interview.application = application
+                            interview.save()
+
+                            # Send notification for interview
+                            Notification.objects.create(
+                                application=application,
+                                message=f"An interview has been scheduled for your application for '{application.job.title}'."
+                            )
 
                     # Handle Offer creation
-                    if new_status == 'OFFERED':
-                        salary = request.POST.get('salary')
-                        benefits = request.POST.get('benefits')
-                        offer_date = request.POST.get('offer_date')
-                        expiration_date = request.POST.get('expiration_date')
-
-                        Offer.objects.create(
-                            application=application,
-                            salary=salary,
-                            benefits=benefits,
-                            offer_date=offer_date,
-                            expiration_date=expiration_date
-                        )
-
-                        # Send notification for offer
-                        Notification.objects.create(
-                            application=application,
-                            message=f"A job offer has been made for your application for '{application.job.title}'."
-                        )
+                    elif new_status == 'OFFERED':
+                        offer_form = OfferForm(request.POST)
+                        if offer_form.is_valid():
+                            offer = offer_form.save(commit=False)
+                            offer.application = application
+                            offer.save()
+                            
+                            Notification.objects.create(
+                                application=application,
+                                message=f"A job offer has been made for your application for '{application.job.title}'."
+                            )
 
                     # Handle Feedback creation
-                    if new_status in ['REJECTED', 'ACCEPTED']:
-                        feedback_type = 'APPLICANT' if new_status == 'REJECTED' else 'INTERVIEWER'
-                        content = request.POST.get('feedback_content')
-                        rating = request.POST.get('rating', 0)
+                    elif new_status in ['REJECTED', 'ACCEPTED']:
+                        feedback_form = FeedbackForm(request.POST)
+                        if feedback_form.is_valid():
+                            feedback = feedback_form.save(commit=False)
+                            feedback.application = application
+                            feedback.feedback_type = 'APPLICANT' if new_status == 'REJECTED' else 'INTERVIEWER'
+                            feedback.save()
+                            
+                            Notification.objects.create(
+                                application=application,
+                                message=f"Feedback has been provided for your application for '{application.job.title}'."
+                            )
 
-                        Feedback.objects.create(
-                            application=application,
-                            feedback_type=feedback_type,
-                            content=content,
-                            rating=rating
-                        )
-
-                        # Send notification for feedback
-                        Notification.objects.create(
-                            application=application,
-                            message=f"Feedback has been provided for your application for '{application.job.title}'."
-                        )
-
-                    messages.success(request, f"Application status for {application.user.get_full_name()} updated to {new_status}.")
+                    messages.success(request, f"Application status updated to {dict(ApplicationStatus.STATUS_CHOICES)[new_status]}")
+                    return redirect('job-applicants', pk=pk)
                 else:
                     messages.warning(request, "Unauthorized to update this application.")
 
-                # Redirect to avoid resubmission on refresh
-                return redirect('job-applicants', pk=pk)
-        
-        context = {'job': job, 'applicants': applicants}
+        context = {
+            'job': job,
+            'interview_form': interview_form,
+            'offer_form': offer_form,
+            'feedback_form': feedback_form,
+            'applicants': applicants
+        }
         return render(request, 'company/job-applicants.html', context)
     else:
         messages.warning(request, 'Permission Denied')
@@ -205,18 +263,28 @@ def jobfair_registers(request, pk):
         messages.warning(request, 'Permission Denied')
         return redirect('dashboard')
     
-
 @login_required
 def view_applicant_resume(request, applicant_id):
     if not request.user.is_employer:
-        # If the user is not an employer, redirect or show an error
         messages.warning(request, "Permission Denied.")
         return redirect('dashboard')
     
-    # Get the applicant by ID
     applicant = get_object_or_404(User, id=applicant_id)
+    
+    # Update status to UNDER_REVIEW when viewing resume
+    applications = Application.objects.filter(user=applicant)
+    for application in applications:
+        status, created = ApplicationStatus.objects.get_or_create(application=application)
+        if status.status == 'SUBMITTED':
+            status.status = 'UNDER_REVIEW'
+            status.save()
+            
+            # Create notification
+            Notification.objects.create(
+                application=application,
+                message="Your application is now under review."
+            )
 
-    # Check if the applicant has a resume
     try:
         resume = Resume.objects.get(user=applicant)
         resume_file = resume.upload_resume
@@ -224,7 +292,6 @@ def view_applicant_resume(request, applicant_id):
         resume_file = None
 
     return render(request, 'employer/view_resume.html', {'resume_file': resume_file, 'applicant': applicant})
-    
 
 @login_required(login_url='login')
 def update_employer_profile(request):

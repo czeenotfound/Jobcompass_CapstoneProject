@@ -141,10 +141,6 @@
                                 {% endwith %}
                             </div>
                             
-                            
-                            
-                            
-                            
                             <div class="col-md-6 mt-5 mb-4">
                                 <h4>Certifications</h4>
                                 {% if user.resume.certifications.exists %}
@@ -161,26 +157,23 @@
                                 {% endif %}
                             </div>
                             
-
-
-                            
                             <div class="col-md-6 mt-5 mb-4">
                                 <h4>Project</h4>
                                 {% if user.resume.projects.exists %}
-                                {% for project in user.resume.projects.all %}
-                                    <p class="card-text">
-                                        <strong>{{ project.title }}</strong>
-                                        <br> 
-                                        <small>{{ project.url }}</small>
-                                        <br>
-                                        <ul>
-                                            <li>{{project.description}}</li>
-                                        </ul>
-                                        
-                                    </p>
-                                {% empty %}
-                                    <p class="card-text">No project details available.</p>
-                                {% endfor %}
+                                    {% for project in user.resume.projects.all %}
+                                        <p class="card-text">
+                                            <strong>{{ project.title }}</strong>
+                                            <br> 
+                                            <small>{{ project.url }}</small>
+                                            <br>
+                                            <ul>
+                                                <li>{{project.description}}</li>
+                                            </ul>
+                                            
+                                        </p>
+                                    {% empty %}
+                                        <p class="card-text">No project details available.</p>
+                                    {% endfor %}
                                 {% else %}
                                     <p class="card-text">No project details available.</p>
                                 {% endif %}

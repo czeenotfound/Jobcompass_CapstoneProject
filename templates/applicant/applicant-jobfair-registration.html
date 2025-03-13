@@ -63,13 +63,8 @@
                                                 <h1 style="font-size: 1.5rem;">{{ register.jobfair.title }}</h1>
                                                 <div class="location-badge">
                                                     <i class="fas fa-location-dot"></i>
-                                                    {% if register.jobfair.location.barangay and  register.jobfair.location.city and  register.jobfair.location.street %}
-                                                        <!-- Display Philippine address if available -->
-                                                        {{ register.jobfair.location.street }}{% if  register.jobfair.location.barangay %}, {{  register.jobfair.location.barangay }}{% endif %}{% if  register.jobfair.location.city %}, {{  register.jobfair.location.city }}{% endif %}
-                                                    {% else %}
-                                                        <!-- Display international address if Philippine address is empty -->
-                                                        {{ register.jobfair.location.countrystreet }}{% if  register.jobfair.location.countrystreet %}, {% endif %}{{  register.jobfair.location.countrycity }}{% if  register.jobfair.location.countrycity %}, {% endif %}{{  register.jobfair.location.country }}
-                                                    {% endif %}
+                                                    {{ register.jobfair.location.region }}, {{ register.jobfair.location.city }}, {{ register.jobfair.location.street }}
+                                                        
                                                 </div>
                                             </td>
                                             <td>{{ register.jobfair.fair_event_held}}</td>

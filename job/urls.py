@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('create-job/', views.create_job, name='create-job'),
+    path('delete-job/<int:pk>/', views.delete_job, name='delete-job'),
     path('update-job/<int:pk>/', views.update_job, name='update-job'),
     path('activate-job/<int:pk>/', views.activate_job, name='activate-job'),
     path('deactivate-job/<int:pk>/', views.deactivate_job, name='deactivate-job'),
@@ -32,6 +33,7 @@ urlpatterns = [
     path('all-job-fair/', views.all_job_fair, name="all-job-fair"),
 
     path('create-job-fair/', views.create_job_fair, name='create-job-fair'),
+    path('delete-job-fair/<int:pk>/', views.delete_job_fair, name='delete-job-fair'),
     path('update-job-fair/<int:pk>/', views.update_job_fair, name='update-job-fair'),
     path('activate-job-fair/<int:pk>/', views.activate_job_fair, name='activate-job-fair'),
     path('deactivate-job-fair/<int:pk>/', views.deactivate_job_fair, name='deactivate-job-fair'),

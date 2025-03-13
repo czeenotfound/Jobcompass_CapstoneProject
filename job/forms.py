@@ -1,5 +1,5 @@
 from django import forms
-from .models import Job, Job_Responsibilities, Job_IdealCandidates, Job_Benefits, Job_Experience, Job_Education, Application, ApplicationStatus, RequiredSkill, JobFair
+from .models import Job, Job_Responsibilities, Job_IdealCandidates, Job_Benefits, Job_Experience, Job_Education, Application, ApplicationStatus, RequiredSkill, Interview, Offer, Feedback, JobFair
 from skill.models import Skill as GlobalSkill
 
 class CreateJobForm(forms.ModelForm):
@@ -131,7 +131,7 @@ class JobExperienceForm(forms.ModelForm):
                 'rows': 4,
             }),
         }
-
+        
     def clean(self):
         cleaned_data = super().clean()
         exp_type = cleaned_data.get("exp_type")
@@ -139,22 +139,29 @@ class JobExperienceForm(forms.ModelForm):
         min_exp_years = cleaned_data.get("min_exp_years")
         max_exp_years = cleaned_data.get("max_exp_years")
 
+        errors = {}
+
         if exp_type == "fixed":
             if not exp_years:
-                self.add_error("exp_years", "Please provide a fixed number of years.")
+                errors["exp_years"] = "Please provide a fixed number of years."
             cleaned_data["min_exp_years"] = None
             cleaned_data["max_exp_years"] = None
 
         elif exp_type == "range":
             if not (min_exp_years and max_exp_years):
-                self.add_error("min_exp_years", "Both min and max years are required for a range.")
-                self.add_error("max_exp_years", "Both min and max years are required for a range.")
+                errors["min_exp_years"] = "Both min and max years are required for a range."
+                errors["max_exp_years"] = "Both min and max years are required for a range."
             elif min_exp_years > max_exp_years:
-                self.add_error("min_exp_years", "Minimum experience cannot be greater than maximum experience.")
-                self.add_error("max_exp_years", "Maximum experience cannot be less than minimum experience.")
+                errors["min_exp_years"] = "Minimum experience cannot be greater than maximum experience."
+                errors["max_exp_years"] = "Maximum experience cannot be less than minimum experience."
             cleaned_data["exp_years"] = None
 
+        # Instead of blocking submission, raise errors only if ALL fields are empty
+        if errors and not (exp_years or min_exp_years or max_exp_years):
+            raise forms.ValidationError(errors)
+
         return cleaned_data
+
 
 class JobEducationForm(forms.ModelForm):
     
@@ -187,6 +194,35 @@ class ApplicationStatusForm(forms.ModelForm):
         model = ApplicationStatus
         fields = ['status', 'feedback']
 
+
+class InterviewForm(forms.ModelForm):
+    class Meta:
+        model = Interview
+        fields = ['interview_date', 'interview_type', 'interviewer', 'notes']
+        widgets = {
+            'interview_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'notes': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Notes'}),
+        }
+
+class OfferForm(forms.ModelForm):
+    class Meta:
+        model = Offer
+        fields = ['salary_display_type', 'currency', 'salary_fixed', 'salary_min', 'salary_max', 
+                 'salary_mode','notes', 'benefits', 'offer_date', 'expiration_date']
+        widgets = {
+            'offer_date': forms.DateInput(attrs={'type': 'date'}),
+            'notes': forms.Textarea(attrs={'rows': 3}),
+            'expiration_date': forms.DateInput(attrs={'type': 'date'}),
+            'benefits': forms.Textarea(attrs={'rows': 3}),
+        }
+
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        model = Feedback
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 3}),
+        }
 
 
 # JOB FAIR

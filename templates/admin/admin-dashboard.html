@@ -8,96 +8,187 @@
             <h1 class="h2">Admin Dashboard</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
                 <div class="btn-group me-2">
-                    <a href="{% url 'admin-verification' %}" type="button" class="btn btn-sm btn-outline-secondary">Verify Companies</a>
+                    <a href="{% url 'admin-verification' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-check-circle"></i> Verify Companies
+                    </a>
                 </div>
             </div>
         </div>
     
-        <!-- Metrics Section -->
+        <!-- User Statistics Section -->
         <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card text-white bg-primary mb-3">
+            <h4 class="mb-3">User Statistics</h4>
+            <div class="col-md-3">
+                <div class="card bg-primary text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Users</h5>
+                        <p class="display-4">{{ total_users_active|add:total_users_inactive }}</p>
+                        <div class="mt-3">
+                            <small>Active: {{ total_users_active }}</small><br>
+                            <small>Inactive: {{ total_users_inactive }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white h-100">
                     <div class="card-body">
                         <h5 class="card-title">Total Applicants</h5>
-                        <p class="card-text fs-1">{{ total_applicants }}</p>
+                        <p class="display-4">{{ total_applicants }}</p>
+                        <div class="mt-3">
+                            <small>With Resume: {{ applicants_with_resume }}</small><br>
+                            <small>Without Resume: {{ applicants_without_resume }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Employers</h5>
+                        <p class="display-4">{{ total_employers }}</p>
+                        <div class="mt-3">
+                            <small>Verified: {{ verified_employers }}</small><br>
+                            <small>Pending: {{ pending_employers }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-dark h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Companies</h5>
+                        <p class="display-4">{{ total_companies }}</p>
+                        <div class="mt-3">
+                            <small>Verified: {{ verified_companies }}</small><br>
+                            <small>Pending: {{ pending_companies }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Statistics Section -->
+        <div class="row mb-4">
+            <h4 class="mb-3">Job Statistics</h4>
+            <div class="col-md-4">
+                <div class="card bg-purple text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Jobs</h5>
+                        <p class="display-4">{{ jobs_open|add:jobs_closed }}</p>
+                        <div class="mt-3">
+                            <small>Active: {{ jobs_open }}</small><br>
+                            <small>Closed: {{ jobs_closed }}</small>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card text-white bg-success mb-3">
+                <div class="card bg-orange text-white h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Total Company</h5>
-                        <p class="card-text fs-1">{{ total_companies }}</p>
+                        <h5 class="card-title">Job Applications</h5>
+                        <p class="display-4">{{ total_applications }}</p>
+                        <div class="mt-3">
+                            <small>Pending: {{ pending_applications }}</small><br>
+                            <small>Processed: {{ processed_applications }}</small>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card text-white bg-warning mb-3">
+                <div class="card bg-teal text-white h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Total Applications</h5>
-                        <p class="card-text fs-1">{{ total_applications }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            <div class="btn-group me-2">
-                <a href="{% url 'admin-employers' %}" type="button" class="btn btn-sm btn-outline-secondary">Manage Employers</a>
-                <a href="{% url 'admin-applicants' %}" type="button" class="btn btn-sm btn-outline-secondary">Manage Applicants</a>
-            </div>
-        </div>
-
-        <hr>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card text-dark bg-white mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Users Active</h5>
-                        <p class="card-text fs-1">{{ total_users_active }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card text-dark bg-white mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Users Deactive</h5>
-                        <p class="card-text fs-1">{{ total_users_inactive }}</p>
+                        <h5 class="card-title">Job Fairs</h5>
+                        <p class="display-4">{{ total_job_fairs }}</p>
+                        <div class="mt-3">
+                            <small>Active: {{ active_job_fairs }}</small><br>
+                            <small>Upcoming: {{ upcoming_job_fairs }}</small>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="btn-toolbar mb-2 mb-md-0">
-            <div class="btn-group me-2">
-                <a href="{% url 'admin-manage-jobs' %}" type="button" class="btn btn-sm btn-outline-secondary">Manage Jobs</a>
-                <a href="{% url 'admin-manage-jobfairs' %}" type="button" class="btn btn-sm btn-outline-secondary">Manage Job Fairs</a>
+        <!-- Application Status Overview -->
+        <div class="row mb-4">
+            <h4 class="mb-3">Application Status Overview</h4>
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col">
+                                <h5>Submitted</h5>
+                                <p class="h3">{{ submitted_applications }}</p>
+                            </div>
+                            <div class="col">
+                                <h5>Under Review</h5>
+                                <p class="h3">{{ under_review_applications }}</p>
+                            </div>
+                            <div class="col">
+                                <h5>Interview</h5>
+                                <p class="h3">{{ interview_applications }}</p>
+                            </div>
+                            <div class="col">
+                                <h5>Offered</h5>
+                                <p class="h3">{{ offered_applications }}</p>
+                            </div>
+                            <div class="col">
+                                <h5>Accepted</h5>
+                                <p class="h3">{{ accepted_applications }}</p>
+                            </div>
+                            <div class="col">
+                                <h5>Rejected</h5>
+                                <p class="h3">{{ rejected_applications }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <hr>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card text-dark bg-white mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Jobs Open</h5>
-                        <p class="card-text fs-1">{{ jobs_open  }}</p>
+        <!-- Quick Actions -->
+        <div class="row mb-4">
+            <h4 class="mb-3">Quick Actions</h4>
+            <div class="col-md-3">
+                <a href="{% url 'admin-manage-jobs' %}" class="card bg-light text-dark h-100 text-decoration-none">
+                    <div class="card-body text-center">
+                        <i class="fas fa-briefcase fa-2x mb-3"></i>
+                        <h5>Manage Jobs</h5>
                     </div>
-                </div>
+                </a>
             </div>
-            <div class="col-md-6">
-                <div class="card text-dark bg-white mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Jobs Closed</h5>
-                        <p class="card-text fs-1">{{ jobs_closed  }}</p>
+            <div class="col-md-3">
+                <a href="{% url 'admin-manage-jobfairs' %}" class="card bg-light text-dark h-100 text-decoration-none">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar-alt fa-2x mb-3"></i>
+                        <h5>Manage Job Fairs</h5>
                     </div>
-                </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{% url 'admin-employers' %}" class="card bg-light text-dark h-100 text-decoration-none">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-tie fa-2x mb-3"></i>
+                        <h5>Manage Employers</h5>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{% url 'admin-applicants' %}" class="card bg-light text-dark h-100 text-decoration-none">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-2x mb-3"></i>
+                        <h5>Manage Applicants</h5>
+                    </div>
+                </a>
             </div>
         </div>
-    
-        <!-- Chart Section -->
-        <!-- <canvas class="bg-white p-4 my-4 w-100" id="myChart" width="900" height="380"></canvas> -->
-        
     </main>
 
-    
+    <style>
+    .bg-purple { background-color: #6f42c1; }
+    .bg-orange { background-color: #fd7e14; }
+    .bg-teal { background-color: #20c997; }
+    .card { transition: transform 0.2s; }
+    .card:hover { transform: translateY(-5px); }
+    </style>
 {% endblock content %}

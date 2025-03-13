@@ -92,7 +92,6 @@ class Job(models.Model):
 class RequiredSkill(models.Model):
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     skill_name = models.CharField(max_length=50, blank=True)
-    # minimum_proficiency = models.IntegerField()
 
     def __str__(self): 
         return f"{self.skill_name} for {self.job}"
@@ -140,10 +139,6 @@ class Job_Experience(models.Model):
             return f"{self.exp_name} - {self.exp_years} years"
         else:
             return f"{self.exp_name} - {self.min_exp_years}-{self.max_exp_years} years"
-
-
-
-
 
 class Job_Education(models.Model):
     EDUCATION_LEVEL_CHOICES = [
@@ -198,7 +193,7 @@ class ApplicationStatus(models.Model):
 
     def __str__(self):
         return f"{self.application} - {self.status}"    
-    
+
 class Conversation(models.Model):
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -253,8 +248,21 @@ class Notification(models.Model):
         return f"Notification for {self.application} sent on {self.sent_date}"
 
 class Offer(models.Model):
-    application = models.OneToOneField(Application, on_delete=models.CASCADE)
+    application = models.ForeignKey(Application, on_delete=models.CASCADE)
 
+    # Expected Salary Display Option
+    SALARY_DISPLAY_CHOICES = (
+        ('fixed', 'Fixed Salary'),
+        ('range', 'Salary Range'),
+        ('hidden', 'Do not display'),
+    )
+    salary_display_type = models.CharField(
+        max_length=10, 
+        choices=SALARY_DISPLAY_CHOICES, 
+        default='fixed'
+        ,null=True
+        ,blank=True
+    )
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='PHP')
     salary_fixed = models.PositiveIntegerField(null=True, blank=True, help_text="Enter a fixed salary.")
     salary_min = models.PositiveIntegerField(null=True, blank=True, help_text="Enter minimum salary for range.")
@@ -271,7 +279,7 @@ class Offer(models.Model):
         null=True,
         blank=True
     )
-
+    notes = models.TextField(blank=True, null=True)
     benefits = models.TextField(blank=True, null=True)
     offer_date = models.DateField(blank=True, null=True)
     expiration_date = models.DateField(blank=True, null=True)
@@ -288,7 +296,6 @@ class Feedback(models.Model):
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     feedback_type = models.CharField(max_length=20, choices=FEEDBACK_TYPES)
     content = models.TextField()
-    rating = models.IntegerField()
     feedback_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

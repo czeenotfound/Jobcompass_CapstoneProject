@@ -59,6 +59,43 @@
                         {% endfor %}
                     </div>
                 </div>
+                <style>
+                    .status-badge {
+                        font-size: 0.875rem;
+                        padding: 0.25rem 0.75rem;
+                        border-radius: 50rem;
+                    }
+
+                    .status-submitted {
+                        background-color: #cfe2ff;
+                        color: #084298;
+                    }
+
+                    .status-review {
+                        background-color: #fff3cd;
+                        color: #664d03;
+                    }
+
+                    .status-interview {
+                        background-color: #e2e3e5;
+                        color: #41464b;
+                    }
+
+                    .status-accepted {
+                        background-color:  #62b891;;
+                        color: #e7e7e7;
+                    }
+
+                    .status-rejected {
+                        background-color: #f8d7da;
+                        color: #842029;
+                    }
+
+                    .status-offered {
+                        background-color: #d1e7dd;
+                        color: #0f5132;
+                    }
+                </style>
                 <!-- Inbox Details Column -->
                 <div class="col-lg-7">
                     {% for conversation in conversations %}
@@ -87,7 +124,15 @@
                                                 <h5 class="mb-1 fw-bolder">{{conversation.application.job.title}}</h5>
                                                 <p class="text-muted mb-0">{{conversation.application.job.company}}</p>
                                                 <span class="text-muted mb-0">{{conversation.application.job.location_job_type|title}}</span>
-                                                <p class="text-muted mb-0">₱ {{conversation.application.job.salary_min}} - ₱ {{conversation.application.job.salary_max}} ({{conversation.application.job.salary_mode}})</p>
+                                                {% if conversation.application.job.salary_display_type == 'fixed' %}
+                                                   <p class="text-muted">{{ conversation.application.job.currency }} {{ conversation.application.job.salary_fixed|intcomma }} {{conversation.application.job.salary_mode|title}}</p>
+                                                {% elif conversation.application.job.salary_display_type == 'range' %}
+                                                    <p class="text-muted">{{ conversation.application.job.currency }} {{ conversation.application.job.salary_min|intcomma }} - {{ conversation.application.job.currency }} {{ conversation.application.job.salary_max|intcomma }} {{conversation.application.job.salary_mode|title}}</p>
+                                                {% elif conversation.application.job.salary_display_type == 'hidden' %}
+                                                    <p class="text-muted">No Salary Information Available</p>
+                                                {% else %}
+                                                    <p class="text-muted">No Salary Information Available</p>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
@@ -165,6 +210,7 @@
                                             <img src="{{conversation.application.user.resume.avatar.url}}" alt="CompanyLogo" class="img-fluid rounded-circle company-logo me-3">
                                             <div>
                                                 <h6 class="mb-1 fw-bolder">{{conversation.application.user.resume.last_name|title}},{{conversation.application.user.resume.first_name|title}}</h6>
+                                                <p class="text-muted mb-0">{{conversation.application.job.title}}</p>
                                                 <span class="text-muted mb-0">{{conversation.application.user.resume.employment_job_type}}</span>
                                                 {% if conversation.messages.all %}
                                                     <!-- Sneak peek of the latest message -->
@@ -191,6 +237,44 @@
                         {% endfor %}
                     </div>
                 </div>
+
+                <style>
+                    .status-badge {
+                        font-size: 0.875rem;
+                        padding: 0.25rem 0.75rem;
+                        border-radius: 50rem;
+                    }
+
+                    .status-submitted {
+                        background-color: #cfe2ff;
+                        color: #084298;
+                    }
+
+                    .status-review {
+                        background-color: #fff3cd;
+                        color: #664d03;
+                    }
+
+                    .status-interview {
+                        background-color: #e2e3e5;
+                        color: #41464b;
+                    }
+
+                    .status-accepted {
+                        background-color:  #62b891;;
+                        color: #e7e7e7;
+                    }
+
+                    .status-rejected {
+                        background-color: #f8d7da;
+                        color: #842029;
+                    }
+
+                    .status-offered {
+                        background-color: #d1e7dd;
+                        color: #0f5132;
+                    }
+                </style>
                 <!-- Inbox Details Column -->
                 <div class="col-lg-7">
                     {% for conversation in conversations %}
@@ -198,17 +282,17 @@
                             <div class="card inbox-card-details">
                                 <div class="featured-badge p-3 d-flex flex-column align-items-end">
                                     {% if conversation.application.applicationstatus.status == 'SUBMITTED' %}
-                                        <span class="status-badge status-submitted">Submitted</span>
+                                        <span class="status-badge mb-2 status-submitted">Submitted</span>
                                     {% elif  conversation.application.applicationstatus.status == 'UNDER_REVIEW' %}
-                                        <span class="status-badge status-review">Under Review</span>
+                                        <span class="status-badge mb-2 status-review">Under Review</span>
                                     {% elif  conversation.application.applicationstatus.status == 'INTERVIEW' %}
-                                        <span class="status-badge status-interview">Interview Scheduled</span>
+                                        <span class="status-badge mb-2 status-interview">Interview Scheduled</span>
                                     {% elif  conversation.application.applicationstatus.status == 'OFFERED' %}
-                                        <span class="status-badge status-offered">Offered</span>
+                                        <span class="status-badge mb-2 status-offered">Offered</span>
                                     {% elif  conversation.application.applicationstatus.status == 'ACCEPTED' %}
-                                        <span class="status-badge status-accepted">Accepted</span>
+                                        <span class="status-badge mb-2 status-accepted">Accepted</span>
                                     {% elif  conversation.application.applicationstatus.status == 'REJECTED' %}
-                                        <span class="status-badge status-rejected">Rejected</span>
+                                        <span class="status-badge mb-2 status-rejected">Rejected</span>
                                     {% endif %}
                                     <a href="{% url 'job-applicants' conversation.application.job.pk %}" class="text-decoration-none px-3"> Update Status</a>
                                 </div>
@@ -218,7 +302,7 @@
                                             <img src="{{conversation.application.user.resume.avatar.url}}" alt="CompanyLogo" class="img-fluid rounded-circle company-logo me-3">
                                             <div>
                                                 <h5 class="mb-1 fw-bolder">{{conversation.application.user.resume.last_name|title}}, {{conversation.application.user.resume.first_name|title}}</h5>
-                                                <p class="text-muted mb-0">{{conversation.application.user.resume.industry}}</p>
+                                                <p class="text-muted mb-0">{{conversation.application.job.title}}</p>
                                                 <p class="text-muted mb-0">{{conversation.application.user.resume.employment_job_type}}</p>
                                             </div>
                                         </div>

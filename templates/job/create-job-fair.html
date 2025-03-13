@@ -139,6 +139,7 @@
                         {% render_field form.url_location class="form-control" placeholder="https://www.website.com" %}
                     </div>
                 </div>
+                
                 <!-- Location (Onsite) -->
                 <div id="onsite-venue-section" style="display: none;" class="py-3">
                     <hr>
@@ -148,8 +149,13 @@
                         <div class="row">
                             <h4 for="employerAddress" class="form-label mb-3">Location Venue</h4>
                             <div class="col-sm-6 mb-3">
-                                <label for="country-text" class="form-label">Country</label>
-                                <input type="text" class="form-control" name="country" id="country-text" placeholder="Enter Country">
+                                <label for="country" class="form-label">Country</label>
+                                <select name="country" id="country" class="form-select">
+                                    <option value="">Select Country</option>
+                                    {% for code, name in country_choices %}
+                                        <option value="{{ code }}">{{ name }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                             <div class="col-sm-6 mb-3">
                                 <label for="countrypostal-text" class="form-label">Postal Code</label>
