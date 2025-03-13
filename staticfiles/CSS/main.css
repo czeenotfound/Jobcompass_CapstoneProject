@@ -13,6 +13,8 @@
     --color-danger: hsl(0, 95%, 60%);
     --color-dark: hsl(252, 30%, 17%);
     --color-black: hsl(252, 30%, 10%);
+    --color-gradient-primary: #850703;
+    --color-gradient-secondary: #e23c37;
 
     /* Border  */
     --border-radius: 2rem;
@@ -49,8 +51,8 @@ body{
     overflow-y: scroll;
     margin: 0;
     height: 100vh;
+    
 }
-
 
 .colored-toast {
     font-family: 'Arial', sans-serif;
@@ -209,7 +211,7 @@ body{
     height: 45px;
     border: 3px solid var(--color-white);
     border-radius: 50%;
-    background-color: var(--color-secondary);
+    background-color: var(--color-gradient-secondary);
     color: #fff;
     font-size: 20px;
     line-height: 1.5;
@@ -250,6 +252,10 @@ body{
 #otpSection {
     background-color: white;
 }
+
+#resendSection {
+    background-color: white;
+}
 /* End of Scroll to top Button */
 
 /* NAVBAR */
@@ -274,7 +280,7 @@ body{
 
 #landsection{
     height: 500px;
-    background: linear-gradient(to right, #4a90e2, #6a11cb);
+    background: linear-gradient(to right, var(--color-gradient-secondary), var(--color-gradient-primary));
 }
 
 /* homepage bg CIRCLE ANIMATIONS */
@@ -537,7 +543,7 @@ body{
     color: white;
     padding: 2rem;
     border-radius: 10px;
-    background-image: radial-gradient(circle at 100% 100%,  #4a90e2, #6a11cb);
+    background: linear-gradient(to right, var(--color-gradient-secondary), var(--color-gradient-primary));
 }
 
 
@@ -546,7 +552,7 @@ body{
     color: white;
     padding: 2rem;
     border-radius: 10px;
-    background-image: radial-gradient(circle at 100% 100%, #6a11cb,#4a90e2);
+    background: linear-gradient(to right, var(--color-gradient-secondary), var(--color-gradient-primary));
 }
 
 
@@ -780,7 +786,7 @@ background: linear-gradient(0deg, rgba(39,116,237,1) 0%, rgba(70,195,208,1) 100%
 /* LOGIN */
 
 #loginBG{
-    background: linear-gradient(to right, #4a90e2, #6a11cb);
+    background: linear-gradient(to right, var(--color-gradient-secondary), var(--color-gradient-primary));
 }
 
 #loginSection{
@@ -789,10 +795,13 @@ background: linear-gradient(0deg, rgba(39,116,237,1) 0%, rgba(70,195,208,1) 100%
 }
 
 #signupBG{
-    /* background: linear-gradient(to right, #4a90e2, #6a11cb); */
-    background-color: #4a8ee1;
-    background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #4a8ee1 40px ), repeating-linear-gradient( #671fcd55, #671fcd );
+    background-color: #da1515;
+    opacity: 0.8;
+    background-image: radial-gradient(circle at center center, #ad1a1a, #da1515), repeating-radial-gradient(circle at center center, #ad1a1a, #ad1a1a, 40px, transparent 80px, transparent 40px);
+    background-blend-mode: multiply;
 }
+
+
 
 #signupSection{
     width: 75vw;
@@ -891,7 +900,7 @@ background: linear-gradient(0deg, rgba(39,116,237,1) 0%, rgba(70,195,208,1) 100%
     background-color: #4070f4;
     color: white;
     padding: 4rem 0;
-    background-image: radial-gradient(circle at 100% 100%, #5584ff, #4070f4);
+    background: linear-gradient(to right, var(--color-gradient-secondary), var(--color-gradient-primary));
 }
 .event-card {
     transition: transform 0.3s ease;
@@ -957,7 +966,7 @@ c
     color: white;
     padding: 2rem;
     border-radius: 10px;
-    background-image: radial-gradient(circle at 100% 100%, #6a11cb,#4a90e2);
+    background: linear-gradient(to right, var(--color-gradient-secondary), var(--color-gradient-primary));
 }
 
 
@@ -972,7 +981,7 @@ c
     padding: 3rem 2rem;
     border-radius: 1.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    background-image: radial-gradient(circle at 100% 100%,  #6a11cb,#4a90e2);
+    background: linear-gradient(to right, var(--color-gradient-secondary), var(--color-gradient-primary));
 }
 
 .applicantProfile-card .row{
@@ -992,7 +1001,6 @@ c
     background: #f8f9fa;
     border-radius: 15px;
     padding: 1rem;
-    margin: 1rem 0;
     transition: transform 0.3s ease;
 }
 
@@ -1120,9 +1128,76 @@ c
     background-color: #e9ecef;
     margin-left: 0.5rem;
 }
+
+.applicationStatusbanner {
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    background: linear-gradient(to right, var(--color-gradient-secondary), var(--color-gradient-primary));
+}
+
+.applicationjobbanner {
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.applicationStatusbanner .status-badge {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50rem;
+}
+
+.applicationStatusbanner .status-submitted {
+    background-color: #cfe2ff;
+    color: #084298;
+}  
+
+.applicationStatusbanner .status-review {
+    background-color: #fff3cd;
+    color: #664d03;
+}   
+
+.applicationStatusbanner .status-interview {
+    background-color: #e2e3e5;
+    color: #41464b;
+}   
+
+.applicationStatusbanner .status-accepted {
+    background-color:  #62b891;;
+    color: #e7e7e7;
+}   
+
+.applicationStatusbanner .status-rejected {
+    background-color: #f8d7da;
+    color: #842029;
+}   
+
+.applicationStatusbanner .status-offered {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}   
+
+.createresume-card{
+    border-radius: 1rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin-bottom: 1rem;
+
+}
+
+
 /* END OF APPLICANT DASHBOARD */
 
 /* EMPLOYER DASHBOARD */
+
+.employerform-card{
+    border-radius: 1rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin-bottom: 1rem;
+}
+
 
 .candidate-card {
     transition: transform 0.3s ease;
@@ -1572,6 +1647,30 @@ c
     border: 2px solid  #3B82F6;
 }
 
+.action-buttons .btn-archive {
+    background: #EFF6FF;
+    color: #444444;
+    border: 2px solid  #444444;
+}
+
+.action-buttons .btn-delete {
+    background: #EFF6FF;
+    color: #ff0000;
+    border: 2px solid  #ff0000;
+}
+
+.action-buttons .btn-success {
+    background: #EFF6FF;
+    color: #008a2e;
+    border: 2px solid   #008a2e;
+}
+
+.action-buttons .btn- {
+    background: #EFF6FF;
+    color: #008a2e;
+    border: 2px solid   #008a2e;
+}
+
 .action-buttons .btn:hover {
     transform: translateY(-2px);
 }
@@ -1651,43 +1750,6 @@ c
 #jobApplicationStatusTable tbody tr:hover {
     background-color: #F8FAFC;
 }
-
-
-#jobfairregistersStatusTable {
-    border-collapse: separate;
-    border-spacing: 0;
-    width: 100%;
-    border: none;
-    margin-bottom: 0;
-    border-radius: 2rem;
-}
-
-#jobfairregistersStatusTable thead th {
-    background: var(--color-light);
-    border: none;
-    font-weight: bolder;
-    text-align: start;
-    font-size: 0.95rem;
-    padding: 1.5rem 2.5rem;
-    letter-spacing: 0.5px;
-    white-space: nowrap; /* Prevent header text wrapping */
-    
-}
-
-#jobfairregistersStatusTable tbody td {
-    padding: 2.2rem 2.5rem;
-    vertical-align: middle;
-    border-bottom: 1px solid #F1F5F9;
-    color: #334155;
-    white-space: nowrap; /* Prevent cell text wrapping */
-}
-
-#jobfairregistersStatusTable tbody tr:hover {
-    background-color: #F8FAFC;
-}
-
-
-
 
 #jobfairPostingsTable {
     border-collapse: separate;

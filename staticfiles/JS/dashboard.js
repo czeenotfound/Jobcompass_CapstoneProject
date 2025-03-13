@@ -1,4 +1,3 @@
-/* globals Chart:false */
 
 var manageJobss;
 /* globals Chart:false */
@@ -85,7 +84,6 @@ $('#btn-pdf').on('click', function(){
 $('#btn-print').on('click', function(){
   manageJobss.button('.buttons-print').trigger();
 });
-
 
 var manageJobfair;
 /* globals Chart:false */
@@ -175,14 +173,13 @@ $('#btn-print').on('click', function(){
 
 var companyVerify;
 /* globals Chart:false */
-/* globals Chart:false */
 $(document).ready(function() {  
   companyVerify =$('#companyverifiedTable').DataTable({
       pageLength: 5, // Initial page length
       order: [[2, 'desc']],   // Sort by date by default
       language: {
           search: "",
-          searchPlaceholder: 'Search jobs...',
+          searchPlaceholder: 'Search company...',
           lengthMenu: "Show _MENU_entries",
           paginate: {
               first: '<i class="fa fa-angle-double-left"></i>',
@@ -431,3 +428,53 @@ $('#btn-pdf').on('click', function(){
 $('#btn-print').on('click', function(){
   manageApplicant.button('.buttons-print').trigger();
 });
+
+(() => {
+  'use strict'
+
+  // Graphs
+  const ctx = document.getElementById('myChart')
+  // eslint-disable-next-line no-unused-vars
+  const myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [
+        'Sunday',
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday'
+      ],
+      datasets: [{
+        data: [
+          15339,
+          21345,
+          18483,
+          24003,
+          23489,
+          24092,
+          12034
+        ],
+        lineTension: 0,
+        backgroundColor: 'transparent',
+        borderColor: '#007bff',
+        borderWidth: 4,
+        pointBackgroundColor: '#007bff'
+      }]
+    },
+    options: {
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          boxPadding: 3
+        }
+      }
+    }
+  })
+})()
+
+
