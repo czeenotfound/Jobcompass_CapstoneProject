@@ -1,0 +1,115 @@
+{% load humanize %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Application Accepted - Job Compass</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #f4f4f4; 
+            margin: 0; 
+            padding: 0; 
+        }
+        .verify-container { 
+            max-width: 600px; 
+            background: hsl(252, 30%, 95%);
+            margin: 20px auto; 
+            padding: 20px; 
+            border-radius: 20px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .verify-logo { 
+            padding: 2rem 0;
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+        .verify-btn { 
+            display: inline-block; 
+            padding: 12px 20px; 
+            background: #acd4ff;
+            color: white;
+            border-radius: 5px; 
+            font-weight: bold; 
+        }
+        .success-banner {
+            background-color: #e7f7e7;
+            border-left: 5px solid #4BB543;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .job-details {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        p{
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        a{
+            text-decoration: none;
+        }
+        .verify-footer { 
+            text-align: center; 
+            font-size: 12px; 
+            color: #666; 
+            margin-top: 20px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="verify-container">
+        <div class="verify-logo">
+            <img src="https://res.cloudinary.com/di2hrzuyq/image/upload/v1739724165/lpkqsalzgvzlsnc9g1rf.png" alt="Job Compass" width="250">
+        </div>
+        <h2 style="text-align: center; color: #4BB543;">Congratulations! Your Application Has Been Accepted</h2>
+        
+        <div class="success-banner">
+            <p style="margin: 0"><strong>Great news!</strong> Your application has been accepted.</p>
+        </div>
+        
+        <p>Hello <strong>{{ application.user.first_name|title }}</strong>,</p>
+        
+        <p>We're pleased to inform you that your application for <strong>{{ application.job.title }}</strong> at <strong>{{ application.job.company.company_name }}</strong> has been accepted!</p>
+        
+        <div class="job-details">
+            <p style="margin: 5px 0"><strong>Position:</strong> {{ application.job.title }}</p>
+            <p style="margin: 5px 0"><strong>Company:</strong> {{ application.job.company.company_name }}</p>
+            {% if offer %}
+            <p style="margin: 5px 0"><strong>Compensation:</strong> 
+                {% if offer.salary_display_type == 'fixed' %}
+                    {{ offer.currency }} {{ offer.salary_fixed|intcomma }} {{ offer.salary_mode }}
+                {% elif offer.salary_display_type == 'range' %}
+                    {{ offer.currency }} {{ offer.salary_min|intcomma }} - {{ offer.salary_max|intcomma }} {{ offer.salary_mode }}
+                {% endif %}
+            </p>
+            {% endif %}
+        </div>
+        
+        {% if feedback %}
+        <h3>Feedback from the employer:</h3>
+        <p style="font-style: italic; padding: 10px; background-color: #f9f9f9; border-radius: 5px; border-left: 3px solid #4BB543;">{{ feedback.content }}</p>
+        {% endif %}
+        
+        <p>The employer will be in touch shortly with more details about next steps and your start date.</p>
+        
+        <p style="text-align: center; margin: 25px 0;">
+            <a href="{{ dashboard_link }}" class="verify-btn">View in Dashboard</a>
+        </p>
+        
+        <p>If you have any questions, please contact the employer through the Job Compass messaging system.</p>
+        
+        <p>Congratulations again and best wishes for your new role!</p>
+        
+        <hr>
+        <div class="verify-footer">
+            &copy; 2025 Job Compass. All rights reserved.<br>
+            <small>This is an automated message, please do not reply to this email.</small>
+        </div>
+    </div>
+</body>
+</html>

@@ -525,37 +525,6 @@ function showInboxDetails(inboxId) {
     }
 }
 
-
-// // JavaScript to manage the step flow
-// let currentStep = 1;
-
-// function nextStep(step) {
-//     if (validateStep(step)) {
-//         // Hide current step
-//         document.getElementById('step' + step).classList.add('d-none');
-//         // Show next step
-//         document.getElementById('step' + (step + 1)).classList.remove('d-none');
-//         currentStep = step + 1;
-
-//         // Show the navigation buttons once we're past step 1
-//         if (currentStep > 1) {
-//             document.getElementById('navigationButtons').classList.remove('d-none');
-//         }
-//     }
-// }
-
-// function previousStep() {
-//     // Hide current step
-//     document.getElementById('step' + currentStep).classList.add('d-none');
-//     // Show previous step
-//     document.getElementById('step' + (currentStep - 1)).classList.remove('d-none');
-//     currentStep -= 1;
-
-//     // Hide the "Previous" button if we're on the first step
-//     if (currentStep === 1) {
-//         document.getElementById('navigationButtons').classList.add('d-none');
-//     }
-// }
 function validateStep(step) {
     // Simple validation for required fields
     const inputs = document.querySelectorAll(`#step${step} input`);

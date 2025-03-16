@@ -19,6 +19,10 @@ from address.forms import AddressForm
 from job.forms import ApplicationForm, ApplicationStatusForm, InterviewForm, OfferForm, FeedbackForm
 from users.forms import UpdateAvatarPhoneForm
 
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.conf import settings
+
 # Create your views here.
 # manage job postings
 
@@ -229,10 +233,54 @@ def job_applicants(request, pk):
                             feedback.feedback_type = 'APPLICANT' if new_status == 'REJECTED' else 'INTERVIEWER'
                             feedback.save()
                             
+                            # Create notification
                             Notification.objects.create(
                                 application=application,
                                 message=f"Feedback has been provided for your application for '{application.job.title}'."
                             )
+                            
+                            # Get the offer if available (for accepted applications)
+                            offer = None
+                            if new_status == 'ACCEPTED':
+                                try:
+                                    offer = Offer.objects.filter(application=application).latest('offer_date')
+                                except Offer.DoesNotExist:
+                                    pass
+                            
+                            # Generate dashboard link
+                            dashboard_url = request.build_absolute_uri(reverse('dashboard'))
+                            
+                            # Set up email context
+                            context = {
+                                "application": application,
+                                "feedback": feedback,
+                                "offer": offer,
+                                "dashboard_link": dashboard_url
+                            }
+                            
+                            # Determine which email template to use
+                            if new_status == 'ACCEPTED':
+                                subject = f"Congratulations! Your application for {application.job.title} has been accepted"
+                                template_html = "emails/application_accepted_email.html"
+                                template_txt = "emails/application_accepted_email.txt"
+                            else:  # REJECTED
+                                subject = f"Update on your application for {application.job.title}"
+                                template_html = "emails/application_rejected_email.html"
+                                template_txt = "emails/application_rejected_email.txt"
+                            
+                            # Render email templates
+                            html_message = render_to_string(template_html, context)
+                            plain_message = render_to_string(template_txt, context)
+                            
+                            # Send email
+                            email = EmailMultiAlternatives(
+                                subject=subject,
+                                body=plain_message,
+                                from_email="Job Compass <no-reply@jobcompass.com>",
+                                to=[application.user.email],
+                            )
+                            email.attach_alternative(html_message, "text/html")
+                            email.send()
 
                     messages.success(request, f"Application status updated to {dict(ApplicationStatus.STATUS_CHOICES)[new_status]}")
                     return redirect('job-applicants', pk=pk)

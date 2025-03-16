@@ -1,11 +1,29 @@
 import django_filters
 from django.db.models import Q
-from resume.models import Resume
+from resume.models import Resume, Education
 from industry.models import Industry
 
 class Resumefilter(django_filters.FilterSet):
     name = django_filters.CharFilter(method='filter_name', label="Name")
     address = django_filters.CharFilter(method='filter_address')
+    
+    EDUCATION_LEVEL_CHOICES = [
+        ('high_school', 'High School'),
+        ('associate', 'Associate Degree'),
+        ('bachelor', 'Bachelor’s Degree'),
+        ('master', 'Master’s Degree'),
+        ('doctorate', 'Doctorate (Ph.D.)'),
+        ('vocational', 'Vocational/Technical'),
+        ('other', 'Other'),
+    ]
+
+    education_level = django_filters.ChoiceFilter(
+        choices=Education.EDUCATION_LEVEL_CHOICES,
+        label="Minimum Education Level",
+        method='filter_education_level',
+        empty_label="Select Education Level"
+    )
+    
     employment_job_type = django_filters.ChoiceFilter(
         choices=Resume.employment_type_choices,
         label="Job Type",
@@ -42,7 +60,7 @@ class Resumefilter(django_filters.FilterSet):
         model = Resume
         fields = [
             'name', 'address', 'employment_job_type', 
-            'location_job_type', 'industry',
+            'location_job_type', 'industry', 'education_level',
             'salary_display_type', 'min_salary', 'max_salary'
         ]
 
@@ -55,15 +73,18 @@ class Resumefilter(django_filters.FilterSet):
     
     def filter_address(self, queryset, name, value):
         return queryset.filter(
+            Q(address__country__icontains=value) |
             Q(address__region__icontains=value) |
-            Q(address__province__icontains=value) |
             Q(address__city__icontains=value) |
-            Q(address__barangay__icontains=value) |
             Q(address__street__icontains=value)
         )
 
+    # Filter for education level
+    def filter_education_level(self, queryset, name, value):
+        return queryset.filter(education__education_level=value).distinct()
+    
     def filter_min_salary(self, queryset, name, value):
-        if not value:
+        if value is None or value == '':  # Also check for empty string
             return queryset
         
         return queryset.filter(

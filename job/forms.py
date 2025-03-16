@@ -1,6 +1,7 @@
 from django import forms
 from .models import Job, Job_Responsibilities, Job_IdealCandidates, Job_Benefits, Job_Experience, Job_Education, Application, ApplicationStatus, RequiredSkill, Interview, Offer, Feedback, JobFair
 from skill.models import Skill as GlobalSkill
+from django.utils.timezone import now
 
 class CreateJobForm(forms.ModelForm):
     class Meta:
@@ -210,7 +211,7 @@ class OfferForm(forms.ModelForm):
         fields = ['salary_display_type', 'currency', 'salary_fixed', 'salary_min', 'salary_max', 
                  'salary_mode','notes', 'benefits', 'offer_date', 'expiration_date']
         widgets = {
-            'offer_date': forms.DateInput(attrs={'type': 'date'}),
+            'offer_date': forms.DateInput(attrs={'type': 'date', 'min': now().date().isoformat()}),
             'notes': forms.Textarea(attrs={'rows': 3}),
             'expiration_date': forms.DateInput(attrs={'type': 'date'}),
             'benefits': forms.Textarea(attrs={'rows': 3}),

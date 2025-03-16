@@ -1,0 +1,21 @@
+Application Status Update
+
+Hello {{ application.user.first_name|title }},
+
+Thank you for your interest in the {{ application.job.title }} position at {{ application.job.company.company_name }}.
+
+After careful consideration, the employer has decided to move forward with other candidates whose qualifications more closely align with their current needs.
+
+{% if feedback %}
+Feedback from the employer:
+{{ feedback.content }}
+{% endif %}
+
+We encourage you to continue exploring other opportunities on Job Compass that match your skills and experience.
+
+To explore more job opportunities, visit: {{ dashboard_link }}
+
+Thank you for using Job Compass. We wish you the best in your job search!
+
+Best regards,
+The Job Compass Team 

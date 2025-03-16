@@ -1,0 +1,27 @@
+Congratulations! Your Application Has Been Accepted
+
+Hello {{ application.user.first_name|title }},
+
+We are pleased to inform you that your application for {{ application.job.title }} at {{ application.job.company.company_name }} has been accepted!
+
+Position: {{ application.job.title }}
+Company: {{ application.job.company.company_name }}
+{% if offer %}
+Salary: {% if offer.salary_display_type == 'fixed' %}{{ offer.currency }} {{ offer.salary_fixed }} {{ offer.salary_mode }}{% elif offer.salary_display_type == 'range' %}{{ offer.currency }} {{ offer.salary_min }} - {{ offer.salary_max }} {{ offer.salary_mode }}{% endif %}
+{% endif %}
+
+{% if feedback %}
+Feedback from the employer:
+{{ feedback.content }}
+{% endif %}
+
+The employer will contact you soon with further details about your start date and onboarding process.
+
+To view more details, visit your dashboard: {{ dashboard_link }}
+
+If you have any questions, please don't hesitate to contact the employer directly through our messaging system.
+
+Congratulations again on this achievement!
+
+Best regards,
+The Job Compass Team 

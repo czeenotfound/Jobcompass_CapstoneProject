@@ -66,7 +66,7 @@ class Jobfilter(django_filters.FilterSet):
         ).distinct()
 
     def filter_min_salary(self, queryset, name, value):
-        if not value:
+        if value is None or value == '':  # Also check for empty string
             return queryset
         
         return queryset.filter(

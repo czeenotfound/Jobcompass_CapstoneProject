@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Application Status Update - Job Compass</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #f4f4f4; 
+            margin: 0; 
+            padding: 0; 
+        }
+        .verify-container { 
+            max-width: 600px; 
+            background: hsl(252, 30%, 95%);
+            margin: 20px auto; 
+            padding: 20px; 
+            border-radius: 20px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .verify-logo { 
+            padding: 2rem 0;
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+        .verify-btn { 
+            display: inline-block; 
+            padding: 12px 20px; 
+            background: #acd4ff;
+            border-radius: 5px; 
+            font-weight: bold; 
+        }
+        .info-banner {
+            background-color: #f0f7ff;
+            border-left: 5px solid #acd4ff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .job-details {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        p{
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        a{
+            text-decoration: none;
+        }
+        .verify-footer { 
+            text-align: center; 
+            font-size: 12px; 
+            color: #666; 
+            margin-top: 20px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="verify-container">
+        <div class="verify-logo">
+            <img src="https://res.cloudinary.com/di2hrzuyq/image/upload/v1739724165/lpkqsalzgvzlsnc9g1rf.png" alt="Job Compass" width="250">
+        </div>
+        <h2 style="text-align: center;">Application Status Update</h2>
+        
+        <div class="info-banner">
+            <p style="margin: 0">Your application status has been updated.</p>
+        </div>
+        
+        <p>Hello <strong>{{ application.user.first_name }}</strong>,</p>
+        
+        <p>Thank you for your interest in the <strong>{{ application.job.title }}</strong> position at <strong>{{ application.job.company.company_name }}</strong>.</p>
+        
+        <div class="job-details">
+            <p style="margin: 5px 0"><strong>Position:</strong> {{ application.job.title }}</p>
+            <p style="margin: 5px 0"><strong>Company:</strong> {{ application.job.company.company_name }}</p>
+            <p style="margin: 5px 0"><strong>Application Date:</strong> {{ application.submit_date|date:"F j, Y" }}</p>
+        </div>
+        
+        <p>After careful consideration, the employer has decided to move forward with other candidates whose qualifications more closely align with their current needs.</p>
+        
+        {% if feedback %}
+        <h3>Feedback from the employer:</h3>
+        <p style="font-style: italic; padding: 10px; background-color: #f9f9f9; border-radius: 5px; border-left: 3px solid #acd4ff;">{{ feedback.content }}</p>
+        {% endif %}
+        
+        <p>We appreciate your time and interest in this position and encourage you to continue exploring other opportunities on Job Compass that match your skills and experience.</p>
+        
+        <p style="text-align: center; margin: 25px 0;">
+            <a href="{{ dashboard_link }}" class="verify-btn">Explore More Jobs</a>
+        </p>
+        
+        <p>Don't be discouraged - the right job opportunity is waiting for you!</p>
+        
+        <p>Best regards,<br>The Job Compass Team</p>
+        
+        <hr>
+        <div class="verify-footer">
+            &copy; 2025 Job Compass. All rights reserved.<br>
+            <small>This is an automated message, please do not reply to this email.</small>
+        </div>
+    </div>
+</body>
+</html>
