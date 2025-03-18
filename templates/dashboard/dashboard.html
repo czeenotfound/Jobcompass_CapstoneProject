@@ -90,7 +90,7 @@
                     
                     <div class="row g-3 mb-4 justify-content-center text-center input-group">
                         <!-- Location Filter -->
-                        <div class="col-xs-12 col-sm-6 col-md-4">
+                        <div class="col-xs-12 col-sm-6 col-md-3">
                             <label for="location">Location</label>
                             <div class="bubbleformfilter d-flex gap-3 align-items-center">
                                 <i class="fa-solid fa-location-dot text-dark"></i>
@@ -99,7 +99,7 @@
                         </div>
                         
                         <!-- Job Type Filter -->
-                        <div class="col-xs-12 col-sm-6 col-md-4">
+                        <div class="col-xs-12 col-sm-6 col-md-3">
                             <label for="jobType">Job Type</label>
                             <div class="bubbleformfilter d-flex gap-3 align-items-center">
                                 <i class="fa-solid fa-briefcase text-dark"></i>
@@ -108,7 +108,7 @@
                         </div>
                         
                         <!-- Education Level Filter -->
-                        <div class="col-xs-12 col-sm-6 col-md-4">
+                        <div class="col-xs-12 col-sm-6 col-md-3">
                             <label for="education">Education Level</label>
                             <div class="bubbleformfilter d-flex gap-3 align-items-center">
                                 <i class="fa-solid fa-graduation-cap text-dark"></i>
@@ -117,58 +117,14 @@
                         </div>
                         
                         <!-- Experience Filter -->
-                        <div class="col-xs-12 col-sm-6 col-md-6">
+                        <div class="col-xs-12 col-sm-6 col-md-3">
                             <label for="experience">Experience (Years)</label>
                             <div class="bubbleformfilter d-flex gap-3 align-items-center">
                                 <i class="fa-solid fa-clock-rotate-left text-dark"></i>
                                 {% render_field job_filter.form.experience type="number" min="0" class="form-control border-0 p-0" placeholder="Enter years" %}
                             </div>
                         </div>
-                        <!-- Salary Type Filter -->
-                        <div class="col-xs-12 col-sm-6 col-md-6">
-                            <label for="salaryType">Salary Type</label>
-                            <div class="bubbleformfilter d-flex gap-3 align-items-center">
-                                <i class="fa-solid fa-money-bill-wave text-dark"></i>
-                                <select name="salary_display_type" class="form-control border-0 p-0" id="salaryType">
-                                    <option value="" selected>Select Salary Type</option>
-                                    {% for value, text in job_filter.form.salary_display_type.field.choices %}
-                                        {% if value %}
-                                            <option value="{{ value }}" {% if job_filter.form.salary_display_type.value == value %}selected{% endif %}>
-                                                {{ text }}
-                                            </option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Fixed Salary Input (Initially Hidden) -->
-                        <div class="col-xs-12 col-sm-6 col-md-6" id="fixedSalaryContainer" style="display: none;">
-                            <label for="minSalary">Fixed Salary</label>
-                            <div class="bubbleformfilter d-flex gap-3 align-items-center">
-                                <i class="fa-solid fa-money-bill-1 text-dark"></i>
-                                {% render_field job_filter.form.min_salary type="number" class="form-control border-0 p-0" placeholder="Enter Fixed Salary" %}
-                            </div>
-                        </div>
-
-                        <!-- Salary Range Inputs (Initially Hidden) -->
-                        <div id="salaryRangeContainer" class="row mt-2" style="display: none;">
-                            <div class="col-xs-12 col-sm-6 col-md-6">
-                                <label for="minSalary">Minimum Salary</label>
-                                <div class="bubbleformfilter d-flex gap-3 align-items-center">
-                                    <i class="fa-solid fa-money-bill-1 text-dark"></i>
-                                    {% render_field job_filter.form.min_salary type="number" class="form-control border-0 p-0" placeholder="Min Salary" %}
-                                </div>
-                            </div>
-
-                            <div class="col-xs-12 col-sm-6 col-md-6">
-                                <label for="maxSalary">Maximum Salary</label>
-                                <div class="bubbleformfilter d-flex gap-3 align-items-center">
-                                    <i class="fa-solid fa-money-bill-1-wave text-dark"></i>
-                                    {% render_field job_filter.form.max_salary type="number" class="form-control border-0 p-0" placeholder="Max Salary" %}
-                                </div>
-                            </div>
-                        </div>
+                        
                     </div>
                 </form>
             </div>
@@ -827,7 +783,7 @@
                         
                         <div class="row g-3 mb-4 justify-content-center text-center input-group">
                             <!-- Location Filter -->
-                            <div class="col-xs-12 col-sm-6 col-md-3">
+                            <div class="col-xs-12 col-sm-6 col-md-4">
                                 <label for="address">Location</label>
                                 <div class="bubbleformfilter d-flex gap-3 align-items-center">
                                     <i class="fa-solid fa-location-dot text-dark"></i>
@@ -838,7 +794,7 @@
                             </div>
                             
                             <!-- Job Type Filter -->
-                            <div class="col-xs-12 col-sm-6 col-md-3">
+                            <div class="col-xs-12 col-sm-6 col-md-4">
                                 <label for="jobType">Employment Type</label>
                                 <div class="bubbleformfilter d-flex gap-3 align-items-center">
                                     <i class="fa-solid fa-briefcase text-dark"></i>
@@ -846,57 +802,11 @@
                                 </div>
                             </div>
                             
-                            <div class="col-xs-12 col-sm-6 col-md-3">
+                            <div class="col-xs-12 col-sm-6 col-md-4">
                                 <label for="educationLevel">Minimum Education</label>
                                 <div class="bubbleformfilter d-flex gap-3 align-items-center">
                                     <i class="fa-solid fa-graduation-cap text-dark"></i>
                                     {% render_field resume_filter.form.education_level class="form-control border-0 p-0" %}
-                                </div>
-                            </div>
-
-                            <!-- Salary Type Filter -->
-                            <div class="col-sm-6 col-md-3">
-                                <label for="salaryType">Salary Type</label>
-                                <div class="bubbleformfilter d-flex gap-3 align-items-center">
-                                    <i class="fa-solid fa-money-bill-wave text-dark"></i>
-                                    <select name="salary_display_type" class="form-control border-0 p-0" id="salaryType">
-                                        <option value="" selected>Select Salary Type</option>
-                                        {% for value, text in resume_filter.form.salary_display_type.field.choices %}
-                                            {% if value %}
-                                                <option value="{{ value }}" {% if resume_filter.form.salary_display_type.value == value %}selected{% endif %}>
-                                                    {{ text }}
-                                                </option>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- Fixed Salary Input (Initially Hidden) -->
-                            <div class="col-xs-12 col-sm-6 col-md-6" id="fixedSalaryContainer" style="display: none;">
-                                <label for="minSalary">Fixed Salary</label>
-                                <div class="bubbleformfilter d-flex gap-3 align-items-center">
-                                    <i class="fa-solid fa-money-bill-1 text-dark"></i>
-                                    {% render_field resume_filter.form.min_salary type="number" class="form-control border-0 p-0" placeholder="Enter Fixed Salary" %}
-                                </div>
-                            </div>
-
-                            <!-- Salary Range Inputs (Initially Hidden) -->
-                            <div id="salaryRangeContainer" class="row mt-2" style="display: none;">
-                                <div class="col-xs-12 col-sm-6 col-md-6">
-                                    <label for="minSalary">Minimum Salary</label>
-                                    <div class="bubbleformfilter d-flex gap-3 align-items-center">
-                                        <i class="fa-solid fa-money-bill-1 text-dark"></i>
-                                        {% render_field resume_filter.form.min_salary type="number" class="form-control border-0 p-0" placeholder="Min Salary" %}
-                                    </div>
-                                </div>
-
-                                <div class="col-xs-12 col-sm-6 col-md-6">
-                                    <label for="maxSalary">Maximum Salary</label>
-                                    <div class="bubbleformfilter d-flex gap-3 align-items-center">
-                                        <i class="fa-solid fa-money-bill-1-wave text-dark"></i>
-                                        {% render_field resume_filter.form.max_salary type="number" class="form-control border-0 p-0" placeholder="Max Salary" %}
-                                    </div>
                                 </div>
                             </div>
                         </div>

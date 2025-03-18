@@ -46,7 +46,7 @@ class Jobfilter(django_filters.FilterSet):
     class Meta:
         model = Job
         fields = ['title', 'location', 'employment_job_type', 'education_level', 
-                 'experience', 'salary_display_type', 'min_salary', 'max_salary']
+                 'experience']
 
     def filter_location(self, queryset, name, value):
         return queryset.filter(
@@ -65,23 +65,6 @@ class Jobfilter(django_filters.FilterSet):
             Q(job_experience__exp_type='range', job_experience__min_exp_years__lte=value)
         ).distinct()
 
-    def filter_min_salary(self, queryset, name, value):
-        if value is None or value == '':  # Also check for empty string
-            return queryset
-        
-        return queryset.filter(
-            Q(salary_display_type='fixed', salary_fixed__gte=value) |
-            Q(salary_display_type='range', salary_min__gte=value)
-        )
-
-    def filter_max_salary(self, queryset, name, value):
-        if not value:
-            return queryset
-        
-        return queryset.filter(
-            Q(salary_display_type='fixed', salary_fixed__lte=value) |
-            Q(salary_display_type='range', salary_max__lte=value)
-        )
     
 class JobFairfilter(django_filters.FilterSet):
     title = django_filters.CharFilter(lookup_expr='icontains')
@@ -99,6 +82,7 @@ class JobFairfilter(django_filters.FilterSet):
 
     def filter_location(self, queryset, name, value):
         return queryset.filter(
+            Q(location__country__icontains=value) |
             Q(location__region__icontains=value) |
             Q(location__city__icontains=value) |
             Q(location__street__icontains=value)

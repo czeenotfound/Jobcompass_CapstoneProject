@@ -91,13 +91,7 @@
                                             <p>{{company.email}}</p>
                                             <div class="location-badge">
                                                 <i class="fas fa-location-dot"></i>
-                                                {% if company.address.barangay and company.address.city and company.address.street %}
-                                                    <!-- Display Philippine address if available -->
-                                                    {{ company.address.street }}{% if company.address.barangay %}, {{ company.address.barangay }}{% endif %}{% if company.address.city %}, {{ company.address.city }}{% endif %}
-                                                {% else %}
-                                                    <!-- Display international address if Philippine address is empty -->
-                                                    {{ company.address.street }}{% if company.address.street %}, {% endif %}{{ company.address.countrycity }}{% if company.address.countrycity %}, {% endif %}{{ company.address.country }}
-                                                {% endif %}
+                                                    {{ company.address.get_country_display }}, {{ company.address.region }}, {{ company.address.city }}
                                             </div>
                                             <hr>
                                             <div class="mt-3">

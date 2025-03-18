@@ -60,8 +60,7 @@ class Resumefilter(django_filters.FilterSet):
         model = Resume
         fields = [
             'name', 'address', 'employment_job_type', 
-            'location_job_type', 'industry', 'education_level',
-            'salary_display_type', 'min_salary', 'max_salary'
+            'location_job_type', 'industry', 'education_level'
         ]
 
     def filter_name(self, queryset, name, value):
@@ -82,24 +81,6 @@ class Resumefilter(django_filters.FilterSet):
     # Filter for education level
     def filter_education_level(self, queryset, name, value):
         return queryset.filter(education__education_level=value).distinct()
-    
-    def filter_min_salary(self, queryset, name, value):
-        if value is None or value == '':  # Also check for empty string
-            return queryset
-        
-        return queryset.filter(
-            Q(salary_display_type='fixed', expt_salary_fixed__gte=value) |
-            Q(salary_display_type='range', expt_salary_min__gte=value)
-        )
-
-    def filter_max_salary(self, queryset, name, value):
-        if not value:
-            return queryset
-        
-        return queryset.filter(
-            Q(salary_display_type='fixed', expt_salary_fixed__lte=value) |
-            Q(salary_display_type='range', expt_salary_max__lte=value)
-        )
     
     @property
     def count(self):
