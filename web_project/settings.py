@@ -35,19 +35,19 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default='django-insecure-j@+x+5zwid@6k
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-ALLOWED_HOSTS = ["*"]
+# DEBUG = True
+# ALLOWED_HOSTS = ["*"]
 
 
 # UNCOMMENT THIS FOR PRODUCTION 
 
-# DEBUG = not os.environ.get("DATABASE_URL")  # False in production, True in development
+DEBUG = not os.environ.get("DATABASE_URL")  # False in production, True in development
 
-# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []
 
-# RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
-# if RENDER_EXTERNAL_HOSTNAME:
-#     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # ===================================================================================================
 
@@ -151,16 +151,16 @@ WSGI_APPLICATION = 'web_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 # DATABASES = {
-#     "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
 # }
+
+DATABASES = {
+    "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
+}
 
 # postgresql://jobcompass_app_user:jSrQGtdfpdxWEVbtaHF2172dNK8OMfOi@dpg-ct684k3v2p9s7398nk1g-a.singapore-postgres.render.com/jobcompass_app
 
@@ -246,8 +246,8 @@ GRAPH_MODELS = {
   'group_models': True,
 }
 
-INTERNAL_IPS = [
-    # ...
-    "127.0.0.1",
-    # ...
-]
+# INTERNAL_IPS = [
+#     # ...
+#     "127.0.0.1",
+#     # ...
+# ]
