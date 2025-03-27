@@ -17,10 +17,9 @@
     <div class="custom-container container bg-white applicantProfile-card">
         <div class="p-5 mb-5">
             <div class="row">
-                <div class="col-md-7">
+                <div class="col-md-7 mb-3">
                     <h1>{{jobfair.title}}</h1>
                     <p class="fs-3 text-muted mb-0">{{jobfair.location_job_type|title}}</p>
-                    <p>{{jobfair.fair_event_held}}</p>
 
                     <p class="fs-5">
                         {% if jobfair.fair_event_held == 'Onsite' %}
@@ -35,25 +34,20 @@
                             </a>
                         {% elif jobfair.fair_event_held == 'Hybrid' %}
                             <span class="fw-bold">Onsite:</span>
-                            {% if jobfair.location.barangay and jobfair.location.city and jobfair.location.street %}
-                                {{ jobfair.location.street }}{% if jobfair.location.barangay %}, {{ jobfair.location.barangay }}{% endif %}{% if jobfair.location.city %}, {{ jobfair.location.city }}{% endif %}
-                            {% else %}
-                                {{ jobfair.location.countrystreet }}{% if jobfair.location.countrystreet %}, {% endif %}{{ jobfair.location.countrycity }}{% if jobfair.location.countrycity %}, {% endif %}{{ jobfair.location.country }}
-                            {% endif %}
+                            {{ jobfair.location }}
 
                             <span class="fw-bold">Virtual:</span>
                             <a href="{{ jobfair.url_location }}" target="_blank" class="text-decoration-none">
                                 {{ jobfair.url_location }}
                             </a>
                         {% else %}
-                            <!-- Default message if status is undefined -->
                             <span class="text-muted">Location details unavailable</span>
                         {% endif %}
                     </p>
                     
-                    <p class="fs-5 mb-3">Application Date: {{jobfair.application_starts}} - {{jobfair.application_deadline}}</p>
-                    <p class="fs-5 mt-4 mb-3">Start Date: {{jobfair.start_date}} - {{jobfair.end_date}}</p>
-                    <p class="fs-5 mt-4 mb-3">Time: {{jobfair.start_time|date:'h:i A'}} - {{jobfair.end_time|date:'h:i A'}}</p>
+                    <p class="fs-5 mb-3"><strong>Application Date :</strong> {{jobfair.application_starts}} - {{jobfair.application_deadline}}</p>
+                    <p class="fs-5 mt-4 mb-3"><strong>Start Date :</strong> {{jobfair.start_date}} - {{jobfair.end_date}}</p>
+                    <p class="fs-5 mt-4 mb-3"><strong>Time :</strong> {{jobfair.start_time|date:'h:i A'}} - {{jobfair.end_time|date:'h:i A'}}</p>
                    
                     
                     {% if user.is_authenticated %}
@@ -81,51 +75,63 @@
                 <div class="col-md-5 mt-5">
                     <img src="{{jobfair.image.url}}" alt="Tech Career Fair" class="img-fluid mb-3">
                 </div>
-                <div class="col-md-5">
-                    <div class="stats-card mb-3">
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-md-7 mt-3">
+                        {% if jobfair.description %}
                         <div class="mb-4">
-                            <p>Company Name</p>
-                            <h4>{{jobfair.company|title}}</h4>
-                            <h6>{{jobfair.company.industry|title}}</h6>
+                            <h4>Job Fair Description</h4>
+                            <div>
+                                <p>{{jobfair.description}}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if jobfair.url_location %}
+                        <div class="mb-4">
+                            <h4>Job Fair Url location</h4>
+                            <div>
+                                <p>{{jobfair.url_location}}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-5">
+                        <div class="stats-card mb-3">
+                            <div class="mb-4">
+                                <p>Company Name</p>
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ jobfair.company.avatar.url }}" alt="Company Logo" class="img-fluid rounded-circle company-logo me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                    <div>
+                                        <h4 class="mb-0">{{ jobfair.company|title }}</h4>
+                                        <h6 class="text-muted">{{ jobfair.company.industry|title }}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stats-card mb-3">
+                            <h5>Attendees</h5>
+                            <div class="contact-info mb-2">
+                                <i class="fa-solid fa-people-group fs-3 me-3"></i>
+                                <span class="fs-5">{{jobfair.max_attendees}}</span>
+                            </div>
+                        </div>
+                        <div class="stats-card mb-3">
+                            <h5>Contact Information</h5>
+                            <div class="contact-info mb-2">
+                                <i class="fas fa-phone me-2"></i>
+                                <span>{{jobfair.company.phone}}</span>
+                            </div>
+                            <div class="contact-info mb-2">
+                                <i class="fas fa-envelope me-2"></i>
+                                <span>{{jobfair.company.email}}</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="stats-card mb-3">
-                        <h5>Attendees</h5>
-                        <div class="contact-info mb-2">
-                            <i class="fa-solid fa-people-group fs-3 me-3"></i>
-                            <span class="fs-5">{{jobfair.max_attendees}}</span>
-                        </div>
-                    </div>
-                    <div class="stats-card mb-3">
-                        <h5>Contact Information</h5>
-                        <div class="contact-info mb-2">
-                            <i class="fas fa-phone me-2"></i>
-                            <span>{{jobfair.company.phone}}</span>
-                        </div>
-                        <div class="contact-info mb-2">
-                            <i class="fas fa-envelope me-2"></i>
-                            <span>{{jobfair.company.email}}</span>
-                        </div>
-                    </div>
+                    
                 </div>
-                <div class="col-md-6">
-                    {% if jobfair.description %}
-                    <div class="stats-card mb-4">
-                        <h4>Job Fair Description</h4>
-                        <div>
-                            <p>- {{jobfair.description}}</p>
-                        </div>
-                    </div>
-                    {% endif %}
-                    {% if jobfair.url_location %}
-                    <div class="mb-4">
-                        <h4>Job Fair Url location</h4>
-                        <div>
-                            <p>{{jobfair.url_location}}</p>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
+                
             </div>
         </div>
     </div>

@@ -118,7 +118,11 @@ def create_resume(request):
                 # Save all forms and formsets
                 resume_instance = form.save(commit=False)
                 user.has_resume = True
-                user.save()
+
+                user.first_name = avatar_phone_form.cleaned_data['first_name']
+                user.last_name = avatar_phone_form.cleaned_data['last_name']
+                user.save() 
+
                 
                 # Save the address
                 address_instance = address_form.save(commit=False)

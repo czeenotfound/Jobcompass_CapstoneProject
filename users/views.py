@@ -58,10 +58,22 @@ def register(request):
             user.save()
 
             if user.is_applicant:
-                Resume.objects.get_or_create(user=user)
+                Resume.objects.get_or_create(
+                    user=user,
+                    defaults={
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                    }
+                )
             elif user.is_employer:
                 Company.objects.get_or_create(user=user)
-                Employer.objects.get_or_create(user=user)
+                Employer.objects.get_or_create(
+                    user=user,
+                    defaults={
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                    }
+                )
 
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))

@@ -24,7 +24,130 @@
                 <h1 class="hero-heading">Job Fairs Management</h1>
             </section>
         </div>
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Total Job Fairs</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_jobfairs }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Active Job Fairs</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.active_jobfairs }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Featured Job Fairs</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.featured_jobfairs }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-star fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Participating Companies</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.companies_participating }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-building fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style>
+            .border-left-primary {
+                border-left: .25rem solid #4e73df!important;
+            }
+            .border-left-success {
+                border-left: .25rem solid #1cc88a!important;
+            }
+            .border-left-warning {
+                border-left: .25rem solid #f6c23e!important;
+            }
+            .border-left-info {
+                border-left: .25rem solid #36b9cc!important;
+            }
+            .chart-area {
+                position: relative;
+                height: 300px;
+                margin: 0 auto;
+            }
+            .chart-pie {
+                position: relative;
+                height: 300px;
+                margin: 0 auto;
+            }
+        </style>
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <!-- Monthly Trends Chart -->
+            <div class="col-xl-8 col-lg-7">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Monthly Job Fair Trends</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-area">
+                            <canvas id="monthlyTrendsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location Distribution Chart -->
+            <div class="col-xl-4 col-lg-5">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Top Locations</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-pie">
+                            <canvas id="locationPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="mainTableContent">
             <div class="custom-container bg-white p-3 shadow-sm">
                 <div class="card-header p-4">
@@ -141,4 +264,53 @@
         confirmActionButton.href = actionUrl;
     });
 </script>
+
+{% block extra_scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Monthly Trends Chart
+        const monthlyData = {{ stats.monthly_stats|safe }};
+        const months = monthlyData.map(item => {
+            const date = new Date(item.year, item.month - 1);
+            return date.toLocaleString('default', { month: 'short' }) + ' ' + item.year;
+        });
+        const counts = monthlyData.map(item => item.count);
+
+        new Chart(document.getElementById('monthlyTrendsChart'), {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Number of Job Fairs',
+                    data: counts,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        // Location Pie Chart
+        const locationData = {{ stats.location_stats|safe }};
+        new Chart(document.getElementById('locationPieChart'), {
+            type: 'pie',
+            data: {
+                labels: locationData.map(item => item.location),
+                datasets: [{
+                    data: locationData.map(item => item.count),
+                    backgroundColor: [
+                        '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    </script>
+{% endblock extra_scripts %}
 {% endblock content %}

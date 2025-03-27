@@ -36,16 +36,57 @@
                         </div>
                        
                         <div class="d-flex gap-3 w-100" role="group" aria-label="Role Selection">
-                            <input class="btn-check" type="radio" name="role" id="applicant" value="applicant" required {% if form.role.value == "applicant" %}checked{% endif %}>
+                            <input class="btn-check" type="radio" name="role" id="applicant" value="applicant" required {% if form.role.value == "applicant" %}checked{% endif %} onclick="toggleContactPersonLabel()">
                             <label class="choiceButton btn btn-outline-primary w-50" for="applicant"><img src="{% static 'images/applicant (Small).png' %}" width="100px" alt="">Applicant</label>
                     
-                            <input class="btn-check" type="radio" name="role" id="employer" value="employer" required {% if form.role.value == "employer" %}checked{% endif %}>
+                            <input class="btn-check" type="radio" name="role" id="employer" value="employer" required {% if form.role.value == "employer" %}checked{% endif %} onclick="toggleContactPersonLabel()">
                             <label class="choiceButton btn btn-outline-primary w-50" for="employer"><img src="{% static 'images/employer (Small).png' %}" width="100px" alt="">Employer</label>
                         </div>  
                     </div>
+                    <div id="contactPersonLabel" class="mb-3" style="display: none;">
+                        <div class="d-flex justify-content-center">
+                            <label class="form-label fs-4">Contact Person Account</label>
+                        </div> 
+                        <div id="floatingPopup">
+                            <button id="closePopupBtn">&times;</button>
+                            <h4>Creating a Company Account</h4>
+                            <p>As an <strong>Employer</strong>, you are setting up a company account. Please provide the details of a 
+                            <strong>contact person</strong> who will represent your company.</p>
+                        </div>
+                    </div>
+                    <style>
+                        #floatingPopup {
+                            position: fixed;
+                            bottom: 20px;
+                            right: 20px;
+                            width: 300px;
+                            background-color: #f0f8ff;  /* Light, calm background */
+                            border: 1px solid #007bff;  /* Match primary theme color */
+                            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                            border-radius: 8px;
+                            padding: 15px;
+                            z-index: 1000;
+                        }
+                        #floatingPopup h4 {
+                            font-size: 1.2rem;
+                            margin-bottom: 5px;
+                        }
+                        #closePopupBtn {
+                            position: absolute;
+                            top: 5px;
+                            right: 8px;
+                            background: none;
+                            border: none;
+                            font-size: 1.2rem;
+                            cursor: pointer;
+                        }
+                    </style>
+                    
+                   
+                    
                     <div class="row p-0 m-0">
                         <div class="col-sm-6">
-                            <label for="firstName" class="form-label">First Name</label> 
+                            <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label> 
                             <div class="bubbleform mb-3">
                                 {% render_field form.first_name class="form-control border-0 p-0" placeholder="John" required=True %}
                                 {% if form.first_name.errors %}
@@ -55,7 +96,7 @@
                         </div>
                         
                         <div class="col-sm-6">
-                            <label for="lastName" class="form-label">Last Name</label>
+                            <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
                             <div class="bubbleform mb-3">
                                 {% render_field form.last_name class="form-control border-0 p-0" placeholder="Doe" required=True %}
                                 {% if form.last_name.errors %}
@@ -64,7 +105,6 @@
                             </div>
                         </div>
                     </div>
-                    
 
                     <div class="d-flex justify-content-center">
                         <button type="button" class="customButton btn-primary w-50 mt-3" onclick="nextStep(2)">Next</button>
@@ -176,6 +216,27 @@
         var currentStep = document.getElementById('currentStep').value;
         showStep(currentStep);
     });
+    
+    function toggleContactPersonLabel() {
+        const employerSelected = document.getElementById('employer').checked;
+        const contactPersonLabel = document.getElementById('contactPersonLabel');
+        const floatingPopup = document.getElementById('floatingPopup');
+
+        // Show or hide the contact person label
+        contactPersonLabel.style.display = employerSelected ? 'block' : 'none';
+
+        // Show the floating pop-up when "Employer" is selected
+        if (employerSelected) {
+            floatingPopup.style.display = 'block';
+        }
+    }
+
+    // Close button functionality
+    document.getElementById('closePopupBtn').addEventListener('click', function() {
+        document.getElementById('floatingPopup').style.display = 'none';
+    });
+
+
 </script>
 
 {% block scripts %}
@@ -258,6 +319,8 @@
         updateStatus("digit", digit.test(password));
         updateStatus("special", special.test(password));
     }
+
+    
 </script>
 
 {% endblock scripts %}

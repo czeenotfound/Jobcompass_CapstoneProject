@@ -327,7 +327,7 @@
     </div>
     
     <!-- Feedback Modal (for both Reject and Accept) -->
-    <div class="modal fade" id="feedbackModal" tabindex="-1">
+    <div class="modal fade" id="feedbackModal" tabindex="-1"  aria-labelledby="feedbackModalLabel" aria-hidden="true"  data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" style="border-radius: 1rem;">
                 <div class="modal-header bg-dark text-white" style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
@@ -342,7 +342,8 @@
                         
                         <div class="col-md-12 mb-2">
                             <label for="feedback" class="form-label fw-bold">Feedback</label>
-                            {% render_field feedback_form.content class="form-control" %}
+                            <textarea name="content" id="feedback_content" class="form-control" rows="8"></textarea>
+                            <small class="text-muted">You can edit this default message or provide your own custom feedback.</small>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -834,7 +835,49 @@
                 });
             });
         });
+        
+        document.querySelectorAll('button[name="status"][value="ACCEPTED"], button[name="status"][value="REJECTED"]').forEach(button => {
+            // Clone and replace the button to remove all event listeners
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+        });
 
+        const feedbackMessages = {
+            'ACCEPTED': `{{ feedback_messages.ACCEPTED|escapejs }}`,
+            'REJECTED': `{{ feedback_messages.REJECTED|escapejs }}`
+        };
+
+        // Add clean event listeners with a single approach
+        document.querySelectorAll('button[name="status"][value="ACCEPTED"], button[name="status"][value="REJECTED"]').forEach(button => {
+            // Don't use both event listeners and data attributes
+            button.removeAttribute('data-bs-toggle');
+            button.removeAttribute('data-bs-target');
+            button.setAttribute('type', 'button');
+            
+            button.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent form submission
+                
+                const applicationId = this.closest('form').querySelector('input[name="application_id"]').value;
+                const status = this.value;
+                
+                // Set values in the feedback modal
+                document.getElementById('feedback_application_id').value = applicationId;
+                document.getElementById('feedback_status').value = status;
+                document.getElementById('feedback_content').value = feedbackMessages[status];
+                
+                // Use jQuery to show modal (Bootstrap's reliable method)
+                $('#feedbackModal').modal('show');
+            });
+        });
+
+        // Add proper modal cleanup
+        $('#feedbackModal').on('hidden.bs.modal', function () {
+            // Ensure body classes and styles are reset
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+            $('body').css('overflow', '');
+            $('body').css('padding-right', '');
+        });
     </script>
 
 {% endblock content %}

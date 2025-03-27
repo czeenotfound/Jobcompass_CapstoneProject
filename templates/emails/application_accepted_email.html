@@ -72,10 +72,12 @@
             <p style="margin: 0"><strong>Great news!</strong> Your application has been accepted.</p>
         </div>
         
-        <p>Hello <strong>{{ application.user.first_name|title }}</strong>,</p>
+        <p>Hello <strong>{{ application.user.first_name|title }} {{ application.user.last_name|title }}</strong>,</p>
         
-        <p>We're pleased to inform you that your application for <strong>{{ application.job.title }}</strong> at <strong>{{ application.job.company.company_name }}</strong> has been accepted!</p>
-        
+        {% if feedback %}
+        <p>{{ feedback.content }}</p>
+        {% endif %}
+
         <div class="job-details">
             <p style="margin: 5px 0"><strong>Position:</strong> {{ application.job.title }}</p>
             <p style="margin: 5px 0"><strong>Company:</strong> {{ application.job.company.company_name }}</p>
@@ -89,11 +91,6 @@
             </p>
             {% endif %}
         </div>
-        
-        {% if feedback %}
-        <h3>Feedback from the employer:</h3>
-        <p style="font-style: italic; padding: 10px; background-color: #f9f9f9; border-radius: 5px; border-left: 3px solid #4BB543;">{{ feedback.content }}</p>
-        {% endif %}
         
         <p>The employer will be in touch shortly with more details about next steps and your start date.</p>
         

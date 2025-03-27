@@ -231,6 +231,81 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="custom-container mt-4 mb-4">
+                    <h4 class="mb-3">Job Match Analytics</h4>
+                    <div class="row">
+                        <!-- Match Quality Card -->
+                        <div class="col-md-6">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Match Quality Distribution</h5>
+                                    <div class="chart-container" style="position: relative; height:300px;">
+                                        <canvas id="matchQualityChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Skill Match Rate Card -->
+                        <div class="col-md-6">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Top Matched Skills</h5>
+                                    <div class="chart-container" style="position: relative; height:300px;">
+                                        <canvas id="skillMatchChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Match Rate by Job Type -->
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Match Rate by Job</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Job Title</th>
+                                                    <th>Total Applicants</th>
+                                                    <th>High Matches (>80%)</th>
+                                                    <th>Medium Matches (50-80%)</th>
+                                                    <th>Low Matches (<50%)</th>
+                                                    <th>Match Rate</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for stat in job_stats %}
+                                                <tr>
+                                                    <td>{{ stat.job.title }}</td>
+                                                    <td>{{ stat.application_count }}</td>
+                                                    <td>{{ stat.match_high_count|default:"0" }}</td>
+                                                    <td>{{ stat.match_medium_count|default:"0" }}</td>
+                                                    <td>{{ stat.match_low_count|default:"0" }}</td>
+                                                    <td>
+                                                        <div class="progress" style="height: 20px;">
+                                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                                 style="width: {{ stat.match_rate|default:"0" }}%;" 
+                                                                 aria-valuenow="{{ stat.match_rate|default:"0" }}" 
+                                                                 aria-valuemin="0" aria-valuemax="100">
+                                                                {{ stat.match_rate|default:"0" }}%
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -371,6 +446,64 @@
                 }
             }
         });
+
+        const matchQualityCtx = document.getElementById('matchQualityChart').getContext('2d');
+        const matchQualityChart = new Chart(matchQualityCtx, {
+            type: 'pie',
+            data: {
+                labels: ['High Match (>80%)', 'Medium Match (50-80%)', 'Low Match (<50%)'],
+                datasets: [{
+                    data: [
+                        {{ match_stats.high_count|default:"0" }}, 
+                        {{ match_stats.medium_count|default:"0" }}, 
+                        {{ match_stats.low_count|default:"0" }}
+                    ],
+                    backgroundColor: [
+                        '#198754',  // High - green
+                        '#ffc107',  // Medium - yellow
+                        '#dc3545'   // Low - red
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+
+        // Skill Match Chart
+        const skillMatchCtx = document.getElementById('skillMatchChart').getContext('2d');
+        const skillMatchChart = new Chart(skillMatchCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ top_matched_skills|safe }},
+                datasets: [{
+                    label: 'Match Frequency',
+                    data: {{ top_matched_skills_counts }},
+                    backgroundColor: 'rgba(13, 110, 253, 0.7)',
+                    borderColor: '#0d6efd',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
     });
 
     const confirmModal = document.getElementById('confirmModal');
@@ -386,6 +519,8 @@
         // Set the URL in the confirmation button
         confirmActionButton.href = actionUrl;
     });
+
+    
 </script>
     
 {% endblock content %}

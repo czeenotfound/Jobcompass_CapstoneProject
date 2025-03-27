@@ -20,85 +20,495 @@
 {% block content %}
     <main class="col-md-9 ms-sm-auto col-lg-9 col-xl-10 py-3 px-md-4">
         <div class="d-flex align-items-center">
-            <section class="employerbanner w-100  h-100 p-5 bg-light mb-4">
-                <h1 class="hero-heading">Jobs Management</h1>
+            <section class="employerbanner w-100 h-100 p-5 bg-light mb-4">
+                <h1 class="hero-heading">Jobs Management Dashboard</h1>
             </section>
         </div>
-
-        <div class="mainTableContent">
-            <div class="custom-container bg-white p-3 shadow-sm">
-                <div class="card-header p-4">
-                    <div class="btn-group float-end">
-                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            Export
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><p class="mx-2 text-muted">Export</p></li>
-                            <li><button class="dropdown-item" id="btn-csv"><i class="fa-solid fa-file-csv"></i> Save as CSV</button></li>
-                            <li><button class="dropdown-item" id="btn-excel"><i class="fa-solid fa-file-excel"></i> Save as Excel</button></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><p class="mx-2 text-muted">Print</p></li>
-                            <li><button class="dropdown-item" id="btn-print"><i class="fa-solid fa-print"></i> Print</button></li>
-                        </ul>
-                    </div> 
+        <div class="card shadow mb-4">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">All Jobs Overview</h5>
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Export Table
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><button class="dropdown-item" id="btn-csv-all"><i class="fas fa-file-csv"></i> CSV</button></li>
+                        <li><button class="dropdown-item" id="btn-excel-all"><i class="fas fa-file-excel"></i> Excel</button></li>
+                        <li><button class="dropdown-item" id="btn-print-all"><i class="fas fa-print"></i> Print</button></li>
+                    </ul>
                 </div>
-                <div class="mb-5">
-                    <div class="tableBg">
-                        <table id="managejobpostingsTable" class="table bg-light">
-                            <thead>
-                                <tr>
-                                    <th>Job Details</th>
-                                    <th>Status</th>
-                                    <th>Post Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for job in jobs %}
-                                    <tr>
-                                        <td class="fw-semibold">
-                                            <h1 style="font-size: 1.5rem;">{{ job.title }}</h1>
-                                            <div class="location-badge">
-                                                <i class="fas fa-location-dot"></i>
-                                                {{ job.location }}
-                                            </div>
-                                            <hr>
-                                            <div class="mt-3">
-                                                <label for="companyfiles">Company</label>
-                                                <h4>{{ job.company.company_name}}</h4>
-                                            </div>
-                                        </td>
+            </div>
+            <div class="card-body">
+                <!-- Summary Stats -->
+                <div class="row text-center mb-4">
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6>Total Jobs</h6>
+                                <h3>{{ all_jobs_stats.total }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <h6>Open Jobs</h6>
+                                <h3>{{ all_jobs_stats.open }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-danger text-white">
+                            <div class="card-body">
+                                <h6>Closed Jobs</h6>
+                                <h3>{{ all_jobs_stats.closed }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- All Jobs Table -->
+                <div class="table-responsive">
+                    <table id="allJobsTable" class="table table-striped table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Job Title</th>
+                                <th>Company</th>
+                                <th>Industry</th>
+                                <th>Location</th>
+                                <th>Posted Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in all_jobs %}
+                            <tr>
+                                <td>{{ job.title }}</td>
+                                <td>{{ job.company.company_name }}</td>
+                                <td>{{ job.industry }}</td>
+                                <td>{{ job.location }}</td>
+                                <td>{{ job.posted_date_time|date:"F d, Y" }}</td>
+                                <td>
+                                    <span class="badge {% if job.is_available %}bg-success{% else %}bg-danger{% endif %}">
+                                        {% if job.is_available %}Open{% else %}Closed{% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
                                         {% if job.is_available %}
-                                                <td><span class="status-badge status-open">Open</span></td>
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" 
+                                                    data-bs-target="#confirmModal" 
+                                                    data-action-url="{% url 'admin-deactivate-job' job.pk %}">
+                                                <i class="fa-solid fa-times"></i> Disable
+                                            </button>
                                         {% else %}
-                                            <td><span class="status-badge status-closed">Closed</span></td>
+                                            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" 
+                                                    data-bs-target="#confirmModal" 
+                                                    data-action-url="{% url 'admin-activate-job' job.pk %}">
+                                                <i class="fa-solid fa-check"></i> Enable
+                                            </button>
                                         {% endif %}
-                                        <td>{{job.posted_date_time|date:'F d, Y'}}</td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                {% if job.is_available %}
-                                                    <!-- Deactivate Button -->
-                                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmModal" 
-                                                        data-action-url="{% url 'admin-deactivate-job' job.pk %}">
-                                                        <i class="fa-solid fa-times"></i> Disable
-                                                    </button>
-                                                {% else %}
-                                                    <!-- Activate Button -->
-                                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmModal" 
-                                                        data-action-url="{% url 'admin-activate-job' job.pk %}">
-                                                        <i class="fa-solid fa-check"></i> Enable
-                                                    </button>
-                                                {% endif %}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <h3>Job Matching Report</h3>
+        <!-- Summary Cards -->
+        <div class="row text-center mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card text-white bg-primary shadow h-100">
+                    <div class="card-body">
+                        <h5>Total Jobs</h5>
+                        <p class="fs-1 fw-bold display-6">{{ total_jobs }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card text-white bg-success shadow h-100">
+                    <div class="card-body d">
+                        <h5>Open Jobs</h5>
+                        <p class="fs-1 fw-bold display-6">{{ open_jobs_count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card text-white bg-danger shadow h-100">
+                    <div class="card-body d">
+                        <h5>Closed Jobs</h5>
+                        <p class="fs-1 fw-bold display-6">{{ closed_jobs_count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card text-white bg-warning shadow h-100">
+                    <div class="card-body d">
+                        <h5>Matched Jobs</h5>
+                        <p class="fs-1 fw-bold display-6">{{ matched_jobs_count }}</p>
+                        <p class="small">{{ report_data.match_percentage }}% of all jobs</p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Charts Section -->
+        <div class="row mb-4">
+            <div class="col-md-6 mb-4">
+                <div class="card shadow">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Jobs Match Quality</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="matchQualityChart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card shadow">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Jobs Status Overview</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="jobStatusChart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow mb-4">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Advanced Filters</h5>
+                <button class="btn btn-light btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                    <i class="fas fa-filter"></i> Toggle Filters
+                </button>
+            </div>
+            <div class="collapse show" id="filterCollapse">
+                <div class="card-body">
+                    <form method="GET" action="{% url 'admin-manage-jobs' %}" class="row g-3">
+                        <!-- Preset Date Ranges -->
+                        <div class="col-md-3">
+                            <label class="form-label">Preset Ranges</label>
+                            <select name="filter_type" class="form-select" id="filterType">
+                                <option value="all" {% if filter_type == 'all' %}selected{% endif %}>All Time</option>
+                                <option value="last_week" {% if filter_type == 'last_week' %}selected{% endif %}>Last Week</option>
+                                <option value="last_30_days" {% if filter_type == 'last_30_days' %}selected{% endif %}>Last 30 Days</option>
+                                <option value="custom" {% if filter_type == 'custom' %}selected{% endif %}>Custom Range</option>
+                            </select>
+                        </div>
+        
+                        <!-- Custom Date Range -->
+                        <div class="col-md-3 custom-date-range" {% if filter_type != 'custom' %}style="display: none;"{% endif %}>
+                            <label class="form-label">Start Date</label>
+                            <input type="date" name="start_date" class="form-control" value="{{ start_date|default:'' }}">
+                        </div>
+                        <div class="col-md-3 custom-date-range" {% if filter_type != 'custom' %}style="display: none;"{% endif %}>
+                            <label class="form-label">End Date</label>
+                            <input type="date" name="end_date" class="form-control" value="{{ end_date|default:'' }}">
+                        </div>
+        
+                        <!-- Job Status Filter -->
+                        <div class="col-md-3">
+                            <label class="form-label">Job Status</label>
+                            <select name="job_status" class="form-select">
+                                <option value="all" {% if job_status == 'all' %}selected{% endif %}>All Status</option>
+                                <option value="open" {% if job_status == 'open' %}selected{% endif %}>Open Only</option>
+                                <option value="closed" {% if job_status == 'closed' %}selected{% endif %}>Closed Only</option>
+                            </select>
+                        </div>
+        
+                        <!-- Match Quality Filter -->
+                        <div class="col-md-3">
+                            <label class="form-label">Match Quality</label>
+                            <select name="match_quality" class="form-select">
+                                <option value="all" {% if match_quality == 'all' %}selected{% endif %}>All Matches</option>
+                                <option value="high" {% if match_quality == 'high' %}selected{% endif %}>High Match (>80%)</option>
+                                <option value="medium" {% if match_quality == 'medium' %}selected{% endif %}>Medium Match (50-80%)</option>
+                                <option value="low" {% if match_quality == 'low' %}selected{% endif %}>Low Match (<50%)</option>
+                            </select>
+                        </div>
+        
+                        <!-- Minimum Match Percentage -->
+                        <div class="col-md-3">
+                            <label class="form-label">Minimum Match %</label>
+                            <input type="number" name="min_match_percentage" class="form-control" min="0" max="100" 
+                                   value="{{ min_match_percentage|default:'' }}" placeholder="Enter minimum %">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Industry</label>
+                            <select name="industry" class="form-select">
+                                <option value="all" {% if selected_industry == 'all' %}selected{% endif %}>All Industries</option>
+                                {% for industry in available_industries %}
+                                    <option value="{{ industry.id }}" {% if selected_industry == industry.id %}selected{% endif %}>
+                                        {{ industry.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <!-- Filter Actions -->
+                        <div class="row align-items-center mt-4">
+                            <div class="col-md-6 col-12 mb-3 mb-md-0">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-filter"></i> Apply Filters
+                                </button>
+                                <a href="{% url 'admin-manage-jobs' %}" class="btn btn-secondary">
+                                    <i class="fas fa-undo"></i> Reset Filters
+                                </a>
+                            </div>
+                        
+                            <div class="col-md-6 col-12 text-md-end">
+                                <div class="d-flex justify-content-start justify-content-md-end flex-wrap">
+                                    <button id="printReport" class="btn btn-primary me-2 mb-2">
+                                        <i class="fas fa-print"></i> Print Report
+                                    </button>
+                                    <button id="exportExcel" class="btn btn-success me-2 mb-2">
+                                        <i class="fas fa-file-excel"></i> Export to Excel
+                                    </button>
+                                    <button id="exportPDF" class="btn btn-danger mb-2">
+                                        <i class="fas fa-file-pdf"></i> Export to PDF
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- Report Generation Section -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Job Matching Report</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <table class="table table-bordered" id="matchSummaryTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Job Overview Section -->
+                            <tr class="table-primary">
+                                <td colspan="3"><strong>Job Overview</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Total Jobs</td>
+                                <td>{{ total_jobs }}</td>
+                                <td>
+                                    Open: {{ open_jobs_count }} | 
+                                    Closed: {{ closed_jobs_count }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Jobs with Matches</td>
+                                <td>{{ report_data.jobs_with_matches }}</td>
+                                <td>{{ report_data.match_percentage }}% of total jobs have matches</td>
+                            </tr>
+        
+                            <!-- Industry Breakdown Section -->
+                            <tr class="table-info">
+                                <td colspan="3"><strong>Industry Breakdown</strong></td>
+                            </tr>
+                            {% for industry in enhanced_report.industry_breakdown %}
+                            <tr>
+                                <td>{{ industry.name }}</td>
+                                <td>{{ industry.matched_jobs }} / {{ industry.total_jobs }}</td>
+                                <td>
+                                    Match Rate: {{ industry.match_rate }}%
+                                </td>
+                            </tr>
+                            {% endfor %}
+        
+                            <!-- Match Quality Section -->
+                            <tr class="table-success">
+                                <td colspan="3"><strong>Match Quality Breakdown</strong></td>
+                            </tr>
+                            <tr>
+                                <td>High Match Jobs (>80%)</td>
+                                <td>{{ report_data.high_match_jobs }}</td>
+                                <td>{{ enhanced_report.high_match_percentage }}% of total jobs</td>
+                            </tr>
+                            <tr>
+                                <td>Medium Match Jobs (50-80%)</td>
+                                <td>{{ report_data.medium_match_jobs }}</td>
+                                <td>{{ enhanced_report.medium_match_percentage }}% of total jobs</td>
+                            </tr>
+                            <tr>
+                                <td>Low Match Jobs (<50%)</td>
+                                <td>{{ report_data.low_match_jobs }}</td>
+                                <td>{{ enhanced_report.low_match_percentage }}% of total jobs</td>
+                            </tr>
+        
+                            <!-- Resume Matches Section -->
+                            <tr class="table-warning">
+                                <td colspan="3"><strong>Resume Match Details</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Total Resume Matches</td>
+                                <td>{{ report_data.total_matches }}</td>
+                                <td>Average {{ enhanced_report.avg_matches_per_job }} matches per job</td>
+                            </tr>
+                            <tr>
+                                <td>Match Distribution</td>
+                                <td colspan="2">
+                                    <div class="progress" style="height: 25px;">
+                                        <div class="progress-bar bg-success" 
+                                             style="width: {{ enhanced_report.high_match_percentage }}%" 
+                                             title="High Matches">
+                                            {{ enhanced_report.high_match_percentage }}%
+                                        </div>
+                                        <div class="progress-bar bg-warning" 
+                                             style="width: {{ enhanced_report.medium_match_percentage }}%" 
+                                             title="Medium Matches">
+                                            {{ enhanced_report.medium_match_percentage }}%
+                                        </div>
+                                        <div class="progress-bar bg-danger" 
+                                             style="width: {{ enhanced_report.low_match_percentage }}%" 
+                                             title="Low Matches">
+                                            {{ enhanced_report.low_match_percentage }}%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+        
+                            <!-- Time-based Analysis -->
+                            <tr class="table-secondary">
+                                <td colspan="3"><strong>Time-based Analysis</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Recent Matches (Last 7 days)</td>
+                                <td>{{ enhanced_report.recent_matches.last_7_days }}</td>
+                                <td>{{ enhanced_report.recent_matches.trend_7_days }}</td>
+                            </tr>
+                            <tr>
+                                <td>Monthly Matches (Last 30 days)</td>
+                                <td>{{ enhanced_report.recent_matches.last_30_days }}</td>
+                                <td>{{ enhanced_report.recent_matches.trend_30_days }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jobs Table Section -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Job Listings</h5>
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Export Table
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><button class="dropdown-item" id="btn-csv"><i class="fas fa-file-csv"></i> CSV</button></li>
+                        <li><button class="dropdown-item" id="btn-excel"><i class="fas fa-file-excel"></i> Excel</button></li>
+                        <li><button class="dropdown-item" id="btn-print"><i class="fas fa-print"></i> Print</button></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="managejobpostingsTable" class="table table-striped table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Job Details</th>
+                                <th>Status</th>
+                                <th>Post Date</th>
+                                <th>Matching Resumes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job_data in jobs_with_matches %}
+                                <tr>
+                                    <td class="fw-semibold">
+                                        <h5>{{ job_data.job.title }}</h5>
+                                        <div class="location-badge">
+                                            <i class="fas fa-location-dot"></i>
+                                            {{ job_data.job.location }}
+                                        </div>
+                                        <hr>
+                                        <div class="mt-2">
+                                            <label class="text-muted">Company</label>
+                                            <h6>{{ job_data.job.company.company_name}}</h6>
+                                        </div>
+                                    </td>
+                                    {% if job_data.job.is_available %}
+                                        <td><span class="badge bg-success">Open</span></td>
+                                    {% else %}
+                                        <td><span class="badge bg-danger">Closed</span></td>
+                                    {% endif %}
+                                    <td>{{job_data.job.posted_date_time|date:'F d, Y'}}</td>
+                                    <td>
+                                        <span class="fw-bold">{{ job_data.match_count }}</span> matching resumes
+                                        {% if job_data.matches %}
+                                            <button class="btn btn-sm btn-outline-primary ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#matches{{ job_data.job.id }}" aria-expanded="false">
+                                                <i class="fas fa-users"></i> View
+                                            </button>
+                                            <div class="collapse mt-2" id="matches{{ job_data.job.id }}">
+                                                <div class="card card-body">
+                                                    <ul class="list-group">
+                                                        {% for match in job_data.matches %}
+                                                            <li class="list-group-item">
+                                                                <div class="d-flex justify-content-between align-items-center">
+                                                                    <span>
+                                                                        <strong>{{ match.user.first_name }} {{ match.user.last_name }}</strong>
+                                                                        <span class="badge bg-{% if match.skill_match_percentage >= 80 %}success{% elif match.skill_match_percentage >= 50 %}warning{% else %}danger{% endif %}">
+                                                                            {{ match.skill_match_percentage }}% match
+                                                                        </span>
+                                                                    </span>
+                                                                    <button class="btn btn-sm btn-outline-info" type="button" data-bs-toggle="collapse" data-bs-target="#skills{{ job_data.job.id }}{{ match.user.id }}" aria-expanded="false">
+                                                                        <i class="fas fa-tools"></i> Skills
+                                                                    </button>
+                                                                </div>
+                                                                <div class="collapse mt-2" id="skills{{ job_data.job.id }}{{ match.user.id }}">
+                                                                    <div class="d-flex flex-wrap gap-1">
+                                                                        {% for skill in match.matched_skills %}
+                                                                            <span class="badge bg-light text-dark">{{ skill }}</span>
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">(No matches)</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            {% if job_data.job.is_available %}
+                                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmModal" 
+                                                    data-action-url="{% url 'admin-deactivate-job' job_data.job.pk %}">
+                                                    <i class="fa-solid fa-times"></i> Disable
+                                                </button>
+                                            {% else %}
+                                                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#confirmModal" 
+                                                    data-action-url="{% url 'admin-activate-job' job_data.job.pk %}">
+                                                    <i class="fa-solid fa-check"></i> Enable
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        
+
     </main>
     <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -131,6 +541,294 @@
 
         // Set the URL in the confirmation button
         confirmActionButton.href = actionUrl;
+    });
+
+    var manageJobss;
+    // Initialize DataTables
+    $(document).ready(function() {
+        if (!$.fn.DataTable.isDataTable('#managejobpostingsTable')) {
+            manageJobss =$('#managejobpostingsTable').DataTable({
+                pageLength: 10,
+                order: [[2, 'desc']],
+                language: {
+                    search: "",
+                    searchPlaceholder: 'Search jobs...',
+                    lengthMenu: "Show _MENU_ entries"
+                },
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                columnDefs: [
+                    { orderable: false, targets: [3, 4] }
+                ],
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'csv',
+                        text: 'Export CSV',
+                        title: 'Job_Matches_Report',
+                        className: 'btn btn-primary btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3]
+                        },
+                        init: function(api, node, config) {
+                            $(node).hide();
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        text: 'Export Excel',
+                        title: 'Job_Matches_Report',
+                        className: 'btn btn-success btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3]
+                        },
+                        init: function(api, node, config) {
+                            $(node).hide();
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: 'Print',
+                        title: 'Job Matches Report',
+                        className: 'btn btn-info btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3]
+                        },
+                        init: function(api, node, config) {
+                            $(node).hide();
+                        }
+                    }
+                ]
+            });
+
+            // Button handlers for table exports
+            $('#btn-csv').on('click', function() {
+                manageJobss.button('.buttons-csv').trigger();
+            });
+            
+            $('#btn-excel').on('click', function() {
+                manageJobss.button('.buttons-excel').trigger();
+            });
+            
+            $('#btn-print').on('click', function() {
+                manageJobss.button('.buttons-print').trigger();
+            });
+
+            // Report printing and export functionality
+            $('#printReport').on('click', function() {
+                printReport();
+            });
+            
+            $('#exportExcel').on('click', function() {
+                exportTableToExcel('matchSummaryTable', 'Job_Match_Summary');
+            });
+            
+            $('#exportPDF').on('click', function() {
+                // This would require a PDF library, for now we'll use print
+                printReport();
+            });
+
+            // Initialize Charts
+            const matchQualityCtx = document.getElementById('matchQualityChart').getContext('2d');
+            const matchQualityChart = new Chart(matchQualityCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['High Match (>80%)', 'Medium Match (50-80%)', 'Low Match (<50%)', 'No Match'],
+                    datasets: [{
+                        label: 'Match Quality',
+                        data: [
+                            {{ report_data.high_match_jobs }},
+                            {{ report_data.medium_match_jobs }},
+                            {{ report_data.low_match_jobs }},
+                            {{ total_jobs }} - {{ report_data.jobs_with_matches }}
+                        ],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(201, 203, 207, 0.8)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Job Match Quality Distribution'
+                        }
+                    }
+                }
+            });
+
+            const jobStatusCtx = document.getElementById('jobStatusChart').getContext('2d');
+            const jobStatusChart = new Chart(jobStatusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Open Jobs', 'Closed Jobs'],
+                    datasets: [{
+                        label: 'Job Status',
+                        data: [{{ open_jobs_count }}, {{ closed_jobs_count }}],
+                        backgroundColor: [
+                            'rgba(40, 167, 69, 0.8)',
+                            'rgba(220, 53, 69, 0.8)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Job Status Distribution'
+                        }
+                    }
+                }
+            });
+        }
+    });
+
+    // Function to print the report
+    function printReport() {
+        const printContent = document.getElementById('matchSummaryTable');
+        const windowUrl = 'about:blank';
+        const uniqueName = new Date().getTime();
+        const windowName = 'Print_' + uniqueName;
+        const printWindow = window.open(windowUrl, windowName, 'left=0,top=0,width=800,height=600,toolbar=0,scrollbars=0,status=0');
+        
+        printWindow.document.write('<html><head><title>Job Compass | Job Match Report</title>');
+        printWindow.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write('<h2 class="text-center mb-4">Job Match Summary Report</h2>');
+        printWindow.document.write('<div class="container">');
+        printWindow.document.write(printContent.outerHTML);
+        printWindow.document.write('<p class="mt-3 text-end">Generated on: ' + new Date().toLocaleString() + '</p>');
+        printWindow.document.write('</div></body></html>');
+        
+        printWindow.document.close();
+        printWindow.focus();
+        
+        printWindow.onload = function() {
+            printWindow.print();
+            printWindow.close();
+        };
+    }
+
+    // Function to export table to Excel
+    function exportTableToExcel(tableID, filename = '') {
+        var downloadLink;
+        var dataType = 'application/vnd.ms-excel';
+        var tableSelect = document.getElementById(tableID);
+        var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+        
+        // Create download link element
+        downloadLink = document.createElement("a");
+        
+        document.body.appendChild(downloadLink);
+        
+        if(navigator.msSaveOrOpenBlob){
+            var blob = new Blob(['\ufeff', tableHTML], {
+                type: dataType
+            });
+            navigator.msSaveOrOpenBlob(blob, filename + '.xls');
+        } else {
+            // Create a link to the file
+            downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+        
+            // Setting the file name
+            downloadLink.download = filename + '.xls';
+            
+            //triggering the function
+            downloadLink.click();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterType = document.getElementById('filterType');
+        const customDateRanges = document.querySelectorAll('.custom-date-range');
+
+        filterType.addEventListener('change', function() {
+            const isCustom = this.value === 'custom';
+            customDateRanges.forEach(element => {
+                element.style.display = isCustom ? 'block' : 'none';
+            });
+        });
+    });
+
+    $(document).ready(function() {
+        if (!$.fn.DataTable.isDataTable('#allJobsTable')) {
+            var allJobsTable = $('#allJobsTable').DataTable({
+                pageLength: 10,
+                order: [[4, 'desc']], // Sort by posted date by default
+                language: {
+                    search: "",
+                    searchPlaceholder: 'Search jobs...',
+                    lengthMenu: "Show _MENU_ entries"
+                },
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'csv',
+                        text: 'Export CSV',
+                        title: 'All_Jobs_Report',
+                        className: 'btn btn-primary btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5]
+                        },
+                        init: function(api, node, config) {
+                            $(node).hide();
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        text: 'Export Excel',
+                        title: 'All_Jobs_Report',
+                        className: 'btn btn-success btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5]
+                        },
+                        init: function(api, node, config) {
+                            $(node).hide();
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: 'Print',
+                        title: 'All Jobs Report',
+                        className: 'btn btn-info btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5]
+                        },
+                        init: function(api, node, config) {
+                            $(node).hide();
+                        }
+                    }
+                ]
+            });
+
+            // Button handlers for all jobs table exports
+            $('#btn-csv-all').on('click', function() {
+                allJobsTable.button('.buttons-csv').trigger();
+            });
+            
+            $('#btn-excel-all').on('click', function() {
+                allJobsTable.button('.buttons-excel').trigger();
+            });
+            
+            $('#btn-print-all').on('click', function() {
+                allJobsTable.button('.buttons-print').trigger();
+            });
+        }
     });
 </script>
 {% endblock content %}

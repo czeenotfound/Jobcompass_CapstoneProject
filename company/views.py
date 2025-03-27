@@ -10,7 +10,7 @@ from django.db.models import Count, Avg, F
 
 from .models import Company, Employer
 from address.models import Address
-from job.models import Job, Application, ApplicationStatus, JobFair, Conversation, Message, JobFairRegistration, Interview, Offer, Feedback, Notification
+from job.models import Job, Application, ApplicationStatus, JobFair, Conversation, Message, JobFairRegistration, Interview, Offer, Feedback, Notification, RequiredSkill
 from users.models import User
 from resume.models import Resume
 
@@ -50,6 +50,7 @@ def manage_job_fair(request):
     else:
         messages.warning(request, 'Permission Denied')
         return redirect('dashboard')
+    
 @login_required(login_url='login')
 def job_analytics(request):
     if not request.user.is_employer:
@@ -133,6 +134,79 @@ def job_analytics(request):
     
     registered_job_fairs = JobFairRegistration.objects.filter(jobfair__company__user=request.user).count()
 
+    match_stats = {
+        'high_count': 0,
+        'medium_count': 0,
+        'low_count': 0,
+        'total_matches': 0
+    }
+    
+    # Track matched skills
+    skill_match_counts = {}
+    
+    # Analyze each job and update job_stats with match information
+    for i, job_stat in enumerate(job_stats):
+        job = job_stat['job']
+        required_skills = list(job.requiredskill_set.values_list('skill_name', flat=True))
+        
+        high_matches = 0
+        medium_matches = 0
+        low_matches = 0
+        
+        # Get applications for this job
+        applications = job.application_set.all()
+        for application in applications:
+            try:
+                resume = application.user.resume
+                resume_skills = list(resume.skills.values_list('name', flat=True))
+                
+                # Calculate match
+                if required_skills and resume_skills:
+                    matched_skills = []
+                    for skill in required_skills:
+                        if skill.lower() in [rs.lower() for rs in resume_skills]:
+                            matched_skills.append(skill)
+                            # Add to skill frequency counter
+                            if skill in skill_match_counts:
+                                skill_match_counts[skill] += 1
+                            else:
+                                skill_match_counts[skill] = 1
+                    
+                    if matched_skills:
+                        match_percentage = (len(matched_skills) / len(required_skills)) * 100
+                        
+                        if match_percentage >= 80:
+                            high_matches += 1
+                            match_stats['high_count'] += 1
+                        elif match_percentage >= 50:
+                            medium_matches += 1
+                            match_stats['medium_count'] += 1
+                        else:
+                            low_matches += 1
+                            match_stats['low_count'] += 1
+                        
+                        match_stats['total_matches'] += 1
+            except:
+                # Resume might not exist
+                pass
+        
+        # Update job_stats with match information
+        job_stats[i]['match_high_count'] = high_matches
+        job_stats[i]['match_medium_count'] = medium_matches
+        job_stats[i]['match_low_count'] = low_matches
+        job_stats[i]['match_total'] = high_matches + medium_matches + low_matches
+        
+        if job_stat['application_count'] > 0:
+            job_stats[i]['match_rate'] = round((job_stats[i]['match_total'] / job_stat['application_count']) * 100)
+        else:
+            job_stats[i]['match_rate'] = 0
+    
+    # Get top matched skills
+    top_skills = sorted(skill_match_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+    top_matched_skills = [skill for skill, count in top_skills]
+    top_matched_skills_counts = [count for skill, count in top_skills]
+    
+
     context = {
         'jobs': jobs,
         'job_stats': job_stats,
@@ -142,6 +216,9 @@ def job_analytics(request):
         'registered_job_fairs': registered_job_fairs,
         'dates': dates,
         'app_counts': app_counts,
+        'match_stats': match_stats,
+        'top_matched_skills': top_matched_skills,
+        'top_matched_skills_counts': top_matched_skills_counts,
     }
 
     return render(request, 'company/job-analytics.html', context)
@@ -153,8 +230,24 @@ def job_applicants(request, pk):
         applicants = job.application_set.all().order_by('-submit_date')
         interview_form = InterviewForm()
         offer_form = OfferForm()
-        feedback_form = FeedbackForm()
         
+        accepted_message = ("We're pleased to inform you that after careful consideration of your application, "
+                        "we believe your skills and experience align well with what we're looking for. "
+                        "We were particularly impressed with your qualifications and look forward to having you join our team.")
+        
+        rejected_message = ("After careful consideration of your application, we have decided to move forward with other candidates "
+                        "whose qualifications more closely align with our current needs. We appreciate your interest in our company "
+                        "and encourage you to apply for future positions that match your skills and experience.")
+        
+        # This will be used to populate the template's JavaScript
+        feedback_messages = {
+            'ACCEPTED': accepted_message,
+            'REJECTED': rejected_message
+        }
+        
+        # Regular form with empty initial value
+        feedback_form = FeedbackForm()
+
         # Handle status updates
         if request.method == 'POST':
             
@@ -292,7 +385,8 @@ def job_applicants(request, pk):
             'interview_form': interview_form,
             'offer_form': offer_form,
             'feedback_form': feedback_form,
-            'applicants': applicants
+            'applicants': applicants,
+            'feedback_messages': feedback_messages
         }
         return render(request, 'company/job-applicants.html', context)
     else:
@@ -357,7 +451,9 @@ def update_employer_profile(request):
             if employer_form.is_valid() and address_form.is_valid() and avatar_phone_form.is_valid():
                 # Save employer form
                 employer = employer_form.save()
-
+                user.first_name = avatar_phone_form.cleaned_data['first_name']
+                user.last_name = avatar_phone_form.cleaned_data['last_name']
+                
                 # Save the address and associate it with the employer
                 address = address_form.save()
                 employer.address = address

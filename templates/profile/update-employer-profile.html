@@ -63,7 +63,7 @@
             <form class="col-lg-10 card p-5 mb-5" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <h1 class="mb-4">Update Profile</h1>
-                <h4 id="personalinfo" class="form-label mb-3">Personal Information</h4>
+                <h4 id="personalinfo" class="form-label mb-3">Contact Person Information</h4>
                 <div class="row">
                     <div class="col-3 d-flex align-items-center justify-content-center">
                         {% if avatar_phone_form.avatar.value %}
@@ -90,8 +90,8 @@
                         {% render_field employer_form.first_name class="form-control" placeholder="Enter your first name" required=True%}
                     </div>
                     <div class="col-sm-3 mb-3">
-                        <label for="middle_name" class="form-label">Middle Name <span class="text-danger">*</span></label>
-                        {% render_field employer_form.middle_name class="form-control" placeholder="Enter your middle name" required=True%}
+                        <label for="middle_name" class="form-label">Middle Name</label>
+                        {% render_field employer_form.middle_name class="form-control" placeholder="Enter your middle name" %}
                     </div>
                     <div class="col-sm-4 mb-3">
                         <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
@@ -111,6 +111,11 @@
 
                 <!-- About Me -->
                 <div class="mb-3">
+                    <div class="col-sm-6 mb-3">
+                        <label for="location_job_type" class="form-label">Phone</label>
+                        {% render_field avatar_phone_form.phone class="form-control" required=True %}
+                    </div>
+
                     <label for="about_me" class="form-label">About Me</label>
                     {% render_field employer_form.about_me class="form-control" rows="4" %}
                 </div>

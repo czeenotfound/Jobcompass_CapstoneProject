@@ -28,11 +28,13 @@ class UserRegistrationForm(UserCreationForm):
 class UpdateAvatarPhoneForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['avatar', 'phone']
+        fields = ['avatar', 'phone', 'first_name', 'last_name']
 
         widgets = {
             'avatar': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}), 
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
 

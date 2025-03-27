@@ -69,22 +69,20 @@
             <p style="margin: 0">Your application status has been updated.</p>
         </div>
         
-        <p>Hello <strong>{{ application.user.first_name }}</strong>,</p>
+        <p>Hello <strong>{{ application.user.first_name|title }} {{ application.user.last_name|title }}</strong>,</p>
+        
         
         <p>Thank you for your interest in the <strong>{{ application.job.title }}</strong> position at <strong>{{ application.job.company.company_name }}</strong>.</p>
+        
+        {% if feedback %}
+        <p>{{ feedback.content }}</p>
+        {% endif %}
         
         <div class="job-details">
             <p style="margin: 5px 0"><strong>Position:</strong> {{ application.job.title }}</p>
             <p style="margin: 5px 0"><strong>Company:</strong> {{ application.job.company.company_name }}</p>
             <p style="margin: 5px 0"><strong>Application Date:</strong> {{ application.submit_date|date:"F j, Y" }}</p>
         </div>
-        
-        <p>After careful consideration, the employer has decided to move forward with other candidates whose qualifications more closely align with their current needs.</p>
-        
-        {% if feedback %}
-        <h3>Feedback from the employer:</h3>
-        <p style="font-style: italic; padding: 10px; background-color: #f9f9f9; border-radius: 5px; border-left: 3px solid #acd4ff;">{{ feedback.content }}</p>
-        {% endif %}
         
         <p>We appreciate your time and interest in this position and encourage you to continue exploring other opportunities on Job Compass that match your skills and experience.</p>
         

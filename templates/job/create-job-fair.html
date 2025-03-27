@@ -77,6 +77,17 @@
             </div>
             <form class="col-lg-10 card p-5 mb-5" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
+                {% csrf_token %}
+                <div class="d-flex align-items-center">
+                    <img src="{{user.company.avatar.url}}" alt="CompanyLogo" class="img-fluid rounded-circle company-logo me-3" style="width: 84px; height: 84px; padding: 3px ; border: 3px solid black;">
+                    <div>
+                        <span class="fs-1">{{ user.company.company_name }}</span>
+                        <p>Industry : <span class="fw-bold">{{user.company.industry}}</span></p>
+                    </div>
+                </div>
+
+                <hr>
+
                 <h1 class="mb-4">Post Job Fair</h1>
 
                 <h4 id="jobfairinfo" class="form-label mb-3">Job Fair Information</h4>
@@ -94,12 +105,11 @@
                 <hr>
                 
                 <div class="mb-3">
-                    <label for="jobfairtitle" class="form-label">Job Fair Title</label>
+                    <label for="jobfairtitle" class="form-label">Job Fair Title <span class="text-danger">*</span></label>
                     {% render_field form.title class="form-control fs-4 p-3" required=True %}
                 </div>
 
-                <div class="mb-3">
-                    <label for="jobfairtitle" class="form-label">Company's Industry</label>
+                <div class="mb-3 d-none">
                     <input type="text" disabled class="form-control" name="" id="" placeholder="{{user.company.industry}}">
                 </div>
 
@@ -125,7 +135,7 @@
                     </div>
                     <div class="col-sm-6 mb-3">
                         <label for="jobfairattendees" class="form-label">Attendees</label>
-                        {% render_field form.max_attendees class="form-control fs-4" required=True%}
+                        {% render_field form.max_attendees class="form-control fs-4" required=True %}
                     </div>
                 </div>
 

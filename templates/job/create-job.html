@@ -68,6 +68,9 @@
                             <a href="#jobidealcandidates" class="nav-link px-2">Ideal Candidate</a>
                         </li>
                         <li class="nav-item">
+                            <a href="#requiredskills" class="nav-link px-2">Skill</a>
+                        </li>
+                        <li class="nav-item">
                             <a href="#education" class="nav-link px-2">Education</a>
                         </li>
                         <li class="nav-item">
@@ -75,9 +78,6 @@
                         </li>
                         <li class="nav-item">
                             <a href="#jobresponsibilities" class="nav-link px-2">Responsibility</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#requiredskills" class="nav-link px-2">Skill</a>
                         </li>
                         <li class="nav-item">
                             <a href="#requiredexp" class="nav-link px-2">Experience</a>
@@ -93,16 +93,25 @@
             </div>
             <form class="col-lg-10 card p-5 mb-5" method="POST" >
                 {% csrf_token %}
-                <h1 class="mb-4">Post a Job</h1>
+                <div class="d-flex align-items-center">
+                    <img src="{{user.company.avatar.url}}" alt="CompanyLogo" class="img-fluid rounded-circle company-logo me-3" style="width: 84px; height: 84px; padding: 3px ; border: 3px solid black;">
+                    <div>
+                        <span class="fs-1">{{ user.company.company_name }}</span>
+                        <p>Industry : <span class="fw-bold">{{user.company.industry}}</span></p>
+                    </div>
+                </div>
 
+                <hr>
+
+                <h1 class="mb-4">Post a Job</h1>
+                
                 <h4 id="jobinfo" class="form-label mb-3">Job Information</h4>
                 
                 <div class="mb-3">
-                    <label for="jotitle" class="form-label">Job Title <span class="text-danger">*</span></label>
+                    <label for="jobtitle" class="form-label">Job Title <span class="text-danger">*</span></label>
                     {% render_field form.title class="form-control fs-4 p-3" required="True"%}
                 </div>
-                <div class="mb-3">
-                    <label for="jobIndustry" class="form-label">Company's Industry</label>
+                <div class="mb-3 d-none">
                     <input type="text" disabled class="form-control" placeholder="{{user.company.industry}}">
                 </div>
                 <div class="row">
@@ -191,6 +200,41 @@
                     </div>
                 </div>
                 
+                <hr>
+                <!-- Skills Section -->
+                <div id="requiredskills" class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="fs-2 mb-0">
+                            Required Skills
+                        </label>
+                    </div>
+                    <div id="skills-container">
+                        {{ skill_formset.management_form }}
+                        {% for form in skill_formset %}
+                            <div class="formset-form skill-form row mb-2">
+                                <div class="col-md-10">
+                                    <div class="input-group mb-2">
+                                        {% render_field form.skill_name class="form-control skill-input p-3" placeholder="Enter or select a skill..." %}
+                                        <div class="skill-results dropdown-menu w-100" style="display: none;"></div>  <!-- Ensure this is always present -->
+                                    </div>
+                                    
+                                </div>
+                                <div class="col-md-2 remove-form-container">
+                                    <!-- Regular DELETE field but hidden with CSS -->
+                                    <div style="display: none;">
+                                        {{ form.DELETE }}
+                                    </div>
+                                        
+                                    <!-- Remove button -->
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-form-btn">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
                 <hr>
 
                 <div id="education" class="mb-3">
@@ -337,42 +381,6 @@
                         border-radius: 0.25rem !important;
                     }
                 </style>
-
-                <!-- Skills Section -->
-                <div id="requiredskills" class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <label class="fs-2 mb-0">
-                            Required Skills
-                        </label>
-                    </div>
-                    <div id="skills-container">
-                        {{ skill_formset.management_form }}
-                        {% for form in skill_formset %}
-                            <div class="formset-form skill-form row mb-2">
-                                <div class="col-md-10">
-                                    <div class="input-group mb-2">
-                                        {% render_field form.skill_name class="form-control skill-input p-3" placeholder="Enter or select a skill..." %}
-                                        <div class="skill-results dropdown-menu w-100" style="display: none;"></div>  <!-- Ensure this is always present -->
-                                    </div>
-                                    
-                                </div>
-                                <div class="col-md-2 remove-form-container">
-                                    <!-- Regular DELETE field but hidden with CSS -->
-                                    <div style="display: none;">
-                                        {{ form.DELETE }}
-                                    </div>
-                                        
-                                    <!-- Remove button -->
-                                    <button type="button" class="btn btn-outline-danger btn-sm remove-form-btn">
-                                        <i class="fa-solid fa-xmark"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <hr>
 
                 <!-- Experience Section -->
                 <div id="requiredexp" class="mb-3">

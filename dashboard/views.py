@@ -30,7 +30,7 @@ def dashboard(request):
         company = Company.objects.get(user=request.user)
         company_jobs = Job.objects.filter(company=company, is_available=True)
         company_industries = company_jobs.values_list('industry', flat=True).distinct()
-        
+
         base_queryset = Resume.objects.filter(user__has_resume=True) \
             .select_related('user', 'address') \
             .prefetch_related(

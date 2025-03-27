@@ -22,9 +22,11 @@
         <div class="row">
             {% include 'admin/admin-sidebar.html' %}
             
-            {% block content %}
-            
-            {% endblock content %}
+            <div style="margin-top: 100px;">
+                {% block content %}
+                
+                {% endblock content %}
+            </div>
 
             {% include 'admin/admin-footer.html' %}
         </div>

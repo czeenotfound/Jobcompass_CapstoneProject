@@ -7,8 +7,13 @@
                 </p>
             </div>
             <div class="col-6 text-end">
-                &copy; 2024 Job Compass. All rights reserved.
+                &copy; <span id="currentYear"></span> Job Compass. All rights reserved.
             </div>
         </div>
     </div>
 </footer>
+
+<script>
+    // Get the current year and set it in the footer
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+</script>

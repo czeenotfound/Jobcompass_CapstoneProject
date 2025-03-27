@@ -222,9 +222,27 @@ class FeedbackForm(forms.ModelForm):
         model = Feedback
         fields = ['content']
         widgets = {
-            'content': forms.Textarea(attrs={'rows': 3}),
+            'content': forms.Textarea(attrs={
+                'rows': 3,
+                'class': 'form-control'
+            }),
         }
 
+    def __init__(self, *args, status=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        if status == 'ACCEPTED':
+            default_message = ("We're pleased to inform you that after careful consideration of your application, "
+                             "we believe your skills and experience align well with what we're looking for. "
+                             "We were particularly impressed with your qualifications and look forward to having you join our team.")
+        elif status == 'REJECTED':
+            default_message = ("After careful consideration of your application, we have decided to move forward with other candidates "
+                             "whose qualifications more closely align with our current needs. We appreciate your interest in our company "
+                             "and encourage you to apply for future positions that match your skills and experience.")
+        else:
+            default_message = ""
+            
+        self.fields['content'].initial = default_message
 
 # JOB FAIR
 
