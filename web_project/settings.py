@@ -162,7 +162,7 @@ DATABASES = {
     "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
 }
 
-# postgresql://jobcompass_app_user:jSrQGtdfpdxWEVbtaHF2172dNK8OMfOi@dpg-ct684k3v2p9s7398nk1g-a.singapore-postgres.render.com/jobcompass_app
+# postgresql://jobcompass_db_aadd_user:0G0A9Htj6s0arGsBlqgJsL2pQDpqeAWM@dpg-d072hrruibrs73f2qim0-a.singapore-postgres.render.com/jobcompass_db_aadd
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
