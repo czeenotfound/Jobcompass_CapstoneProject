@@ -18,8 +18,7 @@ A comprehensive job search platform that connects job seekers with employers.
 - **Database**: PostgreSQL
 - **File Storage**: Cloudinary
 - **Authentication**: Custom email-based authentication with OTP verification
-- **Frontend Enhancements**: HTMX for dynamic content
-- **Styling**: Widget Tweaks
+- **Styling**: Widget Tweaks, Bootstrap 5, Vanilla CSS
 - **Deployment**: Whitenoise for static files, configured for Render
 
 ## Setup
