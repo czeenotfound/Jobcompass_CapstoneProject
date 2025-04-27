@@ -100,7 +100,7 @@ The application is configured for deployment on Render. Set the following enviro
 
 ## License
 
-[Your License Here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
