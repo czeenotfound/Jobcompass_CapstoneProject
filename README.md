@@ -1,4 +1,4 @@
-# JobCompass
+# Job Compass: Career Guidance for Job Seekers
 
 A comprehensive job search platform that connects job seekers with employers.
 
