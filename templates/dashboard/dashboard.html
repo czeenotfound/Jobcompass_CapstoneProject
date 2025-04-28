@@ -1093,6 +1093,7 @@
                     </div>
                     <p id="confirmMessage">Are you sure you want to perform this action?</p>
                 </div>
+
                 <div class="modal-footer justify-content-end">
                     <button type="button" class="btn customButton btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <a id="confirmActionButton" href="#" class="btn customButton btn-primary">Confirm</a>
@@ -1141,23 +1142,43 @@
     });
 
     function showConfirmModal({ title, message, actionUrl, theme = "primary", icon = "exclamation-circle" }) {
-        document.getElementById("confirmModalLabel").textContent = title;
-        document.getElementById("confirmMessage").textContent = message;
+        // Update modal title
+        document.getElementById("confirmModalLabel").textContent = title || "Confirm Action";
+        
+        // Update modal message
+        document.getElementById("confirmMessage").textContent = message || "Are you sure you want to perform this action?";
+        
+        // Update action button URL
         document.getElementById("confirmActionButton").href = actionUrl;
-
-        // Update icon dynamically
+        
+        // Update icon
         document.getElementById("confirmIcon").innerHTML = `<i class="bi bi-${icon} text-${theme}" style="font-size: 2rem;"></i>`;
-
+        
         // Update modal header background
         document.querySelector("#confirmModal .modal-header").className = `modal-header bg-${theme} text-white`;
         
-        // Update button color
-        document.getElementById("confirmActionButton").className = `btn btn-${theme}`;
-
+        // Update confirm button style
+        document.getElementById("confirmActionButton").className = `btn customButton btn-${theme}`;
+        
         // Show modal
         new bootstrap.Modal(document.getElementById("confirmModal")).show();
     }
 
+    // Add click handler for unapply buttons
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmModal"]').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                showConfirmModal({
+                    title: "Cancel Application",
+                    message: "Are you sure you want to withdraw your application? This action cannot be undone.",
+                    actionUrl: this.getAttribute('data-action-url'),
+                    theme: "danger",
+                    icon: "exclamation-triangle"
+                });
+            });
+        });
+    });
 
     // Helper function to get CSRF token
     function getCookie(name) {
