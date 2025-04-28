@@ -82,6 +82,15 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
+8. Import initial data
+```
+# Import industries data
+python manage.py add_industries
+
+# Import skills data
+python manage.py import_skills
+```
+
 ### Production Deployment
 
 The application is configured for deployment on Render. Set the following environment variables:
