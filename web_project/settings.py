@@ -90,12 +90,12 @@ AUTH_USER_MODEL = 'users.User'
 
 # OTP PURPOSES ==============================
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'email'
-EMAIL_HOST_PASSWORD = 'yourapppassword'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = SMTP
+# EMAIL_PORT = port
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = email
+# EMAIL_HOST_PASSWORD = yourapppassword
 
 # ============================================ 
 
@@ -225,9 +225,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # cloudinary 
 
 cloudinary.config(
-    cloud_name = "di2hrzuyq",
-    api_key = "851264126552968",
-    api_secret = "GzOPXkOsSrDbOqvmXELiLdkEDNo",
+    cloud_name = CLOUDNAME,
+    api_key = KEY,
+    api_secret = API,
 
 )
 
