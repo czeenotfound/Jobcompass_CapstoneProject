@@ -39,7 +39,7 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 
-# UNCOMMENT THIS FOR PRODUCTION 
+# UNCOMMENT THIS FOR PRODUCTION (USING RENDER)
 
 # DEBUG = not os.environ.get("DATABASE_URL")  # False in production, True in development
 
@@ -109,8 +109,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-   
 
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
@@ -228,7 +226,6 @@ cloudinary.config(
     cloud_name = "di2hrzuyq",
     api_key = "851264126552968",
     api_secret = "GzOPXkOsSrDbOqvmXELiLdkEDNo",
-
 )
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
