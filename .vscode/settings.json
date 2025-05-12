@@ -3,5 +3,5 @@
     "vscode-pets.position": "explorer",
     "vscode-pets.throwBallWithMouse": true,
     "liveServer.settings.port": 5501,
-    "python.defaultInterpreterPath": "$jobcompass_django\\venv\\Scripts\\python.exe"
+    "python.defaultInterpreterPath": "${workplaceFolder}\\venv\\Scripts\\python.exe"
 }
