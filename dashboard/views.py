@@ -23,14 +23,85 @@ from django.db.models.functions import Lower
 
 
 # # Create your views here.
+"""
+Job Recommendation System Overview:
+
+For Job Seekers:
+---------------
+The system recommends jobs based on multiple matching criteria:
+
+1. Base Matching:
+   - Industry match between job and resume
+   - Employment type match (full-time, part-time, etc.)
+   - Location type match (remote, on-site, etc.)
+
+2. Skills Matching:
+   - Exact matches: Direct skill name matches
+   - Fuzzy matches: Similar skills with >70% similarity
+   - Tracks unmatched required skills
+   - Fuzzy matches count as 0.5 of exact matches
+
+3. Education Matching:
+   - Matches education level requirements
+   - Matches specific degree requirements
+   - Both level and degree must match for full score
+
+4. Experience Matching:
+   - Checks total years of experience
+   - Handles both fixed years and range requirements
+   - Considers role similarity and description matches
+
+5. Final Scoring:
+   - Uses weighted scoring system:
+     * Industry match: 1 point
+     * Employment match: 1 point
+     * Location match: 1 point
+     * Skills match: 1 point per skill
+     * Education match: 1 point
+     * Experience match: 1 point
+   - Categories:
+     * Best Match: ≥70% match
+     * Good Match: 50-69% match
+     * Not Suitable: <30% match
+
+For Employers:
+-------------
+The system helps find suitable candidates through:
+
+1. Base Matching:
+   - Matches candidates to company's industry
+   - Matches employment preferences
+   - Matches location preferences
+
+2. Skills Analysis:
+   - Compares candidate skills with job requirements
+   - Uses exact and fuzzy matching (>70% similarity)
+   - Partial matches worth 50% of exact matches
+
+3. Match Scoring:
+   - Calculates overall match percentage
+   - Categories:
+     * Best Match: ≥70% match
+     * Good Match: 50-69% match
+     * Not Suitable: <30% match
+
+The system uses weighted scoring and fuzzy matching to ensure:
+- Similar skills aren't missed due to terminology differences
+- All relevant factors are considered in the final score
+- Both job seekers and employers get relevant matches
+"""
+
 @login_required(login_url='login')
 def dashboard(request):
     try:
+        # EMPLOYER VIEW
+        # Get employer and company information
         employer = Employer.objects.get(user=request.user)
         company = Company.objects.get(user=request.user)
         company_jobs = Job.objects.filter(company=company, is_available=True)
         company_industries = company_jobs.values_list('industry', flat=True).distinct()
 
+        # Initialize resume queryset with all necessary related data
         base_queryset = Resume.objects.filter(user__has_resume=True) \
             .select_related('user', 'address') \
             .prefetch_related(
@@ -42,6 +113,7 @@ def dashboard(request):
                 'social_links'
             )
 
+        # Calculate base matching scores for resumes
         annotated_resumes = base_queryset.annotate(
             industry_match=Case(
                 When(industry__in=company_industries, then=1),
@@ -61,6 +133,7 @@ def dashboard(request):
             total_match_score=F('industry_match') + F('employment_match') + F('location_match')
         ).order_by('-total_match_score', '?')
 
+        # Filter resumes by company industry if specified
         if company.industry:
             annotated_resumes = annotated_resumes.filter(
                 Q(industry=company.industry)
@@ -68,6 +141,7 @@ def dashboard(request):
 
         resume_filter = Resumefilter(request.GET, queryset=annotated_resumes)
         
+        # For each resume, calculate detailed matches with company jobs
         for resume in resume_filter.qs:
             applicant_skills = list(resume.skills.values_list('name', flat=True))
             applicant_skills_lower = [skill.lower() for skill in applicant_skills]
@@ -78,6 +152,7 @@ def dashboard(request):
                 matches = []
                 skill_matches = []
                 
+                # Calculate base matches (industry, employment, location)
                 if resume.industry == job.industry:
                     job_match_score += 1
                     matches.append('Industry')
@@ -90,11 +165,13 @@ def dashboard(request):
                     job_match_score += 1
                     matches.append('Location Type')
                 
+                # Check education requirements match
                 if any(edu.education_level in Job_Education.objects.filter(job=job).values_list('education_level', flat=True) 
                       for edu in resume.education.all()):
                     job_match_score += 1
                     matches.append('Education')
                 
+                # Perform detailed skill matching
                 job_skills = list(job.requiredskill_set.values_list('skill_name', flat=True))
                 job_skills_lower = [skill.lower() for skill in job_skills]
                 
@@ -102,9 +179,11 @@ def dashboard(request):
                 fuzzy_matches = []
                 unmatched_skills = []
                 
+                # Check for exact and fuzzy skill matches
                 for job_skill in job_skills:
                     job_skill_lower = job_skill.lower()
                     
+                    # Check for exact matches first
                     if job_skill_lower in applicant_skills_lower:
                         original_skill = next((s for s in applicant_skills if s.lower() == job_skill_lower), job_skill)
                         exact_matches.append({
@@ -116,6 +195,7 @@ def dashboard(request):
                         skill_matches.append(job_skill)
                         continue
                     
+                    # If no exact match, try fuzzy matching
                     best_match = None
                     best_score = 0
                     
@@ -136,36 +216,37 @@ def dashboard(request):
                     else:
                         unmatched_skills.append(job_skill)
                 
+                # Calculate final skill match score (exact = 1, fuzzy = 0.5)
                 skill_match_score = len(exact_matches) + (len(fuzzy_matches) * 0.5)
                 
                 if skill_match_score > 0:
                     job_match_score += min(skill_match_score, 2) 
                     matches.append('Skills')
-                
-                skill_match_details = {
-                    'exact_matches': exact_matches,
-                    'fuzzy_matches': fuzzy_matches,
-                    'unmatched_skills': unmatched_skills,
-                    'skill_match_score': skill_match_score,
-                    'matched_skills': skill_matches
-                }
-                
+
+                # Store all match details for the job
                 if job_match_score > 0:
                     matching_jobs.append({
                         'job': job,
                         'match_score': job_match_score,
                         'matching_criteria': matches,
-                        'skill_match_details': skill_match_details
+                        'skill_match_details': {
+                            'exact_matches': exact_matches,
+                            'fuzzy_matches': fuzzy_matches,
+                            'unmatched_skills': unmatched_skills,
+                            'skill_match_score': skill_match_score,
+                            'matched_skills': skill_matches
+                        }
                     })
             
+            # Sort jobs by match score and calculate match percentage
             matching_jobs.sort(key=lambda x: x['match_score'], reverse=True)
             resume.matching_jobs = matching_jobs
             
             max_score = 5
-            
             best_job_score = matching_jobs[0]['match_score'] if matching_jobs else 0
             match_percentage = (best_job_score / max_score) * 100
             
+            # Categorize match quality
             resume.best_match = match_percentage >= 70
             resume.good_match = 50 <= match_percentage < 70
             resume.not_suitable = match_percentage < 30
@@ -185,22 +266,23 @@ def dashboard(request):
         resume_filtered_count = 0
         company_jobs = []
     
-    # Fetch the user's resume
-    
+    # JOB SEEKER VIEW
     try:
         resume = Resume.objects.get(user=request.user)
     except Resume.DoesNotExist:
         resume = None
 
     if resume:
+        # Initialize job queryset
         base_queryset = Job.objects.filter(is_available=True)
-
         job_filter = Jobfilter(request.GET, queryset=base_queryset)
         filtered_jobs = job_filter.qs
 
+        # Get applicant skills for matching
         applicant_skills = list(resume.skills.values_list('name', flat=True))
         applicant_skills_lower = [skill.lower() for skill in applicant_skills]
 
+        # Calculate base matching scores for jobs
         recommended_jobs = filtered_jobs.annotate(
             industry_match=Case(
                 When(industry=resume.industry, then=1), 
@@ -231,6 +313,7 @@ def dashboard(request):
             )
         )
 
+        # Filter jobs by industry match
         recommended_jobs = recommended_jobs.filter(
             Q(industry=resume.industry)
         ).distinct() 
@@ -238,6 +321,7 @@ def dashboard(request):
         job_list = list(recommended_jobs)
         final_jobs = []
         
+        # Calculate detailed matches for each job
         for job in job_list:
             job_skills = list(job.requiredskill_set.values_list('skill_name', flat=True))
             job_skills_lower = [skill.lower() for skill in job_skills]

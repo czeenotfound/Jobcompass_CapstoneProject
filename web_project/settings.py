@@ -38,7 +38,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default='django-insecure-j@+x+5zwid@6k
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
-
+'''
 # UNCOMMENT THIS FOR PRODUCTION (USING RENDER)
 
 # DEBUG = not os.environ.get("DATABASE_URL")  # False in production, True in development
@@ -48,7 +48,7 @@ ALLOWED_HOSTS = ["*"]
 # RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 # if RENDER_EXTERNAL_HOSTNAME:
 #     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
+'''
 # ===================================================================================================
 
 # Application definition
@@ -88,7 +88,22 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'users.User'
 
-# OTP PURPOSES ==============================
+'''
+# Verify-email PURPOSES ==============================
+# To set up email configuration (using Gmail as an example):
+# 1. Go to your Google Account settings (https://myaccount.google.com)
+# 2. Enable 2-Step Verification if not already enabled
+# 3. Go to Security > 2-Step Verification > App passwords
+# 4. Create a new app password:
+#    - Select 'Mail' as the app
+#    - Select your device
+#    - Click 'Generate'
+# 5. Use the generated 16-character password as EMAIL_HOST_PASSWORD
+# 6. Configure the settings below with your details:
+#    - EMAIL_HOST_USER: Your full Gmail address
+#    - EMAIL_HOST_PASSWORD: Your generated app password
+'''
+# Uncomment the following lines to enable Verify Email
 
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_HOST = SMTP
@@ -219,14 +234,25 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  
 
+'''
+    # cloudinary 
+    # To create a Cloudinary account and set up cloud storage:
+    # 1. Go to https://cloudinary.com and sign up for a free account
+    # 2. After registration, go to your Cloudinary Dashboard
+    # 3. Find your account credentials under 'Account Details':
+    #    - Cloud name
+    #    - API Key
+    #    - API Secret
+    # 4. Use these credentials in the configuration below
+    # 5. Make sure to store these values as environment variables in production
 
-# cloudinary 
+UNCOMMENT THE LINES BELOW AND FILL IN THE VALUES
 
+'''
 cloudinary.config(
     cloud_name = CLOUDNAME,
     api_key = KEY,
     api_secret = API,
-
 )
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
