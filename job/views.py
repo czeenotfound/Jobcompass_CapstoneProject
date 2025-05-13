@@ -143,86 +143,114 @@ def job_savedjobs(request):
     }
     return render(request, 'applicant/job-savedjobs.html', context)
 
+"""
+Application Analytics System Overview:
+
+This view provides comprehensive analytics for job applications, including:
+1. Application Status Distribution
+2. Success Rates
+3. Industry-wise Applications
+4. Salary Analysis
+5. Timeline Analysis
+6. Job Type Distribution
+
+The system calculates:
+- Response rates
+- Interview success rates
+- Offer success rates
+- Monthly application trends
+- Industry preferences
+"""
+
 @login_required(login_url='login')
 def application_analytics(request):
-    # Ensure the user is authenticated
+    # Ensure user authentication
     if not request.user.is_authenticated:
         return redirect('login')
 
-    # Fetch all applications for the logged-in user
-    applications = Application.objects.filter(user=request.user).select_related('job', 'job__company', 'applicationstatus', 'job__industry')
+    # Fetch all applications with related data for efficient querying
+    applications = Application.objects.filter(user=request.user).select_related(
+        'job', 
+        'job__company', 
+        'applicationstatus', 
+        'job__industry'
+    )
     
-    # Total number of applications
+    # Calculate total number of applications
     total_jobs = applications.count()
 
-    # Get the count of applications by status
-    status_counts = applications.values('applicationstatus__status').annotate(count=Count('applicationstatus')).order_by('-count')
+    # Get application status distribution
+    # Groups applications by status and counts them
+    status_counts = applications.values('applicationstatus__status')\
+        .annotate(count=Count('applicationstatus'))\
+        .order_by('-count')
     status_labels = [item['applicationstatus__status'] for item in status_counts if item['applicationstatus__status']]
     status_values = [item['count'] for item in status_counts if item['applicationstatus__status']]
 
-    # Count specific status values
+    # Count specific status occurrences for detailed analysis
     accepted_count = next((item['count'] for item in status_counts if item['applicationstatus__status'] == 'ACCEPTED'), 0)
     rejected_count = next((item['count'] for item in status_counts if item['applicationstatus__status'] == 'REJECTED'), 0)
     interview_count = next((item['count'] for item in status_counts if item['applicationstatus__status'] == 'INTERVIEW'), 0)
     offered_count = next((item['count'] for item in status_counts if item['applicationstatus__status'] == 'OFFERED'), 0)
     
-    # Calculate response rate (applications that moved beyond SUBMITTED)
+    # Calculate response rate
+    # Response rate = (Applications with status other than SUBMITTED) / Total applications
     total_responded = sum(item['count'] for item in status_counts 
                           if item['applicationstatus__status'] and item['applicationstatus__status'] != 'SUBMITTED')
     response_rate = (total_responded / total_jobs * 100) if total_jobs > 0 else 0
     
     # Calculate interview success rate
+    # Success = (Interviews + Offers + Acceptances) / Total applications
     interview_success_rate = ((interview_count + offered_count + accepted_count) / total_jobs * 100) if total_jobs > 0 else 0
     
     # Calculate offer success rate
+    # Success = (Offers + Acceptances) / Total applications
     offer_success_rate = ((offered_count + accepted_count) / total_jobs * 100) if total_jobs > 0 else 0
 
-    # Count of applications per industry
+    # Analyze applications by industry
+    # Groups applications by industry and counts them
     industry_counts = applications.values(
         'job__industry__name'
     ).annotate(count=Count('job__industry__name')).order_by('-count')
 
-    # Collect industry names and counts
+    # Extract industry data for visualization
     industry_names = [item['job__industry__name'] for item in industry_counts if item['job__industry__name']]
     industry_values = [item['count'] for item in industry_counts if item['job__industry__name']]
 
-    # Salary data for jobs
+    # Analyze salary ranges in applications
     salary_data = applications.values(
         'job__salary_min', 'job__salary_max'
     )
 
     # Calculate average salary for each application
     salary_averages = [
-        (item['job__salary_min'] + item['job__salary_max']) / 2 if item['job__salary_min'] and item['job__salary_max'] else 0
+        (item['job__salary_min'] + item['job__salary_max']) / 2 
+        if item['job__salary_min'] and item['job__salary_max'] else 0
         for item in salary_data
     ]
     
-    # Get applications over time (by month)
+    # Analyze application timeline
+    # Groups applications by month to show application trends
     from django.db.models.functions import TruncMonth
     apps_by_month = applications.annotate(
         month=TruncMonth('submit_date')
     ).values('month').annotate(count=Count('id')).order_by('month')
     
-    # Format for chart
+    # Format timeline data for visualization
     months = [item['month'].strftime('%b %Y') if item['month'] else 'Unknown' for item in apps_by_month]
     monthly_counts = [item['count'] for item in apps_by_month]
     
-    # Job type breakdown
+    # Analyze job type distribution
+    # Groups applications by employment type
     job_type_counts = applications.values('job__employment_job_type').annotate(
         count=Count('job__employment_job_type')
     ).order_by('-count')
     
+    # Extract job type data for visualization
     job_types = [item['job__employment_job_type'] for item in job_type_counts if item['job__employment_job_type']]
     job_type_values = [item['count'] for item in job_type_counts if item['job__employment_job_type']]
     
-    # Response time analysis - get average days to first status change
-    from django.db.models import F
-    from django.db.models.functions import ExtractDay
-    
-    # Get applications with status changes
-    applications_with_status = applications.filter(applicationstatus__isnull=False)
-    
-    # Pass the data to the template
+    # Prepare context with all analytics data
     context = {
         'applications': applications,
         'total_jobs': total_jobs,
@@ -277,13 +305,35 @@ class JobEducationFormSet(BaseInlineFormSet):
         pass
  
  
+"""
+Job Creation System Overview:
+
+This view handles the creation of job postings with multiple related components:
+1. Main job details (title, description, salary, etc.)
+2. Required skills
+3. Job responsibilities
+4. Ideal candidate qualifications
+5. Job benefits
+6. Experience requirements
+7. Education requirements
+
+The system implements:
+- Company verification checks
+- Multiple form handling with formsets
+- Location handling (company or custom)
+- Comprehensive error handling
+- Form validation
+"""
+
 @login_required(login_url='login')
 def create_job(request): 
+    # Check if user is an employer and has a company
     if request.user.is_employer and request.user.has_company:
         try:
             company = Company.objects.get(user=request.user)
 
-            # Check company verification status
+            # Verify company status before allowing job posting
+            # Companies must be verified to post jobs
             if company.verification_status == "Pending":
                 messages.warning(request, "Your company verification is pending. You cannot post a job until it is verified.")
                 return redirect('dashboard')  
@@ -294,7 +344,11 @@ def create_job(request):
             messages.error(request, "You do not have a company profile. Please create one first.")
             return redirect('register-company') 
 
-        # Create formsets with custom base formset for validation
+        # Initialize formsets for all job components
+        # Each formset allows adding multiple entries with a delete option
+        # extra=1 means one empty form is shown by default
+        
+        # Skills formset - for required job skills
         SkillFormSet = inlineformset_factory(
             Job, 
             RequiredSkill, 
@@ -304,6 +358,7 @@ def create_job(request):
             can_delete=True
         )
          
+        # Responsibilities formset - for job duties
         ResponsibilityFormSet = inlineformset_factory(
             Job, 
             Job_Responsibilities, 
@@ -313,6 +368,7 @@ def create_job(request):
             can_delete=True
         )
 
+        # Ideal Candidate formset - for desired candidate traits
         IdealCandidateFormSet = inlineformset_factory(
             Job, 
             Job_IdealCandidates, 
@@ -322,6 +378,7 @@ def create_job(request):
             can_delete=True
         )
 
+        # Benefits formset - for job perks and benefits
         BenefitsFormSet = inlineformset_factory(
             Job, 
             Job_Benefits, 
@@ -331,6 +388,7 @@ def create_job(request):
             can_delete=True
         )
 
+        # Experience formset - for required work experience
         ExperienceFormSet = inlineformset_factory(
             Job, 
             Job_Experience, 
@@ -340,6 +398,7 @@ def create_job(request):
             can_delete=True
         )
 
+        # Education formset - for required education qualifications
         EducationFormSet = inlineformset_factory(
             Job, 
             Job_Education, 
@@ -350,7 +409,9 @@ def create_job(request):
         )
 
         if request.method == 'POST':
+            # Handle form submission
             form = CreateJobForm(request.POST)
+            # Initialize all formsets with POST data
             skill_formset = SkillFormSet(request.POST, prefix='skills')
             responsibility_formset = ResponsibilityFormSet(request.POST, prefix='responsibilities')
             idealcandidate_formset = IdealCandidateFormSet(request.POST, prefix='idealcandidates')
@@ -360,24 +421,28 @@ def create_job(request):
     
             form_errors = []
 
+            # Validate main form and all formsets
             if form.is_valid():
                 if skill_formset.is_valid() and responsibility_formset.is_valid() and idealcandidate_formset.is_valid() and benefits_formset.is_valid() and experience_formset.is_valid() and education_formset.is_valid():
+                    # Save job but don't commit to DB yet
                     var = form.save(commit=False)
                     var.user = request.user
                     var.company = request.user.company
-                    company_industry = request.user.company.industry
                     
+                    # Set industry from company profile
+                    company_industry = request.user.company.industry
                     if company_industry:
                         var.industry = company_industry
                     else:
                         messages.warning(request, 'Your company does not have an associated industry.')
                         return redirect('create-job')
 
-                    # Check if the employer wants to use the company location
+                    # Handle job location
+                    # Option to use company address or specify custom address
                     use_company_location = request.POST.get('use_company_location') == 'true'
 
                     if use_company_location:
-                        # Use the company's address as the job location
+                        # Use company's existing address
                         company_location = request.user.company.address
                         if company_location:
                             var.location = company_location
@@ -385,7 +450,7 @@ def create_job(request):
                             messages.warning(request, 'Your company does not have a valid address.')
                             return redirect('create-job')
                     else:
-                        # Create or update a custom Address
+                        # Create new address for the job
                         location, created = Address.objects.get_or_create(
                             country=request.POST.get('country'),
                             countrypostal=request.POST.get('countrypostal'),
@@ -394,9 +459,11 @@ def create_job(request):
                             street=request.POST.get('street', '')
                         )
                         var.location = location
+                    
+                    # Save the main job posting
                     var.save()
 
-                    # Save formsets
+                    # Associate formsets with the job and save them
                     skill_formset.instance = var
                     responsibility_formset.instance = var
                     idealcandidate_formset.instance = var
@@ -404,6 +471,7 @@ def create_job(request):
                     experience_formset.instance = var
                     education_formset.instance = var
                     
+                    # Save all formsets
                     skill_formset.save()
                     responsibility_formset.save()
                     idealcandidate_formset.save()
@@ -414,7 +482,10 @@ def create_job(request):
                     messages.info(request, 'New Job has been created')
                     return redirect('dashboard')
                 else:
-                    # Collect formset errors
+                    # Detailed error collection for each formset
+                    # This helps users identify exactly what needs to be fixed
+                    
+                    # Skills formset errors
                     if not skill_formset.is_valid():
                         for error in skill_formset.non_form_errors():
                             form_errors.append(f"Skills Error: {error}")
@@ -422,6 +493,7 @@ def create_job(request):
                             if form_errors_list:
                                 form_errors.append(f"Skill {i} Error: {form_errors_list}")
                     
+                    # Responsibilities formset errors
                     if not responsibility_formset.is_valid():
                         for error in responsibility_formset.non_form_errors():
                             form_errors.append(f"Responsibilities Error: {error}")
@@ -429,6 +501,7 @@ def create_job(request):
                             if form_errors_list:
                                 form_errors.append(f"Responsibility {i} Error: {form_errors_list}")
                     
+                    # Ideal candidates formset errors
                     if not idealcandidate_formset.is_valid():
                         for error in idealcandidate_formset.non_form_errors():
                             form_errors.append(f"Ideal Candidates Error: {error}")
@@ -436,6 +509,7 @@ def create_job(request):
                             if form_errors_list:
                                 form_errors.append(f"Ideal Candidate {i} Error: {form_errors_list}")
 
+                    # Benefits formset errors
                     if not benefits_formset.is_valid():
                         for error in benefits_formset.non_form_errors():
                             form_errors.append(f"Benefits Error: {error}")
@@ -443,6 +517,7 @@ def create_job(request):
                             if form_errors_list:
                                 form_errors.append(f"Benefit {i} Error: {form_errors_list}")
                     
+                    # Experience formset errors
                     if not experience_formset.is_valid():
                         for error in experience_formset.non_form_errors():
                             form_errors.append(f"Experiences Error: {error}")
@@ -450,6 +525,7 @@ def create_job(request):
                             if form_errors_list:
                                 form_errors.append(f"Experience {i} Error: {form_errors_list}")
 
+                    # Education formset errors
                     if not education_formset.is_valid():
                         for error in education_formset.non_form_errors():
                             form_errors.append(f"Educations Error: {error}")
@@ -457,6 +533,7 @@ def create_job(request):
                             if form_errors_list:
                                 form_errors.append(f"Education {i} Error: {form_errors_list}")
 
+            # Prepare context with forms and errors
             context = {
                 'form': form,
                 'skill_formset': skill_formset,
@@ -471,7 +548,8 @@ def create_job(request):
             return render(request, 'job/create-job.html', context)
         
         else:
-            # GET request
+            # Handle GET request
+            # Initialize empty forms and formsets
             form = CreateJobForm()
             skill_formset = SkillFormSet(prefix='skills')
             responsibility_formset = ResponsibilityFormSet(prefix='responsibilities')
@@ -480,6 +558,7 @@ def create_job(request):
             experience_formset = ExperienceFormSet(prefix='experiences')
             education_formset = EducationFormSet(prefix="education")
             
+            # Prepare context for rendering empty form
             context = {
                 'form': form,
                 'skill_formset': skill_formset,
@@ -492,6 +571,7 @@ def create_job(request):
             }
             return render(request, 'job/create-job.html', context)
     else:
+        # Handle unauthorized access
         messages.info(request, 'Permission Denied!')
         return redirect('dashboard')
     

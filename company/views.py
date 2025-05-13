@@ -23,11 +23,59 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
 
+"""
+Company Views Documentation
+
+This module handles all company-related functionality including:
+1. Job Management
+   - Creating and managing job postings
+   - Job fair management
+   - Application tracking
+   - Analytics and reporting
+
+2. Applicant Management
+   - Application status updates
+   - Resume viewing
+   - Communication with applicants
+   - Interview scheduling
+   - Offer management
+
+3. Company Profile Management
+   - Profile updates
+   - Document verification
+   - Address management
+   - Employer profile updates
+
+4. Analytics and Reporting
+   - Job posting performance
+   - Application statistics
+   - Candidate matching analytics
+   - Interview and offer tracking
+
+Key Features:
+- Secure employer verification
+- Comprehensive job management
+- Advanced analytics dashboard
+- Applicant tracking system
+- Integrated messaging system
+- Document management
+- Profile management
+"""
+
 # Create your views here.
 # manage job postings
 
 @login_required(login_url='login')
 def manage_jobs(request):
+    """
+    Job Management Views Documentation:
+
+    These views handle the core job management functionality including:
+    1. Job Posting Management
+    2. Job Fair Management
+    3. Analytics Dashboard
+    4. Applicant Tracking
+    """
     if request.user.is_employer:
         jobs = Job.objects.filter(user=request.user, company=request.user.company)
         
@@ -53,6 +101,29 @@ def manage_job_fair(request):
     
 @login_required(login_url='login')
 def job_analytics(request):
+    """
+    Analytics Dashboard Documentation:
+
+    This view provides comprehensive analytics for:
+    1. Application Statistics
+       - Total applications
+       - Status breakdowns
+       - Conversion rates
+
+    2. Job Performance Metrics
+       - Per-job statistics
+       - Application trends
+       - Interview/offer rates
+
+    3. Candidate Matching
+       - Skill matching analysis
+       - Match quality distribution
+       - Top matching skills
+
+    4. Timeline Analysis
+       - Application trends
+       - 30-day activity tracking
+    """
     if not request.user.is_employer:
         return redirect('login')
     
@@ -222,9 +293,29 @@ def job_analytics(request):
     }
 
     return render(request, 'company/job-analytics.html', context)
-    
+
+"""
+    Applicant Management Documentation:
+
+    This view handles:
+    1. Application Review
+        - Status updates
+        - Interview scheduling
+        - Offer management
+
+    2. Communication
+        - Automated notifications
+        - Email communications
+        - Status update messages
+
+    3. Feedback Management
+        - Acceptance/rejection handling
+        - Feedback collection
+        - Email notifications
+"""    
 @login_required(login_url='login')
 def job_applicants(request, pk):
+    
     if request.user.is_employer:
         job = get_object_or_404(Job, pk=pk)
         applicants = job.application_set.all().order_by('-submit_date')
@@ -481,42 +572,65 @@ def update_employer_profile(request):
         messages.warning(request, 'Permission Denied')
         return redirect('dashboard')
     
+"""
+Company Registration System Overview:
+
+This module handles the company registration process including:
+1. Company Profile Creation
+2. Company Address Management
+3. File Upload Handling (Logo, Documents)
+4. Validation and Error Handling
+
+Key Features:
+- Secure employer verification
+- Address management integration
+- File upload support
+- Form validation
+- Error handling
+- User status management
+"""
+
 # register company
 @login_required(login_url='login')
 def register_company(request):
-
+    # Get current date for form validation
     today = date.today().isoformat() 
     
+    # Ensure user is authenticated
     if not request.user.is_authenticated:
         return redirect('login')
     
+    # Verify user is an employer
     if request.user.is_employer:
+        # Get or initialize company and address instances
         company = Company.objects.get(user=request.user)
         address = company.address
 
-        # Initialize form_errors list
+        # Initialize error collection list
         form_errors = []
 
         if request.method == 'POST':
+            # Handle form submission
+            # Initialize forms with POST data and files
             form = UpdateCompanyForm(request.POST, request.FILES, instance=company)
             address_form = AddressForm(request.POST, instance=address)
 
-            # Validate both forms
+            # Validate both company and address forms
             if form.is_valid() and address_form.is_valid():
-                # Save the company instance
+                # Save company information but don't commit yet
                 var = form.save(commit=False)
                 var.save()
 
-                # Save the address instance and link the user to the address
+                # Save address and link to user
                 address_instance = address_form.save(commit=False)
                 address_instance.user = request.user
                 address_instance.save()
 
-                # Associate address with the company
+                # Link address to company profile
                 company.address = address_instance
                 company.save()
 
-                # Update the user's company status
+                # Update user's company registration status
                 user = request.user
                 user.has_company = True
                 user.save()
@@ -524,28 +638,35 @@ def register_company(request):
                 messages.info(request, 'Your company is now active. You can start creating job ads.')
                 return redirect('company-profile', pk=user.pk)
             else:
-                # Collect errors from both forms
+                # Comprehensive error collection
+                # Collect company form errors
                 if not form.is_valid():
                     for field, errors in form.errors.items():
                         for error in errors:
                             form_errors.append(f"Company {field}: {error}")
                 
+                # Collect address form errors
                 if not address_form.is_valid():
                     for field, errors in address_form.errors.items():
                         for error in errors:
                             form_errors.append(f"Address {field}: {error}")
 
         else:
+            # Handle GET request
+            # Initialize empty forms with existing data
             form = UpdateCompanyForm(instance=company)
             address_form = AddressForm(instance=address)
+            
+            # Prepare context with forms and validation date
             context = {
                 'form': form,
                 'address_form': address_form,
-                'form_errors': form_errors,  # Pass errors to the template
-                'today': today
+                'form_errors': form_errors,  # Pass collected errors to template
+                'today': today  # Pass current date for validation
             }
             return render(request, 'company/update-company.html', context)
     else:
+        # Handle unauthorized access
         messages.warning(request, 'Permission Denied')
         return redirect('dashboard')
 
@@ -594,6 +715,15 @@ def update_application_status(request, pk):
         return redirect('dashboard')
     
 def view_bir(request):
+    """
+    Document Management Documentation:
+
+    These views handle company document verification:
+    1. BIR Document Management
+       - File storage
+       - Access control
+       - Verification status
+    """
     try:
         # Get the BIR file for the company associated with the user
         company = Company.objects.get(user=request.user)
@@ -616,6 +746,20 @@ def view_dti(request):
 
 @login_required
 def start_conversation(request, application_id):
+    """
+    Communication System Documentation:
+
+    These views manage the messaging system between employers and applicants:
+    1. Conversation Management
+       - Thread creation
+       - Message handling
+       - Status notifications
+
+    2. Security Features
+       - Access control
+       - User verification
+       - Conversation privacy
+    """
     application = get_object_or_404(Application, id=application_id)
     
     # Ensure only the employer can initiate the conversation

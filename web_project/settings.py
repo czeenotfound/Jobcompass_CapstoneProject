@@ -249,11 +249,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 UNCOMMENT THE LINES BELOW AND FILL IN THE VALUES
 
 '''
-cloudinary.config(
-    cloud_name = CLOUDNAME,
-    api_key = KEY,
-    api_secret = API,
-)
+# cloudinary.config(
+#     cloud_name = CLOUDNAME,
+#     api_key = KEY,
+#     api_secret = API,
+# )
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 

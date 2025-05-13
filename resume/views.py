@@ -45,16 +45,44 @@ class SocialLinkFormSet(BaseInlineFormSet):
         pass
 
 
+"""
+Resume Creation System Overview:
+
+This module handles the comprehensive resume creation process including:
+1. Personal Information
+2. Contact Details
+3. Skills
+4. Education History
+5. Work Experience
+6. Certifications
+7. Projects
+8. Social Links
+
+Key Features:
+- Multiple form handling with formsets
+- File upload support
+- Address management
+- Profile picture handling
+- Comprehensive validation
+- Error handling for all components
+"""
+
 def create_resume(request):
+    # Ensure user is authenticated
     if not request.user.is_authenticated:
         return redirect('login')
     
+    # Verify user is an applicant
     if request.user.is_applicant:
+        # Get or create resume instance for the user
         resume, created = Resume.objects.get_or_create(user=request.user)
         address = resume.address if resume.address else None
         user = request.user
 
-        # Define formsets
+        # Initialize formsets for all resume components
+        # Each formset allows multiple entries with deletion capability
+        
+        # Skills formset - for technical and soft skills
         ResumeSkillFormSet = inlineformset_factory(
             Resume,
             Skill, 
@@ -63,6 +91,8 @@ def create_resume(request):
             extra=1, 
             can_delete=True
         )
+        
+        # Education formset - for academic history
         ResumeEducationFormSet = inlineformset_factory(
             Resume, 
             Education, 
@@ -71,6 +101,8 @@ def create_resume(request):
             extra=1, 
             can_delete=True
         )
+        
+        # Experience formset - for work history
         ResumeExperienceFormSet = inlineformset_factory(
             Resume, Experience, 
             form=ExperienceForm, 
@@ -78,6 +110,8 @@ def create_resume(request):
             extra=1, 
             can_delete=True
         )
+        
+        # Certification formset - for professional certifications
         ResumeCertificationFormSet = inlineformset_factory(
             Resume, Certification, 
             form=CertificationForm, 
@@ -85,6 +119,8 @@ def create_resume(request):
             extra=1, 
             can_delete=True
         )
+        
+        # Project formset - for portfolio projects
         ResumeProjectFormSet = inlineformset_factory(
             Resume, Project, 
             form=ProjectForm, 
@@ -92,6 +128,8 @@ def create_resume(request):
             extra=1, 
             can_delete=True
         )
+        
+        # Social Links formset - for professional profiles
         ResumeSocialLinkFormSet = inlineformset_factory(
             Resume, SocialLink, 
             form=SocialLinkForm, 
@@ -100,13 +138,16 @@ def create_resume(request):
             can_delete=True
         )
 
-        form_errors = []  # Initialize once
+        form_errors = []  # Initialize error collection list
 
         if request.method == 'POST':
+            # Handle form submission
+            # Initialize all forms with POST data
             form = UpdateResumeForm(request.POST, request.FILES, instance=resume)
             address_form = AddressForm(request.POST, instance=address)
-            
             avatar_phone_form = UpdateAvatarPhoneForm(request.POST, request.FILES, instance=user)
+            
+            # Initialize all formsets with POST data
             skill_formset = ResumeSkillFormSet(request.POST, prefix='skills', instance=resume)
             education_formset = ResumeEducationFormSet(request.POST, prefix='education', instance=resume)
             experience_formset = ResumeExperienceFormSet(request.POST, prefix='experience', instance=resume)
@@ -114,23 +155,27 @@ def create_resume(request):
             project_formset = ResumeProjectFormSet(request.POST, prefix='project', instance=resume)
             sociallink_formset = ResumeSocialLinkFormSet(request.POST, prefix='social_link', instance=resume)
 
+            # Validate all forms and formsets
             if form.is_valid() and address_form.is_valid() and avatar_phone_form.is_valid() and skill_formset.is_valid() and education_formset.is_valid() and experience_formset.is_valid() and certification_formset.is_valid() and project_formset.is_valid() and sociallink_formset.is_valid():
-                # Save all forms and formsets
+                # Save resume but don't commit yet
                 resume_instance = form.save(commit=False)
                 user.has_resume = True
 
+                # Update user's basic information
                 user.first_name = avatar_phone_form.cleaned_data['first_name']
                 user.last_name = avatar_phone_form.cleaned_data['last_name']
                 user.save() 
 
-                
-                # Save the address
+                # Save address information
                 address_instance = address_form.save(commit=False)
                 address_instance.user = user
-
                 address_instance.save()
+                
+                # Link address to resume and save
                 resume_instance.address = address_instance
                 resume_instance.save()
+                
+                # Save all other components
                 avatar_phone_form.save()
                 skill_formset.save()
                 education_formset.save()
@@ -140,9 +185,11 @@ def create_resume(request):
                 sociallink_formset.save()
 
                 messages.info(request, 'Your resume is now active. You can start applying for jobs.')
-                return redirect('applicant-profile', pk=user.pk)  # Redirect to dashboard after success
+                return redirect('applicant-profile', pk=user.pk)
             else:
-                # Append field errors
+                # Comprehensive error collection from all forms
+                
+                # Collect main form errors
                 form_errors.extend(form.errors.values())
                 form_errors.extend(address_form.errors.values())
                 form_errors.extend(avatar_phone_form.errors.values())
@@ -152,7 +199,7 @@ def create_resume(request):
                 form_errors.extend(address_form.non_field_errors())
                 form_errors.extend(avatar_phone_form.non_field_errors())
 
-                # Collect errors from formsets
+                # Helper function to collect formset errors
                 def collect_formset_errors(formset, name):
                     for error in formset.non_form_errors():
                         form_errors.append(f"{name} Error: {error}")
@@ -160,6 +207,7 @@ def create_resume(request):
                         if errors:
                             form_errors.append(f"{name} {i} Error: {errors}")
 
+                # Collect errors from all formsets
                 collect_formset_errors(skill_formset, "Skill")
                 collect_formset_errors(education_formset, "Education")
                 collect_formset_errors(experience_formset, "Experience")
@@ -169,10 +217,13 @@ def create_resume(request):
 
                 messages.warning(request, 'Please correct the errors in your form.')
         else:
-            # Initialize forms and formsets for GET request
+            # Handle GET request
+            # Initialize empty forms and formsets
             form = UpdateResumeForm(instance=resume)
             address_form = AddressForm(instance=address)
             avatar_phone_form = UpdateAvatarPhoneForm(instance=user)
+            
+            # Initialize empty formsets
             skill_formset = ResumeSkillFormSet(prefix='skills', instance=resume)
             education_formset = ResumeEducationFormSet(prefix='education', instance=resume)
             experience_formset = ResumeExperienceFormSet(prefix='experience', instance=resume)
@@ -180,6 +231,7 @@ def create_resume(request):
             project_formset = ResumeProjectFormSet(prefix='project', instance=resume)
             sociallink_formset = ResumeSocialLinkFormSet(prefix='social_link', instance=resume)
 
+        # Prepare context with all forms and errors
         context = {
             'form': form,
             'address_form': address_form,
@@ -194,6 +246,7 @@ def create_resume(request):
         }
         return render(request, 'applicant/create-resume.html', context)
     else:
+        # Handle unauthorized access
         messages.warning(request, 'Permission Denied')
         return redirect('dashboard')
 
